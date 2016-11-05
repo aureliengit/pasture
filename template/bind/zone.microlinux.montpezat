@@ -1,0 +1,30 @@
+; zone.microlinux.montpezat
+$TTL 86400
+$ORIGIN microlinux.montpezat.
+@ IN SOA nestor.microlinux.montpezat. hostmaster.microlinux.montpezat. (
+    2013011600 ; serial 
+    3H         ; refresh
+    15M        ; retry
+    1W         ; expiry
+    1D )       ; minimum
+                         IN NS nestor.microlinux.montpezat.
+nestor                   IN A 192.168.2.1
+mirror.nestor            IN A 192.168.2.1
+dan-services.nestor      IN A 192.168.2.1
+dolibarr.nestor          IN A 192.168.2.1
+kikinovak.nestor         IN A 192.168.2.1
+microlinux.nestor        IN A 192.168.2.1
+oldmicrolinux.nestor     IN A 192.168.2.1
+oldscholae.nestor        IN A 192.168.2.1
+osteo-montpellier.nestor IN A 192.168.2.1
+osteo-sommieres.nestor   IN A 192.168.2.1
+phpinfo.nestor           IN A 192.168.2.1
+radionovak.nestor        IN A 192.168.2.1
+scholae.nestor           IN A 192.168.2.1
+villa-figaret.nestor     IN A 192.168.2.1
+xhtml.nestor             IN A 192.168.2.1
+alphamule                IN A 192.168.2.2
+bernadette               IN A 192.168.2.3
+raymonde                 IN A 192.168.2.4
+buzz                     IN A 192.168.2.6
+bebette                  IN A 192.168.2.7

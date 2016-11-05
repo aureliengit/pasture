@@ -1,0 +1,40 @@
+#!/bin/sh
+# Start/stop/restart the distributed C/C++ compiler server (distccd)
+# Written for Slackware Linux by Erik Jan Tromp
+# Modified by Niki Kovacs <info@microlinux.fr>
+
+distccd_start() {
+  if [ -x /usr/bin/distccd ]; then
+    echo "Starting distributed C/C++ compiler server:  /usr/bin/distccd"
+    PATH=/usr/bin # everything we need is here
+    /usr/bin/distccd --daemon \
+      --allow 192.168.2.0/24 \
+      --listen 192.168.2.1 \
+      --log-file /var/log/distccd \
+      --user nobody
+  fi
+}
+
+distccd_stop() {
+  killall distccd
+}
+
+distccd_restart() {
+  distccd_stop
+  sleep 1
+  distccd_start
+}
+
+case "$1" in
+'start')
+  distccd_start
+  ;;
+'stop')
+  distccd_stop
+  ;;
+'restart')
+  distccd_restart
+  ;;
+*)
+  echo "usage: $0 start|stop|restart"
+esac
