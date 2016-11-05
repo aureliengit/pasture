@@ -1,0 +1,25 @@
+# Remove these packages on a standard KDE desktop
+PackageKit
+akregator
+amarok
+choqok
+kdepim4
+kget
+kmahjongg
+kmail
+kmines
+konqueror
+kontact
+konversation
+kopete
+kpat
+kreversi
+krdc
+krfb
+ksudoku
+ktorrent
+kwalletmanager
+linux32
+marble
+synaptiks
+yast2-vm

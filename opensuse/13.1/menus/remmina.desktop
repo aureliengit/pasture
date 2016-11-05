@@ -1,0 +1,14 @@
+[Desktop Entry]
+GenericName=Remote Desktop
+GenericName[de]=Entfernter Rechner
+GenericName[fr]=Bureau distant
+Name=Remmina
+Version=1.0
+TryExec=remmina
+Exec=remmina
+Icon=remmina
+Terminal=false
+Type=Application
+Categories=GTK;GNOME;X-GNOME-NetworkSettings;Network;RemoteAccess;GTK;
+
+

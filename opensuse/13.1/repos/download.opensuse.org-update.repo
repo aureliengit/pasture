@@ -1,0 +1,8 @@
+[download.opensuse.org-update]
+name=Main Update Repository
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/13.1/
+path=/
+type=rpm-md
+keeppackages=0

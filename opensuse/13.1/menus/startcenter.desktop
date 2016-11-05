@@ -1,0 +1,18 @@
+[Desktop Entry]
+GenericName=Office Suite
+GenericName[de]=Bürosuite
+GenericName[fr]=Suite bureautique
+Name=LibreOffice
+Version=1.0
+Terminal=false
+#NoDisplay=true
+Icon=libreoffice-startcenter
+Type=Application
+Categories=Office;X-Red-Hat-Base;X-SuSE-Core-Office;
+Exec=libreoffice %U
+MimeType=application/vnd.openofficeorg.extension;
+StartupNotify=true
+X-GIO-NoFuse=true
+StartupWMClass=libreoffice-startcenter
+X-KDE-Protocols=file,http,smb,ftp,webdav
+

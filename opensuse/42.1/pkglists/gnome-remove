@@ -1,0 +1,4 @@
+# Remove these packages on a standard GNOME desktop
+gnome-documents
+gnome-packagekit
+gnome-software

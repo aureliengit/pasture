@@ -1,0 +1,97 @@
+=============
+Desktop HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=============
+
+Dernière révision : 13 octobre 2014
+
+Ce HOWTO décrit l'installation d'un poste de travail sous openSUSE 13.1.
+
+
+Support d'installation
+----------------------
+
+L'installation s'effectuera avec le DVD standard :
+
+  * openSUSE-13.1-DVD-x86_64.iso
+
+
+Installation
+------------
+
+Au démarrage, appuyer sur [F2] pour choisir la langue.
+
+[ ] Proposer une partition personnelle (home) séparée. --> décocher
+
+Créer la configuration des partitions.
+
+Utiliser la totalité du disque dur.
+
+[ ] Login automatique. --> décocher
+
+Activer l'amorçage depuis le MBR.
+
+Désactiver l'amorçage depuis la partition "/".
+
+Dans la configuration du pare-feu, ouvrir le port 22 pour SSH.
+
+À l'issue du premier redémarrage, effectuer la mise à jour initiale.
+
+
+Gestion des noms d'hôtes
+------------------------
+
+Si l'on dispose d'un serveur Dnsmasq local pour gérer les noms d'hôtes de
+façon centralisée, il n'y a rien de plus à faire. Dans la configuration par
+défaut, un client DHCP openSUSE reçoit son nom d'hôte du serveur.
+
+
+Système invité VirtualBox
+-------------------------
+
+Si l'on installe openSUSE dans une machine virtuelle, les drivers graphiques
+sont obsolètes, ce qu'on ressent notamment dans certains effets graphiques non
+supportés. La solution consiste ici à supprimer les drivers empaquetés et à en
+construire une nouvelle panoplie à la main.
+
+Installer une poignée d'outils de compilation :
+
+  # zypper install dkms gcc make kernel-devel
+
+Supprimer les drivers installés d'office :
+
+  # rpm -qa | grep virtualbox-guest | xargs rpm -e
+
+Monter le périphérique virtuel contenant les Additions Invité :
+
+  # mount /dev/cdrom /mnt
+  # cd /mnt
+  # ./VBoxLinuxAdditions.run
+
+Redémarrer pour utiliser les nouveaux drivers.
+
+
+Peaufiner l'installation
+------------------------
+
+Récupérer les scripts d'installation :
+
+  # cd
+  # git clone https://github.com/kikinovak/opensuse
+
+Lancer la configuration automatique :
+
+  # cd opensuse/13.1/scripts
+  # ./emmenager.sh
+
+Ce script se charge de plusieurs choses :
+
+  1. Agrémenter la console : Bash, XTerm, Vim
+  2. Configurer les dépôts de paquets
+  3. Supprimer les paquets inutiles
+  4. Installer une panoplie de paquets supplémentaires
+
+
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

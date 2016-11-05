@@ -1,0 +1,14 @@
+# Add these packages on a standard KDE desktop
+MozillaThunderbird
+MozillaThunderbird-translations-common
+clementine
+filezilla
+gftp
+gtk3-engine-oxygen 
+gtk3-theme-oxygen
+irssi
+pidgin
+pidgin-otr
+remmina
+transmission-gtk
+

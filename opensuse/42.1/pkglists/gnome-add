@@ -1,0 +1,23 @@
+# Add these packages on a standard KDE desktop
+elementary-icon-theme
+evince
+git
+gnome-tweak-tool
+libreoffice-gnome
+libreoffice-l10n-de
+libreoffice-l10n-fr
+p7zip
+unrar
+##MozillaThunderbird
+#MozillaThunderbird-translations-common
+#clementine
+#filezilla
+#gftp
+#gtk3-engine-oxygen 
+#gtk3-theme-oxygen
+#irssi
+#pidgin
+#pidgin-otr
+#remmina
+#transmission-gtk
+

@@ -1,0 +1,8 @@
+[download.opensuse.org-oss]
+name=Dépôt principal (OSS)
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/distribution/leap/42.1/repo/oss/
+path=/
+type=yast2
+keeppackages=0

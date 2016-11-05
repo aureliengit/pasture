@@ -1,0 +1,8 @@
+[download.opensuse.org-13.1-non-oss]
+name=Update Repository (Non-Oss)
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/13.1-non-oss/
+path=/
+type=rpm-md
+keeppackages=0

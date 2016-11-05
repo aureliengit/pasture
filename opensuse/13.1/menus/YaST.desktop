@@ -1,0 +1,11 @@
+[Desktop Entry]
+GenericName=Control Center
+GenericName[de]=Systemeinstellungen
+GenericName[fr]=Panneau de configuration
+Name=YaST
+Type=Application
+Categories=Settings;System;X-SuSE-Core-System;X-SuSE-ControlCenter-System;X-GNOME-SystemSettings;
+Icon=yast
+Exec=/usr/bin/xdg-su -c /sbin/yast2
+Encoding=UTF-8
+

@@ -1,0 +1,13 @@
+[Desktop Entry]
+GenericName=FTP Client
+GenericName[de]=FTP-Programm
+GenericName[fr]=Téléchargement FTP
+Name=gFTP
+Encoding=UTF-8
+Exec=gftp %u
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=gftp.png
+Categories=Network;FileTransfer;
+StartupNotify=true
