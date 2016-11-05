@@ -1,0 +1,120 @@
+============
+ZentyalHOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+============
+
+Dernière révision : 29 janvier 2014
+
+Ce HOWTO décrit l'installation d'un serveur Zentyal 3.3.
+
+
+Installation
+------------
+
+Créer un compte 'administrateur'.
+
+
+Premier login
+-------------
+
+Ouvrir l'interface d'administration dans un navigateur :
+
+  https://serveur_zentyal
+
+Ignorer l'installation initiale des modules.
+
+Effectuer la mise à jour initiale du système.
+
+  /!\ Ignorer le message d'erreur concernant une "mauvaise référence HTTP".
+
+Mettre à jour les composants de base de Zentyal.
+
+
+Réseau
+------
+
+Installer les modules réseau :
+
+  * Network Configuration
+  * Network Objects
+  * Network Services
+
+Activer les modules :
+
+  * Réseau
+  * Events
+  * Journaux
+
+Configurer les interfaces réseau eth0 et eth1.
+
+Définir l'interface externe (WAN).
+
+Définir une passerelle. Pour la nommer, on utilisera uniquement des lettres
+minuscules, comme 'nestor' ou 'livebox'. 
+
+Définir un serveur DNS provisoire.
+
+Définir un domaine de recherche, par exemple 'sandbox.local'.
+
+
+Pare-feu
+--------
+
+Installer le module 'Firewall'.
+
+Règles de filtrage depuis les réseaux externes vers Zentyal :
+
+  1. Refuser tous les services pour tout le monde.
+  2. Accepter le service 'Zentyal Administration' depuis l'extérieur.
+
+  /!\ Pour plus de sécurité, on peut restreindre l'accès depuis l'extérieur à
+  une ou deux adresses IP fixes.
+
+Activer le module et enregistrer les modifications.
+
+  3. Éventuellement, ouvrir le protocole ICMP et le port 22 pour SSH.
+
+Règles de filtrage depuis les réseaux internes vers Zentyal : 
+
+  1. Tout bloquer.
+  2. Ouvrir le service 'Zentyal Administration'.
+  3. Ouvrir SSH.
+  4. Ouvrir le protocole ICMP.
+
+
+DNS
+---
+
+Installer le module 'DNS Service'.
+
+  [X] Activer le cache DNS transparent.
+
+Éventuellement, ajouter un forwarder.
+
+Ajouter un domaine, par exemple 'sandbox.local'. Configurer ce domaine.
+
+Activer le module et enregistrer les modifications.
+
+
+DHCP
+----
+
+Installer le module 'DHCP Service'.
+
+Choisir l'interface sur laquelle le service devra s'exécuter.
+
+Passerelle par défaut : Zentyal
+
+Recherche d'un domaine : Domaine Zentyal > sandbox.local
+
+Serveur de nom primaire : DNS local de Zentyal
+
+Définir une plage d'attribution DHCP.
+
+Enregistrer les modifications et activer le module.
+
+
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
+# vim: set encoding=latin1
