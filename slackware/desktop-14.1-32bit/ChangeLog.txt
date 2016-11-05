@@ -1,0 +1,162 @@
+Sun Feb  1 12:03:44 CET 2015
+multimedia/flashplayer-plugin-11.2.202.440-i386-1_microlinux.txz: Upgraded.
++--------------------------+
+Fri Jan 30 13:34:26 CET 2015
+multimedia/flashplayer-plugin-11.2.202.438-i386-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Jan 24 09:50:07 CET 2015
+xap/simple-scan-2.32.0.2-i486-1_microlinux.txz: Removed.
+	Simple Scan 2.32 doesn't store settings correctly, which is a showstopper.
+	More recent versions are a PITA to build, so we recommend using XSane, which
+	is already shipping with Slackware. Tagfiles will be modified accordingly.
++--------------------------+
+Sun Jan 18 10:41:33 CET 2015
+multimedia/libcuefile-r475-i486-1_microlinux.txz: Added.
+multimedia/gst-plugins-bad-0.10.23-i486-1_microlinux.txz: Added.
+multimedia/gst-plugins-ugly-0.10.19-i486-2_microlinux.txz: Added.
+multimedia/gst-ffmpeg-0.10.13-i486-2_microlinux.txz: Added.
+multimedia/gst1-plugins-good-1.4.1-i486-1_microlinux.txz: Added.
+multimedia/gst1-libav-1.4.1-i486-1_microlinux.txz: Added.
+  Extra runtime dependencies for Brasero to handle some multimedia stuff.
+locale/mozilla-firefox-langpack-31.4.0-i486-1_microlinux.txz: Upgraded.
+locale/mozilla-thunderbird-langpack-31.4.0-i486-1_microlinux.txz: Upgraded.
++--------------------------+
+Wed Jan 14 09:29:27 CET 2015
+MLED 14.1 32-bit is released! 
+
+Third time's the charm. This is a complete respin, based on the Xfce desktop
+environment, with many changes under the hood. 
+
+For more information, check out http://www.microlinux.fr/mled.php and read the
+files 'RELEASE-NOTES.txt', 'MLED-HOWTO.txt', 'MIGRATION-HOWTO.txt' and
+'FAQ.txt' in the current directory.
+
+Have fun!
++--------------------------+
+Fri Jan  9 08:01:36 CET 2015
+l/libupnp-1.6.17-i486-1_microlinux.txz: Added.
+l/cryptopp-5.6.2-i486-1_microlinux.txz: Added.
++--------------------------+
+Thu Jan  8 10:17:33 CET 2015
+xfce/luna-wallpapers-0.2-noarch-1_microlinux.txz: Added.
++--------------------------+
+Wed Jan  7 12:31:42 CET 2015
+xap/simple-scan-2.32.0.2-i486-1_microlinux.txz: Added.
+l/imlib2-1.4.6-i486-1_microlinux.txz: Added.
+d/scons-2.3.4-i486-1_microlinux.txz: Added.
+l/tolua++-1.0.93-i486-1_microlinux.txz: Added.
+xap/conky-1.9.0-i486-1_microlinux.txz: Added.
+xfce/xfce4-xkb-plugin-0.5.6-i486-1_microlinux.txz: Added.
+xfce/xfce4-notes-plugin-1.7.7-i486-1_microlinux.txz: Added.
++--------------------------+
+Tue Jan  6 10:14:18 CET 2015
+l/wxGTK-2.8.12-i486-1_microlinux.txz: Removed.
+l/wxPython-2.8.12.1-i486-1_microlinux.txz: Added.
+xap/audacity-2.0.6-i486-2_microlinux.txz: Rebuilt.
+l/pyxdg-0.25-i486-1_microlinux.txz: Added.
+xap/openshot-1.4.3-i486-2_microlinux.txz: Rebuilt.
+gnome/gtkmm3-3.8.1-i486-1_SBo.txz: Removed.
+gnome/gnote-3.10.3-i486-1_microlinux.txz: Removed.
+xfce/ristretto-0.6.3-i486-1_microlinux.txz: Removed.
+profile/user-settings-xfce-1.0-noarch-1_microlinux.txz: Added.
+ap/slackpkg+-1.3.2-noarch-2_microlinux.txz: Added.
++--------------------------+
+Sun Jan  4 11:29:37 CET 2015
+xap/leafpad-0.8.18.1-i486-1_microlinux.txz: Added.
+xap/galculator-2.1.3-i486-1_microlinux.txz: Added.
+xap/catfish-0.3.2-noarch-1_microlinux.txz: Added.
+gnome/gtkmm3-3.8.1-i486-1_SBo.txz: Added.
+gnome/gnote-3.10.3-i486-1_microlinux.txz: Added.
++--------------------------+
+Sat Jan  3 11:56:27 CET 2015
+gnome/evince-3.12.2-i486-1_microlinux.txz: Added.
+gnome/gmtk-1.0.8-i486-1_microlinux.txz: Added.
+gnome/gnome-mplayer-1.0.8-i486-1_microlinux.txz: Added.
+d/numpy-1.9.1-i486-1_microlinux.txz: Added.
+l/BeautifulSoup-3.2.1-i486-1_microlinux.txz: Added.
+l/gsl-1.16-i486-1_microlinux.txz: Added.
+l/lxml-3.4.0-i486-1_microlinux.txz: Added.
+xap/inkscape-0.48.5-i486-1_microlinux.txz: Added.
+xap/openshot-1.4.3-i486-1_microlinux.txz: Added.
+xap/transmission-2.84-i486-1_microlinux.txz: Added.
+xap/scribus-1.4.4-i486-1_microlinux.txz: Added.
+xfce/ristretto-0.6.3-i486-1_microlinux.txz: Added.
+xfce/xarchiver-0.5.4-i486-1_microlinux.txz: Added.
+xfce/thunar-archive-plugin-0.3.1-i486-1_microlinux.txz: Added.
+multimedia/cddb-py-1.4-i486-1_microlinux.txz: Added.
++--------------------------+
+Fri Jan  2 20:04:43 CET 2015
+gnome/libsigc++-2.2.11-i486-1_microlinux.txz: Added.
+gnome/glibmm-2.36.2-i486-1_microlinux.txz: Added.
+gnome/cairomm-1.10.0-i486-1_microlinux.txz: Added.
+gnome/pangomm-2.34.0-i486-1_microlinux.txz: Added.
+gnome/atkmm-2.22.7-i486-1_microlinux.txz: Added.
+gnome/mm-common-0.9.6-noarch-1_microlinux.txz: Added.
+gnome/gtkmm-2.24.4-i486-1_microlinux.txz: Added.
+gnome/goocanvas-0.15-i486-1_microlinux.txz: Added.
+gnome/pygoocanvas-0.14.1-i486-1_microlinux.txz: Added.
+gnome/totem-pl-parser-3.4.5-i486-1_microlinux.txz: Added.
+gnome/libunique-1.1.6-i486-1_microlinux.txz: Added.
+multimedia/lame-3.99.5-i486-1_microlinux.txz: Added.
+multimedia/x264-20131101-i486-1_microlinux.txz: Added.
+multimedia/libmp4v2-2.0.0-i486-1_microlinux.txz: Added.
+multimedia/faac-1.28-i486-1_microlinux.txz: Added.
+multimedia/frei0r-1.4-i486-1_microlinux.txz: Added.
+multimedia/xvidcore-1.3.3-i486-1_microlinux.txz: Added.
+multimedia/ffmpeg-2.1.5-i686_custom-1_microlinux.txz: Added.
+multimedia/libcdaudio-0.99.12p2-i486-1_microlinux.txz: Added.
+multimedia/libdvdnav-4.2.0-i486-1_microlinux.txz: Added.
+multimedia/faad2-2.7-i486-1_microlinux.txz: Added.
+multimedia/a52dec-0.7.4-i486-1_microlinux.txz: Added.
+multimedia/libmpeg2-0.5.1-i486-1_microlinux.txz: Added.
+multimedia/libdv-1.0.0-i486-1_microlinux.txz: Added.
+multimedia/mplayer-codecs32-20110131-i486-1_microlinux.txz: Added.
+multimedia/libdvdcss-1.2.13-i486-1_microlinux.txz: Added.
+multimedia/flashplayer-plugin-11.2.202.425-i386-1_microlinux.txz: Added.
+multimedia/libquicktime-1.2.4-i486-1_microlinux.txz: Added.
+multimedia/id3lib-3.8.3-i486-1_microlinux.txz: Added.
+d/orc-0.4.22-i486-1_microlinux.txz: Added.
+multimedia/gstreamer1-1.4.1-i486-1_microlinux.txz: Added.
+multimedia/gst1-plugins-base-1.4.1-i486-1_microlinux.txz: Added.
+multimedia/gst1-plugins-bad-1.4.1-i486-1_microlinux.txz: Added.
+d/lua-5.1.5-i486-1_microlinux.txz: Added.
+multimedia/mlt-0.9.0-i486-1_microlinux.txz: Added.
+xap/MPlayer-1.1.1-i486-1_microlinux.txz: Added.
+xap/asunder-2.5-i486-1_microlinux.txz: Added.
+xap/audacious-3.4.2-i486-1_microlinux.txz: Added.
+xap/audacious-plugins-3.4.2-i486-1_microlinux.txz: Added.
+gnome/libgnomecups-0.2.3-i486-1_microlinux.txz: Added.
+gnome/libgnomeprint-2.18.8-i486-1_microlinux.txz: Added.
+gnome/libgnomeprintui-2.18.6-i486-1_microlinux.txz: Added.
+l/wxGTK-2.8.12-i486-1_microlinux.txz: Added.
+xap/audacity-2.0.6-i486-1_microlinux.txz: Added.
+l/libburn-1.3.8-i486-1_microlinux.txz: Added.
+l/libisofs-1.3.8-i486-1_microlinux.txz: Added.
+gnome/brasero-3.11.4-i486-1_microlinux.txz: Added.
++--------------------------+
+Thu Jan  1 16:01:03 CET 2015
+	Work on the Xfce-based MLED 14.1 Reloaded is starting with the new year.
+profile/user-settings-console-1.0-noarch-1_microlinux.txz: Added.
+ap/p7zip-9.20.1-i486-1_microlinux.txz: Added.
+ap/recode-3.7_beta2-i486-1_microlinux.txz: Added.
+ap/sbopkg-0.37.0-noarch-1_microlinux.txz: Added.
+ap/unrar-5.0.14-i486-1_microlinux.txz: Added.
+gnome/gtk-engines-2.20.2-i486-1_microlinux.txz: Added.
+gnome/libgnomecanvas-2.30.3-i486-1_microlinux.txz: Added.
+gnome/gdm-2.20.11-i486-1_microlinux.txz: Added.
+xfce/aero-1.0-noarch-1_microlinux.txz: Added.
+xfce/clearlooks-phenix-theme-20131228-noarch-1_microlinux.txz: Added.
+xfce/xfwm4-theme-axe-1.0-noarch-1_microlinux.txz: Added.
+xfce/elementary-xfce-20141217-noarch-1_microlinux.txz: Added.
+xfce/microlinux-wallpapers-1.0-noarch-1_microlinux.txz: Added.
+x/google-droid-fonts-20100409-noarch-1_microlinux.txz: Added.
+x/webcore-fonts-3.0-noarch-1_microlinux.txz: Added.
+x/eurostile-fonts-1.0-noarch-1_microlinux.txz: Added.
+d/acpica-20141107-i486-1_microlinux.txz: Added.
+d/jdk-7u71-i586-1_microlinux.txz: Added.
+xap/libreoffice-4.2.8-i586-1_microlinux.txz: Added.
+locale/libreoffice-langpack-fr-4.2.8-i586-1_microlinux.txz: Added.
+locale/libreoffice-langpack-de-4.2.8-i586-1_microlinux.txz: Added.
+locale/mozilla-firefox-langpack-31.3.0-i486-1_microlinux.txz: Added.
+locale/mozilla-thunderbird-langpack-31.3.0-i486-1_microlinux.txz: Added.
++--------------------------+

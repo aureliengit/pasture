@@ -1,0 +1,88 @@
+============
+LiveCD HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+============
+
+Dernière révision : 5 février 2015
+
+Ce HOWTO décrit la confection d'un LiveCD MLED.
+
+
+Installation
+------------
+
+Installer MLED dans une machine virtuelle :
+
+  * 40 Go d'espace disque
+  * 3 Go de RAM
+
+Partitionnement :
+
+  * une seule partition Linux, formatée en ext4
+  * pas de partition swap
+
+LILO : Frame Buffer 1024x768
+
+Options 'nomodeset quiet ipv6.disable=1'
+
+Nom d'hôte : mled-live.microlinux.fr
+
+Réseau : DHCP
+
+
+Outils de construction
+----------------------
+
+Aller sur le site des Slackware Live Scripts :
+
+  * http://slackware-live.tuxfamily.org
+
+Télécharger et installer les paquets :
+
+  * slackware-live
+  * squashfs
+  * unionfs-fuse
+
+
+Configuration
+-------------
+
+Localiser le système en anglais : en_US.utf8
+
+Peaufiner LILO tout en restant sur le kernel 'huge-smp'.
+
+Ajouter un utilisateur 'livecduser' avec le mot de passe 'microlinux'. 
+
+Installer les Additions Invité de VirtualBox et redémarrer. La présence des
+modules correspondants permettra au LiveCD d'afficher correctement
+l'environnement graphique dans une machine virtuelle. 
+
+Définir la disposition du clavier pour le serveur graphique.
+
+Faire un peu de ménage dans le système, supprimer les paquets qui ne servent à
+rien :
+
+  * 
+
+Supprimer les fichiers de périphériques persistants :
+
+  # cd /etc/udev/rules.d
+  # rm 70-persistent-*
+  # rm 60-vboxadd.rules
+
+
+Construction du système Live
+----------------------------
+
+Lancer le script 'build-slackware-live.sh' avec les paramètres suivants :
+
+  # build-slackware-live.sh --init / /tmp/live
+  # build-slackware-live.sh --module / /tmp/live 0-slackware-live -xz
+  # build-slackware-live.sh --iso /tmp/live /tmp/slackware-live.iso
+
+Sur un Quad Core, ça mouline un peu plus de dix minutes.
+
+Pour finir, graver le fichier 'slackware-live.iso'.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

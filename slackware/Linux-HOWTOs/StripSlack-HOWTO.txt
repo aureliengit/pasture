@@ -1,0 +1,168 @@
+================
+StripSlack HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 29 novembre 2014
+
+Ce HOWTO décrit l'installation d'un système Slackware 14.1 minimal. Le nom
+StripSlack est plus ou moins inspiré de ZipSlack, une configuration minimale
+de Slackware que Patrick Volkerding fournissait jusqu'à la version 11.0.
+
+
+Introduction
+------------
+
+Certaines distributions comme CentOS, Debian, Arch, Crux, Gentoo, LFS, etc.
+permettent assez facilement d'installer un système de base relativement
+réduit, pour ensuite ajouter successivement les composants dont on peut avoir
+besoin pour une configuration spécifique : serveur Web, serveur mail, station
+de travail, poste de travail léger, etc.
+
+La distribution Slackware est organisée différemment, et ses groupes de
+paquets mélangent pêle-mêle les composants requis par un système minimal avec
+ceux que l'on choisirait pour une configuration plus spécifique. La politique
+standard de Slackware requiert l'installation "à la louche" des différents
+groupes de paquets, à plus forte raison que la distribution ne dispose pas de
+résolveur automatique de dépendances. 
+
+Ceci étant dit, il est bien évidemment possible de configurer un système de
+base réduit tout comme dans les distributions citées ci-dessus, et c'est ce
+que nous nous proposons de faire. 
+
+
+Qu'est-ce qu'un système minimal ?
+---------------------------------
+
+Lorsque deux personnes parlent de "système minimal", elles ne veulent pas
+forcément dire la même chose. Un système Linux embarqué disposera tout au plus
+d'un kernel, d'une bibliothèque C, d'un shell et d'une poignée d'outils. À
+l'opposé de cela, l'installation du groupe "Système de base" sur un système
+RHEL/CentOS résultera en un système bien complet, avec toute une panoplie bien
+fournie de shells, d'éditeurs et d'outils d'administration divers et variés. 
+
+Un système de base, c'est un peu l'équivalent informatique de la pâte à crêpe.
+Pas de confiture, pas de miel, pas de Nutella, rien. Pas de jambon ni de
+fromage non plus. Juste une préparation de base qui pourra servir à une
+multitude de plats, sucrés ou salés.
+
+Que souhaitons nous faire avec notre système de base ?
+
+  * Démarrer en mode console
+  * Utiliser le shell Bash
+  * Éditer des fichiers texte avec Vim
+  * Afficher les pages man et info
+  * Gérer les disques et les systèmes de fichiers
+  * Construire un initrd
+  * Créer des utilisateurs
+  * Nous connecter à un réseau
+  * Gérer les paquets logiciels via le réseau
+  * Nous connecter à distance avec SSH
+  * Travailler avec l'outil de développement Git
+  * Compiler des applications 
+  * Naviguer sur le Web en mode texte
+
+L'ambition de StripSlack consiste à fournir toutes ces fonctionnalités sans
+toutefois s'encombrer de tout le fatras de bibliothèques et/ou d'utilitaires
+qui ne sont pas strictement nécessaires.
+
+
+Installation
+------------
+
+Pour éviter la corvée de sélectionner manuellement chaque paquet, la méthode
+d'installation recommandée est d'utiliser la collection de tagfiles fournis.
+Il s'agit là d'une série de fichiers au format texte simple, censés
+automatiser le processus de sélection des paquets, un peu comme une version
+simplifiée des fichiers Kickstart de Red Hat Enterprise Linux.
+
+Démarrez sur le support d'installation de Slackware (DVD, premier CD-Rom, clé
+USB). Sélectionnez votre disposition clavier, connectez-vous en tant que root
+et partitionnez le disque dur, mais ne démarrez pas encore l'installateur.
+
+Activez le réseau, par exemple :
+
+  root@slackware:/# dhcpcd eth0 
+
+L'environnement d'installation Slackware fournit déjà un répertoire '/tag'
+vide, censé recevoir un jeu de tagfiles. On va donc l'utiliser.
+
+  # cd /tag 
+
+Téléchargez les tagfiles depuis le serveur :
+
+  # wget http://www.microlinux.fr/slackware/stripslack-14.1/tagfiles.tar.gz 
+
+Décompressez l'archive téléchargée :
+
+  # tar xvzf tagfiles.tar.gz 
+
+Le répertoire '/tag' contient à présent une série de répertoires qui
+correspondent aux jeux de paquets Slackware :
+
+  # ls 
+  a/ ap/ d/ e/ f/ k/ kde/ kdei/ l/ n/ t/ tcl/ x/ xap/ xfce/ y/
+
+Lancez l'installateur Slackware :
+
+  # setup 
+
+PACKAGE SERIES SELECTION : confirmez la sélection de paquets par défaut, étant
+donné que les tagfiles vont prendre le dessus et se charger de la sélection
+des paquets. 
+
+SELECT PROMPTING MODE : tagpath - Utiliser un jeu de tagfiles personnalisés.
+
+Path to tagfiles : /tag
+
+À partir de là, procédez comme à l'accoutumée.
+
+
+Premier redémarrage
+-------------------
+
+Voici ce que l'on peut faire après le redémarrage initial :
+
+  1. Choisir un miroir de téléchargement pour 'slackpkg'.
+
+  2. Effectuer la mise à jour initiale.
+
+  3. Construire un initrd.
+
+  4. Basculer vers le noyau GENERIC.
+
+
+Élaguer une installation existante
+----------------------------------
+
+Le script 'scriptslack.sh' peut se charger d'élaguer un système Slackware
+Linux existant. Il utilise 'slackpkg', qui doit donc être configuré au
+préalable :
+
+  # cd stripslack-14.1
+  # ./stripslack.sh
+
+Attention, ce script écorche votre hamster à vif. :o)
+
+
+Documentation
+-------------
+
+Le livre de la distribution "Linux From Scratch" :
+
+  * http://www.linuxfromscratch.org/lfs/view/stable/
+
+La traduction française de ce dernier :
+
+  * http://www.fr.linuxfromscratch.org/view/lfs-stable/
+
+L'article "Linux From Slack" du site Slackware-fr.org :
+
+  * http://wiki.slackware-fr.org/installation:articles:linux_from_slack
+
+La page "Minimal Slackware Installation" de Vincent Batts :
+
+  * http://www.slackware.com/~vbatts/minimal/
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

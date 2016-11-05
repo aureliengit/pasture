@@ -1,0 +1,315 @@
+===============================
+Beyond Linux From Slack 1 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+===============================
+
+Dernière révision : 2 décembre 2014
+
+Ce HOWTO décrit la construction couche par couche de Slackware Linux 14.1
+en partant d'une installation minimaliste telle qu'elle est décrite dans le
+"Linux From Slackware HOWTO". 
+
+
+  * Introduction
+  * Objectifs
+  * Gestion des paquets
+  * L'éditeur Vim
+  * La documentation en ligne
+
+  * Vue d'ensemble sur les paquets
+
+
+Introduction
+------------
+
+L'objectif de ce HOWTO est de vous faire bâtir un système Linux Slackware
+couche par couche, en dégageant pour chaque fonctionnalité le lot de paquets
+nécessaires et en détaillant le rôle respectif de ceux-ci. 
+
+Au-delà de l'intérêt pédagogique de la démarche, ce document peut également
+servir de guide aux administrateurs chevronnés qui souhaitent constituer une
+bonne base minimaliste pour personnaliser leur système. 
+
+
+Objectifs
+---------
+
+Pour l'instant, notre système réduit au minimum syndical est fonctionnel dans
+la mesure où une poule est capable de voler et un cheval de nager. Notre
+prochain objectif consiste à étendre ses capacités de la sorte :
+
+  1.  Démarrer en mode console
+
+  2.  Utiliser le shell Bash
+
+  3.  Éditer des fichiers texte avec Vim
+
+  4.  Afficher les pages man et info
+
+  5.  Gérer les disques et les systèmes de fichiers
+
+  6.  Construire un initrd
+
+  7.  Nous connecter à un réseau
+
+  8.  Gérer les paquets logiciels via le réseau
+
+  9.  Nous connecter à distance avec SSH
+
+  10. Travailler avec l'outil de développement Git
+
+
+Gestion des paquets
+-------------------
+
+Nous ne disposons pour l'instant que du seul gestionnaire de paquets
+'pkgtools', et nous n'avons pas encore de réseau. Nous devons donc installer
+les paquets localement à partir d'un CD-Rom, d'un DVD ou d'une clé USB. Par
+exemple :
+
+  # mount /dev/cdrom /mnt/cdrom
+  # cd /mnt/cdrom/slackware/ap
+  # installpkg vim-7.4.050-i486-1.txz
+
+
+L'éditeur Vim
+-------------
+
+Notre système minimal ne dispose que d'une version minimale de l'éditeur Vi.
+Nous allons installer Vim pour plus de confort.
+
+  * ap/vim
+
+Lorsque nous essayons de démarrer Vim, nous obtenons le message d'erreur
+suivant :
+
+  # vim
+  vim: error while loading shared libraries: libperl.so: cannot open shared
+  object file: No such file or directory
+
+Nous allons installer Perl pour remédier à cela :
+
+  * d/perl
+
+Une nouvelle tentative se solde par un nouveau message d'erreur, différent du
+premier :
+
+  # vim
+  vim: error while loading shared libraries: libpython2.7.so.1.0: cannot open
+  shared object file: No such file or directory
+
+Il faut donc installer Python :
+
+  * d/python
+
+
+La documentation en ligne
+-------------------------
+
+La commande 'man' est fournie par le paquet du même nom :
+
+  * ap/man
+
+Les pages correspondantes se trouvent dans un paquet à part :
+
+  * ap/man-pages
+
+Essayons d'afficher la page man de la commande elle-même :
+
+  # man man
+  sh: /usr/bin/gtbl: No such file or directory
+  sh: /usr/bin/nroff: No such file or directory
+  sh: /usr/bin/less: No such file or directory
+
+Les deux premières commandes sont des outils de formatage de texte contenus
+dans le paquet 'groff' :
+
+  * ap/groff
+
+La troisième commande, c'est le visualiseur 'less' :
+
+  * a/less
+
+Essayons encore :
+
+  # man man
+  /usr/bin/gtbl: error while loading shared libraries: libstdc++.so.6: cannot
+  open shared object file: No such file or directory
+
+Ces bibliothèques partagées sont fournies par le paquet 'cxxlibs' :
+
+  * a/cxxlibs
+
+La commande 'info' est fournie par le paquet 'texinfo' :
+
+  * ap/texinfo
+
+Faisons un test :
+
+  # info info
+
+Enfin, les deux paquets 'linux-faqs' et 'linux-howtos' contiennent une
+collection de tutoriaux sur des sujets spécifiques :
+
+  * f/linux-faqs
+  * f/linux-howtos
+
+Une fois que ces deux paquets sont installés, leur contenu est accessible dans
+les répertoires respectifs '/usr/doc/Linux-FAQs' et '/usr/doc/Linux-HOWTOs'.
+
+
+Vue d'ensemble sur les paquets
+------------------------------
+
+  * cxxlibs : bibliothèques assurant la compatibilité des applications liées
+    à de plus anciennes versions de la bibliothèque standard C++ avec celle
+    utilisée par le système
+
+  * a/less : visualiseur de fichiers texte
+
+  * ap/groff : programmes de formatage de texte, utilisés principalement pour
+    les pages man
+
+  * ap/man : programmes pour rechercher et afficher des pages man
+
+  * ap/man-pages : les pages man du Linux Documentation Project (LDP) en
+    version originale
+
+  * ap/vim : l'éditeur de texte Vim
+
+  * d/perl : langage pratique d'extraction et de rapport
+
+  * d/python : l'environnement de développement Python
+
+  * f/linux-faqs : collection de questions et de réponses autour de Linux,
+    passablement obsolète par endroits
+
+  * f/linux-howtos : Les HOWTOs du Linux Documentation Project TLDP, qui
+    datent également un peu
+
+
+
+################ ANNEXE (travail en cours) #####################
+
+
+  * a/acl : outils d'administration des listes de contrôle d'accès
+
+  * a/attr : outils de gestion des attributs étendus
+
+  * a/bzip2 : commandes pour compresser et décompresser des données au format
+    éponyme
+
+  * a/cpio : format d'archivage permettant de créer des paquets RPM, également
+    requis pour pouvoir créer l'initrd nécessaire à l'emploi d'un noyau
+    générique
+
+  * a/dialog : utilitaire permettant de créer des interfaces graphiques en
+    mode texte à partir de scripts shell, utilisé par la plupart des outils
+    Slackware
+
+  * a/file : outil pour déterminer le type d'un fichier 
+
+  * a/gawk : programmes de manipulation de fichiers texte
+
+  * a/gettext : outils pour l'internationalisation et la localisation
+
+  * a/kernel-generic-* : un noyau entièrement modulaire, qui n'embarque aucun
+    support de système de fichiers et doit donc être utilisé avec un initrd
+  
+  * a/lvm2 : gestionnaire de volumes logiques
+
+  * a/mdadm : outils d'administration pour le RAID logiciel
+
+  * a/mkinitrd : utilitaire nécessaire pour créer l'initrd requis par le noyau
+    générique
+
+  * a/openssl-solibs : bibliothèques partagées de cryptographie
+
+  * a/sysklogd : programmes pour les messages de traces système
+
+  * ap/diffutils : programmes montrant les différences entre fichiers ou
+    répertoires
+
+  * ap/slackpkg : outil pour l'installation ou la mise à niveau des paquets
+    Slackware à travers un réseau
+
+  * ap/texinfo : programmes de lecture, écriture et conversion des pages info
+
+  * d/git : système de contrôle de versions
+
+  * l/glibc : bibliothèque C standard
+
+  * l/glibc-i18n : traductions pour la bibliothèque C standard
+
+  * l/glibc-profile : versions statiques des bibliothèques C 
+
+  * l/mpfr : contient des fonctions pour des maths à précision multiple
+
+  * n/ca-certificates : liste de certificats pour les connexions sécurisées
+
+  * n/curl : contient un utilitaire et une bibliothèque utilisés pour le
+    transfert de fichiers
+
+  * n/cyrus-sasl : simple couche d'authentification et de sécurité, une
+    méthode pour ajouter le support d'authentification aux protocoles basés
+    sur la connexion
+
+  * n/dhcpcd : client DHCP
+
+  * n/gnupg : outil pour effectuer de la communication et du stockage
+    sécurisés
+
+  * n/iproute2 : outils réseau basiques et avancés
+
+  * n/iputils : outils réseau que l'on trouve sur tous les systèmes *NIX
+
+  * n/net-tools : outils réseau de base 
+
+  * n/network-scripts : scripts et fichiers de configuration réseau de base
+
+  * n/openssh : ensemble d'outils permettant des communications sécurisées en
+    utilisant le protocole SSH
+
+  * n/wget : outil pour le téléchargement non-interactif de fichiers distants
+
+
+
+Configuration
+-------------
+
+Le service '/etc/rc.d/rc.syslog' est activé par défaut, donc il n'y a rien à
+faire pour activer les logs du kernel.
+
+Le réseau n'a pas été configuré lors de l'installation initiale :
+
+  # hostname --fqdn
+  darkstar.example.net
+
+Éditer '/etc/HOSTNAME' et '/etc/hosts' et fournir le nom de la machine.
+
+Enfin, éditer '/etc/rc.d/rc.inet1.conf' pour configurer le réseau.
+
+Redémarrer.
+
+
+Documentation
+-------------
+
+Le livre de la distribution "Linux From Scratch" :
+
+  * http://www.linuxfromscratch.org/lfs/view/stable/
+
+La traduction française de ce dernier :
+
+  * http://www.fr.linuxfromscratch.org/view/lfs-stable/
+
+L'article "Linux From Slack" du site Slackware-fr.org :
+
+  * http://wiki.slackware-fr.org/installation:articles:linux_from_slack
+
+La page "Minimal Slackware Installation" de Vincent Batts :
+
+  * http://www.slackware.com/~vbatts/minimal/
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

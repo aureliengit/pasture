@@ -1,0 +1,19 @@
+# Build order
+xap/virtualbox
+xap/virtualbox-kernel
+xap/virtualbox-extension-pack
+xap/dropbox
+xap/filezilla
+n/freerdp
+xap/remmina
+ap/cdlabelgen
+xap/gtkcdlabel
+xap/easytag
+xap/aMule
+#xap/spotify32 --> install 
+#xap/spotify64 --> manually
+ap/hplip
+# WinFF build dependencies: fpc, fpc-source, lazarus
+xap/winff
+# Wine build dependency: fontforge
+xap/wine
