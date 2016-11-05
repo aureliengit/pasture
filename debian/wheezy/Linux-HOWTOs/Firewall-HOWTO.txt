@@ -1,0 +1,257 @@
+==============
+Firewall HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+==============
+
+Dernière révision : 4 février 2014
+
+Ce HOWTO décrit de façon succincte la configuration d'un pare-feu sur un
+serveur Debian Wheezy.
+
+
+Pare-feu pour un serveur de réseau local
+----------------------------------------
+
+Créer un fichier '/etc/default/firewall', qui contiendra la configuration de
+base du pare-feu :
+
+--8<---------- /etc/default/firewall -----------------------------------------
+# Fichier /etc/default/firewall
+# Démarrer le pare-feu : yes/no
+FW_ACTIVE=yes
+
+# Démarrer le partage de connexion : yes/no
+FW_MASQ=yes
+
+# Internet
+IFACE_INET=eth0
+
+# Réseau local
+IFACE_LAN=eth1
+IFACE_LAN_IP=192.168.3.0/24
+--8<--------------------------------------------------------------------------
+
+Le répertoire '/etc/firewall' contiendra les scripts faits maison pour démarrer
+et arrêter le pare-feu :
+
+  # mkdir -v /etc/firewall
+  mkdir: création du répertoire « /etc/firewall »
+
+Dans un premier temps, 'firewall-stop' se charge de réinitialiser 'iptables' et
+de désactiver le pare-feu :
+
+--8<---------- /etc/firewall/firewall-stop -----------------------------------
+#!/bin/bash
+#
+# /etc/firewall/firewall-stop
+
+# Lire la configuration
+. /etc/default/firewall
+IPT=$(which iptables)
+SYS=$(which sysctl)
+
+# Remettre iptables à zéro
+$IPT -P INPUT ACCEPT
+$IPT -P OUTPUT ACCEPT
+$IPT -P FORWARD ACCEPT
+$IPT -P POSTROUTING ACCEPT -t nat
+$IPT -P PREROUTING ACCEPT -t nat
+$IPT -P OUTPUT ACCEPT -t nat
+$IPT -F
+$IPT -F -t nat
+$IPT -X
+
+# Désactiver le partage de connexion
+$SYS -q -w net.ipv4.ip_forward=0
+--8<--------------------------------------------------------------------------
+
+Rendre ce script exécutable pour root :
+
+  # chmod 0700 /etc/firewall/firewall-stop
+
+À présent, créer le script 'firewall-start' :
+
+--8<---------- /etc/firewall/firewall-start ----------------------------------
+#!/bin/bash
+#
+# /etc/firewall/firewall-start
+
+# Lire la configuration
+. /etc/default/firewall
+IPT=$(which iptables)
+SYS=$(which sysctl)
+
+if [ $FW_ACTIVE != "yes" ]; then
+  echo "Firewall disabled in /etc/default/firewall."
+  exit 0
+fi
+
+# Remise à zéro de toutes les règles de pare-feu
+. /etc/firewall/firewall-stop
+
+# Les connexions entrantes sont bloquées par défaut 
+$IPT -P INPUT DROP
+
+# Les connexions destinées à être routées sont acceptées par défaut 
+$IPT -P FORWARD ACCEPT
+
+# Les connexions sortantes sont acceptées par défaut
+$IPT -P OUTPUT ACCEPT
+
+# Faire confiance à nous-mêmes ;o)
+$IPT -A INPUT -i lo -j ACCEPT
+
+# Protocole ICMP (ping)
+$IPT -A INPUT -p icmp -j ACCEPT
+
+# Protocole IGMP (pour le multicast)
+$IPT -A INPUT -p igmp -j ACCEPT
+
+# Connexions établies
+$IPT -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# FTP 
+# /sbin/modprobe ip_conntrack_ftp
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 21 -j ACCEPT
+
+# SSH en local
+$IPT -A INPUT -p tcp -i $IFACE_LAN --dport 22 -j ACCEPT
+# SSH en provenance d'Internet, en bannissant les attaques en force brute
+# $IPT -A INPUT -p tcp -i $IFACE_INET --dport 22 -m state --state NEW \
+# -m recent --set --name SSH
+# $IPT -A INPUT -p tcp -i $IFACE_INET --dport 22 -m state --state NEW \
+#  -m recent --update --seconds 60 --hitcount 2 --rttl --name SSH -j DROP
+# $IPT -A INPUT -p tcp -i $IFACE_INET --dport 22 -j ACCEPT
+
+# DNS 
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 53 -j ACCEPT
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 53 -j ACCEPT
+
+# DHCP 
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 67 -j ACCEPT
+
+# HTTP 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 80 -j ACCEPT
+
+# NTP 
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 123 -j ACCEPT
+
+# CUPS 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 631 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 631 -j ACCEPT
+
+# Samba 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 135 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 137 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 138 -j ACCEPT
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 139 -j ACCEPT
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 445 -j ACCEPT
+
+# NFS 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 111 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 111 -j ACCEPT
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 2049 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 2049 -j ACCEPT
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 32765:32769 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 32765:32769 -j ACCEPT
+
+# Squid 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 3128 -j ACCEPT
+# $IPT -A INPUT -p udp -i $IFACE_LAN --dport 3128 -j ACCEPT
+# Rediriger toutes les requêtes HTTP - sauf celles vers le serveur lui-même -
+# vers le port 3128 pour obtenir un proxy transparent
+# $IPT -t nat -A PREROUTING -i $IFACE_LAN -p tcp ! -d 192.168.2.1 \
+#  --dport 80 -j REDIRECT --to-port 3128
+
+# Apt-Cacher 
+# $IPT -A INPUT -p tcp -i $IFACE_LAN --dport 3142 -j ACCEPT
+
+# Log
+$IPT -A INPUT -j LOG --log-prefix "+++ IPv4 packet rejected +++ "
+$IPT -A INPUT -j REJECT
+
+# Partage de connexion 
+if [ $FW_MASQ = 'yes' ]; then
+  $IPT -t nat -A POSTROUTING -o $IFACE_INET -s $IFACE_LAN_IP -j MASQUERADE
+  $SYS -q -w net.ipv4.ip_forward=1
+fi
+--8<--------------------------------------------------------------------------
+
+Là aussi, rendre le script exécutable pour root :
+
+  # chmod 0700 /etc/firewall/firewall-start
+
+Pour intégrer le pare-feu au système d'initialisation de Debian, créer un
+fichier '/etc/init.d/firewall' comme ceci :
+
+--8<---------- /etc/init.d/firewall ------------------------------------------
+#!/bin/sh -e
+# 
+# Script d'initialisation /etc/init.d/firewall
+#
+### BEGIN INIT INFO
+# Provides:          firewall
+# Required-Start:    mountall
+# Required-Stop:
+# X-Start-Before:    networking
+# X-Stop-After:      networking
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-description: firewall
+# Description: Start firewall and masquerading
+### END INIT INFO
+
+# Fonctions de base
+. /lib/lsb/init-functions
+
+# Fonctions pour start, stop et restart
+case "$1" in
+  start)
+    log_begin_msg "Starting firewall and masquerading..."
+    . /etc/firewall/firewall-start
+    log_end_msg 0
+    ;;
+  stop)
+    log_begin_msg "Stopping firewall and masquerading..."
+		. /etc/firewall/firewall-stop
+		log_end_msg 0
+		;;
+	restart)
+    log_begin_msg "Stopping firewall and masquerading..."
+		. /etc/firewall/firewall-stop
+		log_end_msg 0
+    log_begin_msg "Starting firewall and masquerading..."
+    . /etc/firewall/firewall-start
+    log_end_msg 0
+		;;
+	status)
+		/sbin/iptables -L -v -n
+		;;	
+  *)
+    log_success_msg "Usage: xxx {start|stop|restart|status}"
+		exit 1
+		;;
+esac
+exit 0
+--8<--------------------------------------------------------------------------
+
+Rendre ce script exécutable :
+
+  # chmod 0755 /etc/init.d/firewall
+
+Intégrer le service au système :
+
+  # insserv firewall
+
+Voir ce que ça donne :
+
+  # sysv-rc-conf --list firewall 
+  firewall     0:off  1:off 2:on  3:on  4:on  5:on  6:off
+
+À partir de là, on peut gérer le pare-feu comme ceci :
+
+  # service firewall start|stop|restart|status
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
+# vim: set encoding=latin1

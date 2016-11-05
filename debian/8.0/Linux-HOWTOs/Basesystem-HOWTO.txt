@@ -1,0 +1,301 @@
+================
+Basesystem HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 3 juillet 2015
+
+Ce HOWTO décrit l'installation d'un système de base Debian 8.0 Jessie.
+
+
+Philosophie
+-----------
+
+Sur des serveurs comme sur des postes de travail, on commence toujours par
+installer un système de base minimal de type JeOS ("Just enough OS"). Ensuite,
+on ajoute les composants au fur et à mesure qu'on en a besoin : système
+graphique, environnement de bureau, applications, etc. C'est un peu le
+principe de la pâte à crêpes, avec laquelle on peut faire toutes sortes de
+crêpes, sucrées ou salées.
+
+
+Support d'installation
+----------------------
+
+Depuis la version 6.0, Debian n'inclut plus les firmwares propriétaires sur les
+supports d'installation. Pour éviter de galérer, on va utiliser les CD-Rom
+officieux qui contiennent les firmwares en question :
+
+  * http://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware
+
+Suivre le lien '8.x.0/multi-arch/iso-cd' et télécharger le fichier suivant :
+
+  * firmware-8.1.0-amd64-i386-netinst.iso (575 Mo)
+
+
+Démarrage
+---------
+
+Advanced options > Expert install ou 64-bit expert install
+
+
+Installation
+------------
+
+Si l'on décide de faire des captures d'écran durant l'installation, on pourra
+les retrouver au format PNG en-dessous de '/var/log'.
+
+  * Créer un compte d'utilisateur ordinaire ? Non.
+
+  * Utiliser NTP pour régler l'horloge ? Non.
+
+  * Type de la table de partitions à utiliser : msdos.
+
+Schéma de partitionnement pour un poste de travail :
+
+  * une partition /boot de 100 Mo, formatée en ext2 ;
+
+  * une partition swap équivalant à un peu plus de la RAM disponible ;
+
+  * une partition principale occupant le reste du disque, formatée en ext4.
+
+Lorsqu'on utilise le RAID sur une machine qui disposait d'une installation RAID
+auparavant, il faut éventuellement faire un peu de ménage avant. Ouvrir une
+deuxième console, puis :
+
+  # mdadm -Ss
+  # mdadm --zero-superblock /dev/sda1
+  # mdadm --zero-superblock /dev/sdb1
+  ...
+
+Et pour finir, effacer tout ce qu'il y a sur le MBR :
+
+  # dd if=/dev/zero of=/dev/sda bs=512 count=64
+  # dd if=/dev/zero of=/dev/sdb bs=512 count=64
+
+Faire de même pour les autres disques, puis redémarrer et relancer
+l'installation.
+
+Si l'on utilise le RAID-5 avec quatre disques, il faut laisser les partitions
+/boot et swap en RAID-1, comme ceci :
+
++-----------+-------------+----------------+--------------------+
+| Partition | Niveau RAID | Disques actifs | Disques de réserve |
++-----------+-------------+----------------+--------------------+
+| /boot     | RAID-1      |              4 |                  0 |
+| swap      | RAID-1      |              4 |                  0 |
+| /         | RAID-5      |              4 |                  0 |
++-----------+-------------+----------------+--------------------+
+
+  * Pilotes à inclure sur l'image disque en mémoire : image ciblée.
+
+  * Mandataire http : http://192.168.2.1:3142 (exemple).
+
+  * Utiliser des logiciels non libres ? Oui.
+
+  * Choix des paquets : tout décocher.
+
+
+Premier login
+-------------
+
+Installer une poignée d'outils :
+
+  # apt-get update
+  # apt-get install git openssh-server vim
+
+Récupérer mes scripts et mes fichiers de configuration :
+
+  # git clone https://github.com/kikinovak/debian
+
+Lancer le script d'installation pour le système de base :
+
+  # cd debian/wheezy/config/scripts
+  # ./install-base.sh
+
+Ce script fait plusieurs choses :
+
+  * Agrémenter le shell pour root.
+
+  * Créer un profil de base pour les futurs utilisateurs.
+
+  * Effectuer une configuration personnalisée pour APT.
+
+  * Installer une sélection d'outils en ligne de commande.
+
+Configurer le shell pour root :
+
+  # source ~/.bashrc
+
+
+GRUB
+----
+
+GRUB a été installé sur le MBR du premier disque. Si l'on utilise le RAID, il
+faudra songer à l'installer sur les autres disques de l'assemblage :
+
+  # dpkg-reconfigure grub-pc
+
+Pour quatre disques en RAID-5, on aura ceci par exemple :
+
+  [*] /dev/sda
+  [*] /dev/sdb
+  [*] /dev/sdc
+  [*] /dev/sdd
+  [ ] /dev/md0
+  [ ] /dev/md1
+
+Si l'on souhaite changer la résolution de la console, il faut éditer
+'/etc/default/grub' et ajouter ces deux lignes :
+
+--8<---------- /etc/default/grub ---------------------------------------------
+...
+GRUB_GFXMODE=800x600
+GRUB_GFXPAYLOAD_LINUX=keep
+...
+--8<--------------------------------------------------------------------------
+
+Avec une résolution différente :
+
+--8<---------- /etc/default/grub ---------------------------------------------
+...
+GRUB_GFXMODE=1024x768
+GRUB_GFXPAYLOAD_LINUX=keep
+...
+--8<--------------------------------------------------------------------------
+
+Alternativement :
+
+--8<---------- /etc/default/grub ---------------------------------------------
+...
+GRUB_CMDLINE_LINUX_DEFAULT="quiet"
+GRUB_CMDLINE_LINUX="video=1024x768"
+...
+#GRUB_GFXMODE=1024x768
+#GRUB_GFXPAYLOAD_LINUX=keep
+...
+--8<--------------------------------------------------------------------------
+
+Avec une carte NVidia, ajouter l'option de démarrage 'nomodeset'. 
+
+  /!\ Sur les postes de travail, l'utilisation du framebuffer peut causer des
+  problèmes avec certaines cartes NVidia, notamment un gel du serveur
+  graphique !
+
+Ensuite :
+
+  # update-grub
+
+Pour personnaliser le fond d'écran du GRUB, c'est relativement simple. Ouvrir
+l'image en question dans GIMP et la redimensionner à 640x480. Ensuite,
+l'enregistrer au format *.tga et la copier dans '/boot/grub'. Vérifier si
+l'image est détectée : 
+
+  # update-grub
+  Generating grub.cfg...
+  ...
+  Found background image: microlinux.tga
+  ...
+
+Redémarrer et admirer le résultat.
+
+
+Désactiver l'IPv6
+-----------------
+
+Sauvegarder '/etc/sysctl.conf' et éditer ce fichier pour désactiver l'IPv6 :
+
+--8<---------- /etc/sysctl.conf ----------------------------------------------
+...
+# Disable IPv6
+net.ipv6.conf.all.disable_ipv6=1
+--8<--------------------------------------------------------------------------
+
+Appliquer ce nouveau paramètre directement sans redémarrer :
+
+  # sysctl -p
+
+
+Configuration réseau sur un serveur local
+-----------------------------------------
+
+Vérifier l'attribution des interfaces réseau 'eth0' et 'eth1'. Le cas échéant,
+éditer '/etc/udev/rules.d/70-persistent-net.rules' pour permuter les interfaces
+respectives.
+
+Configurer le réseau comme ceci :
+
+--8<---------- /etc/network/interfaces ---------------------------------------
+# lo
+auto lo
+iface lo inet loopback
+
+# eth0
+auto eth0
+iface eth0 inet static
+  address 192.168.2.5
+  netmask 255.255.255.0
+  gateway 192.168.2.1
+
+# eth1
+auto eth1
+iface eth1 inet static
+  address 192.168.3.1
+  netmask 255.255.255.0
+--8<--------------------------------------------------------------------------
+
+Activer la deuxième interface réseau :
+
+  # service networking stop
+  # service networking start
+
+  /!\ Pour une raison mystérieuse, l'option 'restart' n'est plus acceptée.
+
+Éditer la configuration du nom d'hôte :
+
+--8<---------- /etc/hosts ----------------------------------------------------
+127.0.0.1   localhost.localdomain localhost
+192.168.3.1 amandine.sandbox.local amandine
+--8<--------------------------------------------------------------------------
+
+
+Configuration réseau sur un poste client
+----------------------------------------
+
+Le fichier '/etc/hosts' ne devra plus comporter qu'une seule ligne :
+
+--8<---------- /etc/hosts ----------------------------------------------------
+127.0.0.1   localhost.localdomain localhost
+--8<--------------------------------------------------------------------------
+
+  /!\ La gestion totalement centralisée des noms d'hôte n'est plus possible. Le
+  nom d'hôte sans la partie FQDN devra toujours figurer dans '/etc/hostname'.
+  La suppression de ce fichier produit des erreurs au démarrage du système.
+
+Sur un PC portable, on utilisera NetworkManager, qu'on verra plus loin. En
+attendant, configurer le portable provisoirement comme un poste de travail
+ordinaire. 
+
+
+Configuration du son
+--------------------
+
+  # apt-get install alsa-base alsa-utils
+
+Régler le volume des différents canaux :
+
+  # alsamixer
+
+Tester le son :
+
+  # aplay /usr/share/sounds/alsa/*.wav
+
+Si jamais le son sort par le petit haut-parleur du PC, il suffit de redémarrer.
+
+Une fois que tout est bon :
+
+  # alsactl store
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
+# vim: set encoding=latin1

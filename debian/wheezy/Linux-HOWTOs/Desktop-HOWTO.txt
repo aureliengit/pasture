@@ -1,0 +1,56 @@
+================
+Basesystem HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 27 janvier 2015
+
+Ce HOWTO décrit l'installation d'un poste de travail sous Debian Wheezy.
+
+
+Serveur graphique
+-----------------
+
+Installer X.org :
+
+  # apt-get install --no-install-recommends xorg mesa-utils wmaker
+
+Si l'on dispose d'une carte graphique NVidia, installer le driver propriétaire
+et l'outil de configuration :
+
+  # apt-get install nvidia-kernel-dkms nvidia-xconfig
+
+Configurer X.org :
+
+  # nvidia-xconfig
+
+Le fichier '/etc/X11/xorg.conf' est créé.
+
+Lancer une session graphique :
+
+  # startx
+
+  /!\ Note pour les pinailleurs : non, ça ne se fait pas de lancer une session
+  graphique en tant que root. Nous n'avons pas encore créé d'utilisateur en
+  dehors de root, et de toute façon, Windowmaker est lancé dans le seul but de
+  vérifier la bonne configuration de la carte graphique. 
+
+Ouvrir un terminal et tester l'accélération graphique :
+
+  # glxgears
+  Running synchronized to the vertical refresh. The framerate should be
+  approximately the same as the monitor refresh rate.
+  7114 frames in 5.0 seconds = 1422.665 FPS
+  7125 frames in 5.0 seconds = 1424.970 FPS
+  7127 frames in 5.0 seconds = 1425.323 FPS
+
+Puis :
+
+  # glxinfo | head -n 3
+  name of display: :0.0
+  display: :0 screen: 0
+  direct rendering: Yes --> vérifier si l'on a bien ça
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
+# vim: set encoding=latin1
