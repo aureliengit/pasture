@@ -1,0 +1,34 @@
+Notes sur FreeBSD
+-----------------
+
+
+Installation en mode poule
+--------------------------
+
+Disposition du clavier : 
+
+  [ ] Swiss-French Codepage 850
+  [ ] Swiss-French ISO-8859-1
+  [ ] Swiss-French ISO-8859-1 (accent keys)
+
+Quid de l'UTF-8 ?
+
+Définir le nom d'hôte via DHCP ?
+
+Apparemment, c'est le FQDN qui doit être fourni :
+
+  * bernadette.microlinux.lan
+
+L'utilisateur initial est ajouté au groupe 'wheel' pour lui permettre de
+devenir root.
+
+Je configure l'IPv4, mais pas l'IPv6.
+
+
+Premier redémarrage
+-------------------
+
+Pas d'accès SSH pour root, uniquement pour un utilisateur simple.
+
+
+
