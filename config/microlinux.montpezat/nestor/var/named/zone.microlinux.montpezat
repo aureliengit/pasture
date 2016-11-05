@@ -1,0 +1,47 @@
+; zone.microlinux.montpezat
+$TTL 86400
+$ORIGIN microlinux.montpezat.
+@ IN SOA nestor.microlinux.montpezat. hostmaster.microlinux.montpezat. (
+    65         ; serial 
+    3H         ; refresh
+    15M        ; retry
+    1W         ; expiry
+    1D )       ; minimum
+                         IN NS nestor.microlinux.montpezat.
+                         IN MX 10 mail.microlinux.montpezat.
+nestor                   IN A 192.168.2.1
+alphamule                IN A 192.168.2.2
+bernadette               IN A 192.168.2.3
+raymonde                 IN A 192.168.2.4
+buildbox                 IN A 192.168.2.5
+buzz                     IN A 192.168.2.6
+bebette                  IN A 192.168.2.7
+wireless-ap              IN A 192.168.2.254
+
+; Sites hébergés sur Nestor
+mirror.nestor            IN A 192.168.2.1
+cmsms.nestor             IN A 192.168.2.1
+dan-services.nestor      IN A 192.168.2.1
+fuckmicrosoft.nestor     IN A 192.168.2.1
+gepi.nestor              IN A 192.168.2.1
+kikinovak.nestor         IN A 192.168.2.1
+laurentobertone.nestor   IN A 192.168.2.1
+microlinux.nestor        IN A 192.168.2.1
+microlinux-2010.nestor   IN A 192.168.2.1
+microlinux-2011.nestor   IN A 192.168.2.1
+microlinux-2012.nestor   IN A 192.168.2.1
+newscholae.nestor        IN A 192.168.2.1
+osteo-montpellier.nestor IN A 192.168.2.1
+osteo-sommieres.nestor   IN A 192.168.2.1
+phpinfo.nestor           IN A 192.168.2.1
+radionovak.nestor        IN A 192.168.2.1
+scholae.nestor           IN A 192.168.2.1
+scholaecms.nestor        IN A 192.168.2.1
+villa-figaret.nestor     IN A 192.168.2.1
+
+; Sites hébergés sur Raymonde
+secure.raymonde          IN A 192.168.2.4
+slackware.raymonde       IN A 192.168.2.4
+freebsd.raymonde         IN A 192.168.2.4
+
+

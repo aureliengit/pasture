@@ -1,0 +1,23 @@
+; zone.crpconsulting.montpellier
+$TTL 86400
+$ORIGIN crpconsulting.montpellier.
+@ IN SOA slackbox.crpconsulting.montpellier.  hostmaster.crpconsulting.montpellier. (
+    2012120702 ; serial 
+    3H         ; refresh
+    15M        ; retry
+    1W         ; expiry
+    1D )       ; minimum
+  IN NS  slackbox.crpconsulting.montpellier.
+laptop-louison IN A 192.168.4.1
+laptop-michael IN A 192.168.4.2
+laptop-ousmane IN A 192.168.4.3
+laptop-romuald IN A 192.168.4.4
+laptop-valia   IN A 192.168.4.5
+laptop-nadir   IN A 192.168.4.6
+laptop-pierre  IN A 192.168.4.7
+laptop-kevin   IN A 192.168.4.8
+laptop-naoual  IN A 192.168.4.9
+laptop-ludovic IN A 192.168.4.10
+desktop-nico   IN A 192.168.4.11
+slackbox       IN A 192.168.4.254
+

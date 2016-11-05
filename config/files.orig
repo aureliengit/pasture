@@ -1,0 +1,70 @@
+# Make a backup of these configuration files and scripts 
+
+# Filesystem
+/etc/fstab
+
+# Bootloader
+/etc/lilo.conf
+/etc/mkinitrd.conf
+
+# Network
+/etc/HOSTNAME
+/etc/hosts
+/etc/rc.d/rc.inet1.conf
+/etc/resolv.conf
+/etc/services
+
+# X.org
+/etc/X11/xorg.conf
+/etc/X11/xorg.conf.d/*
+
+# Custom services on startup
+/etc/rc.d/rc.local
+
+# TCP wrappers
+/etc/hosts.allow
+/etc/hosts.deny
+
+# Firewall and IP forwarding
+/etc/rc.d/rc.firewall
+/etc/rc.d/rc.ip_forward
+
+# NTP
+/etc/ntp.conf
+
+# DHCP server
+/etc/dhcpd.conf
+/etc/rc.d/rc.dhcpd
+
+# DNS server
+/etc/named.conf
+/var/named/*
+
+# CUPS server
+/etc/cups/cupsd.conf
+
+# Samba server
+/etc/samba/smb.conf
+
+# NFS server
+/etc/sysctl.conf
+/etc/exports
+/etc/rc.d/rc.rpc
+/etc/rc.d/rc.nfsd
+
+# NIS server & client
+/etc/nsswitch.conf
+/etc/defaultdomain
+/etc/yp.conf
+/etc/rc.d/rc.yp
+/var/yp/Makefile
+
+# FTP server
+/etc/vsftpd.conf
+
+# Web server
+/etc/httpd/httpd.conf
+/etc/httpd/php.ini
+/etc/httpd/extra/httpd-vhosts.conf
+
+

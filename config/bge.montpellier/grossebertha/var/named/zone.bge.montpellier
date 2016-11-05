@@ -1,0 +1,24 @@
+; zone.bge.montpellier
+$TTL 86400
+$ORIGIN bge.montpellier.
+@ IN SOA grossebertha.bge.montpellier. hostmaster.bge.montpellier. (
+    2014031201 ; serial 
+    3H         ; refresh
+    15M        ; retry
+    1W         ; expiry
+    1D )       ; minimum
+  IN NS  grossebertha.bge.montpellier.
+grossebertha         IN A 192.168.2.1
+poste-nico           IN A 192.168.2.2
+poste-laurent        IN A 192.168.2.3
+poste-jerome         IN A 192.168.2.4
+poste-thomas         IN A 192.168.2.5
+poste-pascal         IN A 192.168.2.6
+poste-remi           IN A 192.168.2.7
+poste-walid          IN A 192.168.2.8
+poste-ludovic        IN A 192.168.2.9
+poste-benjamin       IN A 192.168.2.10
+poste-emmanuel       IN A 192.168.2.11
+poste-samir          IN A 192.168.2.12
+poste-guillaume      IN A 192.168.2.13
+

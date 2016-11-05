@@ -1,0 +1,31 @@
+# Liste des fichiers de configuration à sauvegarder
+
+# Système de fichiers
+/etc/fstab
+
+# Démarrage
+/etc/lilo.conf
+/etc/mkinitrd.conf
+/etc/mdadm.conf
+
+# Réseau
+/etc/HOSTNAME
+/etc/hosts
+/etc/rc.d/rc.inet1.conf
+/etc/resolv.conf
+
+# Services supplémentaires à lancer au démarrage
+/etc/rc.d/rc.local
+
+# Serveur DHCP
+/etc/dhcpd.conf
+/etc/rc.d/rc.dhcpd
+
+# Dnsmasq
+/etc/dnsmasq.conf
+/etc/rc.d/rc.dnsmasq
+
+# DNS avec Bind
+/etc/named.conf
+/etc/rc.d/rc.bind
+/var/named/*

@@ -1,0 +1,26 @@
+; zone.scholae.sainthippo
+$TTL	86400
+$ORIGIN scholae.sainthippo.
+@ IN SOA	niklabox.scholae.sainthippo. info.microlinux.fr. (
+	        2012110102 	; serial 
+					3H		; refresh
+					15M		; retry
+					1W		; expiry
+					1D )	; minimum
+               IN NS niklabox.scholae.sainthippo.
+niklabox       IN A  192.168.2.1
+poste1         IN A  192.168.2.101
+poste2         IN A  192.168.2.102
+poste3         IN A  192.168.2.103
+poste4         IN A  192.168.2.104
+poste5         IN A  192.168.2.105
+poste6         IN A  192.168.2.106
+poste7         IN A  192.168.2.107
+poste8         IN A  192.168.2.108
+poste9         IN A  192.168.2.109
+poste10        IN A  192.168.2.110
+bigbrother     IN A  192.168.2.200
+littlesister   IN A  192.168.2.201
+bourriquet     IN A  192.168.2.202
+surfingscholae IN A  192.168.2.253
+babar          IN A  192.168.2.254

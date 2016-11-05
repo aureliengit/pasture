@@ -1,0 +1,7 @@
+# See exports(5) for a description.
+# This file contains a list of all directories exported to other computers.
+# It is used by rpc.nfsd and rpc.mountd.
+/home 192.168.2.200(rw,async,no_subtree_check)
+/home 192.168.2.201(rw,async,no_subtree_check)
+/home 192.168.2.202(rw,async,no_subtree_check)
+

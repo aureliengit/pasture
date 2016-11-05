@@ -1,0 +1,11 @@
+# /etc/rc.d/rc.local
+#
+# Start DHCP server
+if [ -x /etc/rc.d/rc.dhcpd ]; then
+	/etc/rc.d/rc.dhcpd start
+fi
+
+# Start Squid server
+if [ -x /etc/rc.d/rc.squid ]; then
+  /etc/rc.d/rc.squid start
+fi

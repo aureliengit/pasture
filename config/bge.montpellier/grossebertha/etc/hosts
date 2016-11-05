@@ -1,0 +1,57 @@
+# /etc/hosts
+127.0.0.1		   localhost.localdomain localhost
+192.168.2.1		 grossebertha.bge.montpellier grossebertha
+# Grossebertha
+192.168.2.1		 slackware.grossebertha.bge.montpellier slackware.grossebertha
+192.168.2.1		 freebsd.grossebertha.bge.montpellier freebsd.grossebertha
+192.168.2.1		 phpinfo.grossebertha.bge.montpellier phpinfo.grossebertha
+192.168.2.1		 radionovak.grossebertha.bge.montpellier radionovak.grossebertha
+192.168.2.1		 microlinux.grossebertha.bge.montpellier microlinux.grossebertha
+# Nico
+192.168.2.2    slackware.poste-nico.bge.montpellier slackware.poste-nico
+192.168.2.2    freebsd.poste-nico.bge.montpellier freebsd.poste-nico
+192.168.2.2    phpinfo.poste-nico.bge.montpellier phpinfo.poste-nico
+# Laurent
+192.168.2.3    slackware.poste-laurent.bge.montpellier slackware.poste-laurent
+192.168.2.3    freebsd.poste-laurent.bge.montpellier freebsd.poste-laurent
+192.168.2.3    phpinfo.poste-laurent.bge.montpellier phpinfo.poste-laurent
+# Jérôme
+192.168.2.4    slackware.poste-jerome.bge.montpellier slackware.poste-jerome
+192.168.2.4    freebsd.poste-jerome.bge.montpellier freebsd.poste-jerome
+192.168.2.4    phpinfo.poste-jerome.bge.montpellier phpinfo.poste-jerome
+# Thomas
+# 192.168.2.5    slackware.poste-thomas.bge.montpellier slackware.poste-thomas
+# Pascal
+192.168.2.6    slackware.poste-pascal.bge.montpellier slackware.poste-pascal
+192.168.2.6    freebsd.poste-pascal.bge.montpellier freebsd.poste-pascal
+192.168.2.6    phpinfo.poste-pascal.bge.montpellier phpinfo.poste-pascal
+# Rémi
+192.168.2.7    slackware.poste-remi.bge.montpellier slackware.poste-remi
+192.168.2.7    freebsd.poste-remi.bge.montpellier freebsd.poste-remi
+192.168.2.7    phpinfo.poste-remi.bge.montpellier phpinfo.poste-remi
+# Walid
+192.168.2.8    slackware.poste-walid.bge.montpellier slackware.poste-walid
+192.168.2.8    freebsd.poste-walid.bge.montpellier freebsd.poste-walid
+192.168.2.8    phpinfo.poste-walid.bge.montpellier phpinfo.poste-walid
+# Ludovic
+192.168.2.9    slackware.poste-ludovic.bge.montpellier slackware.poste-ludovic
+192.168.2.9    freebsd.poste-ludovic.bge.montpellier freebsd.poste-ludovic
+192.168.2.9    phpinfo.poste-ludovic.bge.montpellier phpinfo.poste-ludovic
+# Benjamin
+192.168.2.14   slackware.virtualbox-benjamin.bge.montpellier slackware.virtualbox-benjamin
+192.168.2.14   freebsd.virtualbox-benjamin.bge.montpellier freebsd.virtualbox-benjamin
+192.168.2.14   phpinfo.virtualbox-benjamin.bge.montpellier phpinfo.virtualbox-benjamin
+# Emmanuel
+192.168.2.11   slackware.poste-emmanuel.bge.montpellier slackware.poste-emmanuel
+192.168.2.11   freebsd.poste-emmanuel.bge.montpellier freebsd.poste-emmanuel
+192.168.2.11   phpinfo.poste-emmanuel.bge.montpellier phpinfo.poste-emmanuel
+# Guillaume
+192.168.2.13   slackware.eeepc-guillaume.bge.montpellier slackware.eeepc-guillaume
+192.168.2.13   freebsd.eeepc-guillaume.bge.montpellier freebsd.eeepc-guillaume
+192.168.2.13   phpinfo.eeepc-guillaume.bge.montpellier phpinfo.eeepc-guillaume
+# Samir
+192.168.2.12   slackware.poste-samir.bge.montpellier slackware.poste-samir
+192.168.2.12   freebsd.poste-samir.bge.montpellier freebsd.poste-samir
+192.168.2.12   phpinfo.poste-samir.bge.montpellier phpinfo.poste-samir
+# Point d'accès Wifi
+192.168.2.254  wifi.bge.montpellier wifi
