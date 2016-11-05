@@ -1,0 +1,12 @@
+Notes sur Ubuntu LTS
+--------------------
+
+	* Gestion centralisée des noms d'hôtes avec DHCP
+	* Bureau standard KDE
+	* Bureau standard Unity
+	* Bureau standard Xfce
+	* Profil par défaut KDE : favoris, bureau, etc.
+
+Niki Kovacs <info@microlinux.fr> 
+
+Tue Jan 28 08:02:57 CET 2014

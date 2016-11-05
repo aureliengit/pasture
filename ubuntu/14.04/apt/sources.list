@@ -1,0 +1,12 @@
+# /etc/apt/sources.list
+#
+# Dépôts principaux
+deb http://ftp.free.fr/mirrors/ftp.ubuntu.com/ubuntu trusty main restricted universe multiverse
+# Mises à jour
+deb http://ftp.free.fr/mirrors/ftp.ubuntu.com/ubuntu trusty-updates main restricted universe multiverse
+# Mises à jour de sécurité
+deb http://ftp.free.fr/mirrors/ftp.ubuntu.com/ubuntu trusty-security main restricted universe multiverse
+# Paquets rétroportés
+deb http://ftp.free.fr/mirrors/ftp.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse
+# Dépôt Partner
+deb http://archive.canonical.com/ubuntu trusty partner

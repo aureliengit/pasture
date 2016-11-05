@@ -1,0 +1,15 @@
+# Paquets à ajouter à une installation minimale Ubuntu Server 12.04 LTS
+curl
+git
+glances
+links
+lynx
+nmap
+ntp
+openssh-server
+recode
+sysv-rc-conf
+tree
+vim
+
+

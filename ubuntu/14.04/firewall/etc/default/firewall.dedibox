@@ -1,0 +1,7 @@
+# /etc/default/firewall
+
+# Démarrer le pare-feu : yes/no
+FW_ACTIVE=yes
+
+# Internet
+IFACE_INET=eth0

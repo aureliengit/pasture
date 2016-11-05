@@ -1,0 +1,20 @@
+# /etc/network/interfaces
+
+# lo
+auto lo
+iface lo inet loopback
+
+# eth0 (WAN)
+auto eth0
+iface eth0 inet static
+  address 192.168.2.5
+	netmask 255.255.255.0
+	gateway 192.168.2.1
+
+# eth1 (LAN)
+auto eth1
+iface eth1 inet static
+  address 192.168.3.1
+	netmask 255.255.255.0
+	dns-nameservers 192.168.2.1
+	dns-search mondomaine.tld

@@ -1,0 +1,15 @@
+# /etc/network/interfaces
+
+# lo
+auto lo
+iface lo inet loopback
+
+# eth0 
+auto eth0
+iface eth0 inet static
+  address 195.154.104.191
+	netmask 255.255.255.0
+	gateway 195.154.104.1
+	dns-nameservers 62.210.16.6 62.210.16.7
+	dns-search online.net
+
