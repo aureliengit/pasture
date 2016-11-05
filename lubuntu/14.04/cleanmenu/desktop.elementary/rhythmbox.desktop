@@ -1,0 +1,37 @@
+[Desktop Entry]
+Name=Audio Player
+Name[de]=Audio-Player
+Name[fr]=Lecteur audio
+Comment=Rhythmbox
+Exec=rhythmbox %U
+Terminal=false
+Type=Application
+#Icon=rhythmbox
+Icon=multimedia-audio-player
+X-GNOME-DocPath=rhythmbox/rhythmbox.xml
+Categories=GNOME;GTK;AudioVideo;
+MimeType=application/x-ogg;application/ogg;audio/x-vorbis+ogg;audio/x-scpls;audio/x-mp3;audio/x-mpeg;audio/mpeg;audio/x-mpegurl;audio/x-flac;
+Keywords=Mp3;Audio;CD;MTP;Podcast;DAAP;Playlist;Ipod;
+StartupNotify=true
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=rhythmbox
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-OtherBinaries=rhythmbox-client;rhythmbox-metadata;
+X-GNOME-Bugzilla-Version=2.96
+Actions=Play;Pause;Next;Previous;
+
+[Desktop Action Play]
+Name=Play
+Exec=rhythmbox-client --play
+
+[Desktop Action Pause]
+Name=Pause
+Exec=rhythmbox-client --pause
+
+[Desktop Action Next]
+Name=Next
+Exec=rhythmbox-client --next
+
+[Desktop Action Previous]
+Name=Previous
+Exec=rhythmbox-client --previous

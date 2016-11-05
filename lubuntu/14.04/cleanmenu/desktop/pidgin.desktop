@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Internet Messenger
+Name[de]=Sofortnachrichtendienst
+Name[fr]=Messagerie instantanée
+Comment=Pidgin
+Exec=pidgin
+Icon=pidgin
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;
+
+X-MessagingMenu-UsesChatSection=true
+
