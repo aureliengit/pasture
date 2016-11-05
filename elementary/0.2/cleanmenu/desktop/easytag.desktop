@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Audio Tag Editor
+Name[de]=Audio-Tagger
+Name[fr]=Éditeur de tags audio
+Comment=EasyTag
+Exec=easytag %F
+Icon=EasyTAG_icon
+Terminal=false
+Type=Application
+Categories=AudioVideo;AudioVideoEditing;GTK;
+MimeType=audio/x-mp3;application/ogg;
+StartupNotify=true

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Minesweeper
+Name[de]=Minenräumer
+Name[fr]=Démineur
+Comment=Gnomine
+Exec=/usr/games/gnomine
+Icon=gnomine
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Game;LogicGame;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gnome-games
+X-GNOME-Bugzilla-Component=BugBuddyBugs
+X-GNOME-Bugzilla-Version=3.4.1
+Keywords=minesweeper
+StartupNotify=true

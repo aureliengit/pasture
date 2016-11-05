@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=File Synchronization
+Name[de]=Dateisynchronisierung
+Name[fr]=Synchronisation de fichiers
+Comment=Dropbox
+Exec=dropbox start -i
+Terminal=false
+Type=Application
+Icon=dropbox
+Categories=Network;FileTransfer;
+StartupNotify=true

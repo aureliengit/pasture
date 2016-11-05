@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=File Manager
+Name[de]=Dateimanager
+Name[fr]=Gestionnaire de fichiers
+Comment=Nautilus
+Name=Files
+Comment=Access and organize files
+Keywords=folder;manager;explore;disk;filesystem;
+#Exec=nautilus --new-window %U
+Exec=nautilus --no-desktop
+Icon=system-file-manager
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Utility;
+MimeType=inode/directory;application/x-gnome-saved-search;
+

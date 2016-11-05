@@ -1,0 +1,45 @@
+================
+Elementary NOTES (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Notes
+-----
+
+	Elementary Tweaks dépend du gestionnaire de fichiers Pantheon files. Est-ce
+	qu'il y a moyen de se débarrasser de cette dépendance ?
+
+Bugs
+----
+
+Le thème de curseur 'Whiteglass' ne s'affiche pas.
+
+TODO
+----
+	[ ] Polices Vista 
+	[ ] Police Eurostile
+  [ ] Client FTP
+  [ ] LibreOffice ou OpenOffice
+  [ ] GIMP
+  [ ] Transmission
+  [ ] Lecteur audio
+  [ ] Lecteur vidéo
+  [ ] Audacity
+  [ ] Openshot
+  [ ] Logiciel de gravure
+  [ ] Inkscape
+  [ ] Scribus
+  [ ] VirtualBox
+  [ ] GtkCDLabel
+  [ ] Éditeur de texte simple
+  [ ] Easytag
+  [ ] Extracteur de CD audio
+  [ ] Extracteur de DVD
+  [ ] Acquisition d'images
+  [ ] Jeux basiques
+  [ ] Profil d'utilisateur 
+	[ ] Nettoyage des menus
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
+# vim: set encoding=latin1

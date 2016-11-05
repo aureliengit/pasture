@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Virtualization Software
+Name[de]=Virtualisierungssoftware
+Name[fr]=Logiciel de virtualisation
+Comment=VirtualBox
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=VirtualBox %U
+TryExec=VirtualBox
+MimeType=application/x-virtualbox-vbox;application/x-virtualbox-vbox-extpack;application/x-virtualbox-ovf;application/x-virtualbox-ova;
+DocPath=file:///usr/share/doc/virtualbox-4.3/UserManual.pdf
+Icon=virtualbox
+Categories=Emulator;System;X-MandrivaLinux-System;Application;
