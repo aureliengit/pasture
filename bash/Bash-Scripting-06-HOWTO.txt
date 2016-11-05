@@ -1,0 +1,303 @@
+=======================
+Bash Scripting 06 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 18 décembre 2015
+
+Ce HOWTO traite des redirections.
+
+
+  * Redirections
+  * Entrée et sorties standard des processus
+  * Entrée standard
+  * Sortie standard
+  * Sortie d'erreur standard
+  * Redirection des sorties en écriture
+  * Redirection de l'entrée standard
+  * Redirections avancées
+
+
+Redirections
+------------
+
+Les redirections sont couramment utilisées dans les commandes Unix. Elles
+permettent :
+
+  * de récupérer le résultat d'une ou plusieurs commandes dans un fichier ;
+  * de faire lire un fichier à une commande.
+
+
+Entrée et sorties standard des processus
+----------------------------------------
+
+Les processus Unix ont, par défaut, leur fichier terminal ouvert trois fois,
+sous trois descripteurs de fichiers différents : 0, 1 et 2.
+
+
+Entrée standard
+---------------
+
+Le descripteur de fichier 0 est également nommé "entrée standard du
+processus". Les processus qui attendent des informations de la part de
+l'utilisateur déclenchent une requête de lecture sur le descripteur 0. Si ce
+dernier est associé au terminal, cela se matérialise pour l'utilisateur par
+une demande de saisie au clavier.
+
+
+Sortie standard
+---------------
+
+Le descripteur de fichier 1 est également nommé "sortie standard du
+processus". Par convention, un processus qui souhaite envoyer un message
+résultat à l'utilisateur doit le faire transiter via le descripteur 1. Si ce
+dernier est associé au terminal, ce qui est le cas par défaut, cela se
+matérialise pour l'utilisateur par un affichage à l'écran.
+
+
+Sortie d'erreur standard
+------------------------
+
+Le descripteur de fichier 2 est également nommé "sortie d'erreur standard du
+processus". Par convention, un processus qui souhaite envoyer un message
+d'erreur à l'utilisateur doit le faire transiter via le descripteur 2. Si ce
+dernier est associé au terminal, ce qui est le cas par défaut, cela se
+matérialise pour l'utilisateur par un affichage à l'écran.
+
+
+Redirection des sorties en écriture
+-----------------------------------
+
+La redirection des sorties en écriture permet d'envoyer les affichages liés à
+un descripteur particulier non plus sur le terminal, mais dans un fichier.
+
+Syntaxe pour la simple redirection :
+
+  $ commande 1> fichier
+
+Alternativement :
+
+  $ commande > fichier
+
+Exemple :
+
+  $ touch fichier{1,2,3}
+  $ ls
+  fichier1  fichier2  fichier3
+  $ ls > liste
+  $ cat liste 
+  fichier1
+  fichier2
+  fichier3
+  liste
+
+Si le fichier n'existe pas, il est créé. S'il existe déjà, il est écrasé.
+
+La double redirection permet de concaténer les messages résultant d'une
+commande au contenu d'un fichier déjà existant :
+
+  $ commande 1>> fichier
+
+Ou bien :
+
+  $ commande >> fichier
+
+Si le fichier n'existe pas, il est créé. S'il existe déjà, il est ouvert en
+mode ajout.
+
+Dans l'exemple suivant, on va ajouter la date à la fin du fichier 'liste' créé
+précédemment :
+
+  $ date
+  mar. oct. 13 08:51:28 CEST 2015
+  $ date >> liste 
+  $ cat liste 
+  fichier1
+  fichier2
+  fichier3
+  liste
+  mar. oct. 13 08:51:32 CEST 2015
+
+La redirection de la sortie d'erreur standard permet de récupérer les messages
+d'erreur dans un fichier. Les résultats restent à l'écran.
+
+  $ commande 2> fichier
+
+Exemple :
+
+  $ find / -name passwd 2> erreur
+  /usr/bin/passwd
+  /boot/initrd-tree/bin/passwd
+  /boot/initrd-tree/etc/passwd
+  /etc/passwd
+  $ cat erreur 
+  find: "/var/db/sudo": Permission non accordée
+  find: "/var/cache/ldconfig": Permission non accordée
+  find: "/var/spool/cron": Permission non accordée
+  ...
+
+Là encore, la double redirection de la sortie d'erreur standard permet de
+concaténer les messages d'erreur d'une commande au contenu d'un fichier
+existant.
+
+  $ commande 2>> fichier
+
+Dans l'exemple suivant, on va concaténer les messages d'erreur de la commande
+invalide 'ls -z' à la fin du fichier 'erreur' :
+
+  $ ls -z
+  ls : option invalide -- 'z'
+  Saisissez « ls --help » pour plus d'informations.
+  $ ls -z 2>> erreur 
+  $ cat erreur
+  find: "/var/db/sudo": Permission non accordée
+  find: "/var/cache/ldconfig": Permission non accordée
+  ...
+  find: "/etc/openvpn/keys": Permission non accordée
+  find: "/etc/openvpn/certs": Permission non accordée
+  ls : option invalide -- 'z'
+  Saisissez « ls --help » pour plus d'informations.
+
+Il est possible de rediriger plusieurs descripteurs sur une même ligne de
+commande.
+
+  $ commande 1> fichier_a 2> fichier_b
+
+Ou encore :
+
+  $ commande 2> fichier_b 1> fichier_a
+
+Exemple :
+
+  $ find / -name passwd 1> resultat 2> erreur
+  $ cat resultat 
+  /usr/bin/passwd
+  /boot/initrd-tree/bin/passwd
+  /boot/initrd-tree/etc/passwd
+  /etc/passwd
+  $ head -n 3 erreur 
+  find: "/var/db/sudo": Permission non accordée
+  find: "/var/cache/ldconfig": Permission non accordée
+  find: "/var/spool/cron": Permission non accordée
+
+L'option 'noclobber' du shell permet de se protéger d'un écrasement
+involontaire de fichier. Elle est désactivée par défaut.
+
+  $ set -o noclobber
+  $ date > resultat 
+  bash: resultat : impossible d'écraser le fichier existant
+
+Pour forcer l'écrasement il faudra utiliser le symbole de redirection ">|" :
+
+  $ date >| resultat 
+  $ cat resultat 
+  mar. oct. 13 09:16:30 CEST 2015
+
+Et voici comment on réactive l'écrasement des fichiers :
+
+  $ set +o noclobber
+
+Toutes les plates-formes Unix possèdent un fichier spécial nommé '/dev/null'
+qui permet de faire disparaître les affichages. Ce fichier est géré comme un
+périphérique et n'a pas de notion de contenu. On peut donc considérer qu'il
+est toujours vide. 
+
+  $ find / -name passwd 1> resultat 2> /dev/null
+
+
+Redirection de l'entrée standard
+--------------------------------
+
+La redirection de l'entrée standard concerne les commandes qui utilisent le
+descripteur 0, autrement dit celles qui déclenchent une saisie au clavier.
+
+  $ commande 0< fichier_message
+
+Ou bien :
+
+  $ commande < fichier_message
+
+Dans l'exemple qui suit, on va envoyer un mail à l'utilisateur 'glagaffe'. 
+
+  $ mail glagaffe
+  Subject: RDV
+  Rendez-vous au resto à 13h.
+  Nico
+  .
+  EOT
+
+  /!\ Pour mettre l'exemple ci-dessus en pratique, il faut que l'utilisateur
+  'glagaffe' existe et que le serveur mail soit configuré pour la machine
+  locale. Sur un système Slackware, on pourra faire ceci :
+
+    # adduser glagaffe
+    # chmod +x /etc/rc.d/rc.sendmail
+    # /etc/rc.d/rc.sendmail start
+
+  Et pour lire le mail :
+
+    $ su - glagaffe
+    $ mutt
+
+La commande 'mail' lit l'entrée standard jusqu'à la saisie d'un point "." sur
+une ligne. Les données saisies seront envoyées dans la boîte aux lettres de
+l'utilisateur 'glagaffe'. 
+
+Si l'on souhaite faire lire à la commande 'mail' non plus le clavier mais le
+contenu d'un fichier, il suffit de connecter le descripteur 0 sur le fichier
+désiré :
+
+  $ cat message 
+  RDV au resto à 13h.
+  Nico
+  $ mail -s "RDV" glagaffe < message 
+
+
+Redirections avancées
+---------------------
+
+Pour envoyer la sortie standard et la sortie d'erreur standard dans le même
+fichier, il faut employer une syntaxe particulière :
+
+  $ commande 1> fichier 2>&1
+
+Ou bien :
+
+  $ commande 2> fichier 1>&2
+
+Reprenons l'exemple de tout à l'heure :
+
+  $ find / -name passwd > resultat 2>&1
+  $ cat resultat 
+  find: "/home/glagaffe": Permission non accordée
+  /usr/bin/passwd
+  find: "/var/db/sudo": Permission non accordée
+  find: "/var/cache/ldconfig": Permission non accordée
+  find: "/var/spool/cron": Permission non accordée
+  ...
+
+La double redirection en lecture est principalement utilisée dans les scripts
+shell. Elle permet de connecter l'entrée standard d'une commande sur une
+portion du script.
+
+  $ commande <<ETIQUETTE
+  données
+  données
+  données
+  ETIQUETTE
+
+Le symbole placé à la suite des caractères "<<" est une déclaration
+d'étiquette. Elle sera utilisée pour marquer la fin des données à lire. Les
+lignes insérées entre les deux mots "ETIQUETTE" seront envoyées sur l'entrée
+standard de la commande. Exemple :
+
+  $ mail -s "RDV" glagaffe <<FIN
+  > Rendez-vous à 13h au resto.
+  > Nico.
+  > FIN
+
+  /!\ Les étiquettes doivent être immédiatement suivies d'un retour à la
+  ligne.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,170 @@
+====================
+Bash Scripting HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+====================
+
+Dernière révision : 19 décembre 2015
+
+Cette série de HOWTOs fournit un cours complet sur la programmation Bash.
+
+
+Bash Scripting 01 HOWTO
+-----------------------
+
+Ce HOWTO fournit une introduction générale au shell Bash.
+
+  * Définition du shell
+  * Caractéristiques du shell
+  * Historique du shell
+  * Scripts de démarrage
+  * Autres scripts
+
+
+Bash Scripting 02 HOWTO
+-----------------------
+
+Ce HOWTO explique la différence entre une commande externe et une commande
+interne et présente la commande interne 'cd' ainsi que le séparateur de
+commandes.
+
+  * Commandes externes et internes
+  * Les commandes externes
+  * Les commandes internes
+  * Implémentation interne et externe
+  * La commande interne 'cd'
+  * Séparateur de commandes
+
+
+Bash Scripting 03 HOWTO
+-----------------------
+
+Ce HOWTO traite des bases de l'affichage à l'écran.
+
+
+  * La commande 'echo'
+  * Le caractère '\n'
+  * Le caractère '\c'
+  * Le caractère '\t'
+
+
+Bash Scripting 04 HOWTO
+-----------------------
+
+Ce HOWTO traite de la substitution de noms de fichiers grâce à une série
+d'expressions basiques.
+
+  * Substitution de noms de fichiers
+  * Le caractère '*'
+  * Le caractère '?'
+  * Les crochets '[ ]'
+
+
+Bash Scripting 05 HOWTO
+-----------------------
+
+Ce HOWTO traite de la substitution de noms de fichiers grâce à une série
+d'expressions complexes.
+
+  * Expressions complexes
+  * ?(expression)
+  * *(expression)
+  * +(expression)
+  * @(expression)
+  * !(expression)
+  * Alternatives
+
+
+Bash Scripting 06 HOWTO
+-----------------------
+
+Ce HOWTO traite des redirections.
+
+  * Redirections
+  * Entrée et sorties standard des processus
+  * Entrée standard
+  * Sortie standard
+  * Sortie d'erreur standard
+  * Redirection des sorties en écriture
+  * Redirection de l'entrée standard
+  * Redirections avancées
+
+
+Bash Scripting 07 HOWTO
+-----------------------
+
+Ce HOWTO traite des tubes de communication.
+
+  * Tubes de communication
+  * Commandes ne lisant pas leur entrée standard
+  * Commandes lisant leur entrée standard
+  * Enchaîner des tubes
+  * Dupliquer les sorties
+  * Envoyer la sortie standard et la sortie d'erreur standard dans le tube
+
+
+Bash Scripting 08 HOWTO
+-----------------------
+
+Ce HOWTO traite du regroupement de commandes et des processus en arrière-plan.
+
+  * Regroupement de commandes
+  * Les parenthèses ( )
+  * Les accolades { }
+  * Conclusion
+  * Processus en arrière-plan
+
+
+Bash Scripting 09 HOWTO
+-----------------------
+
+Ce HOWTO propose une série d'exercices de révision.
+
+  * Exercices 1 - 12
+
+
+Bash Scripting 10 HOWTO
+-----------------------
+
+Ce HOWTO contient les corrigés des exercices du HOWTO précédent.
+
+  * Corrigés des exercices 1 - 12
+
+
+Bash Scripting 11 HOWTO
+-----------------------
+
+Ce HOWTO traite des variables d'environnement.
+
+  * Variables d'environnement
+  * Liste des variables
+  * Afficher la valeur d'une variable
+  * Modifier la valeur d'une variable
+  * Principales variables
+  * La variable HOME
+  * La variable PATH
+  * Rechercher une commande dans le répertoire courant
+  * La variable PWD
+  * La variable PS1
+  * La variable PS2
+  * La variable TMOUT
+  * La variable TERM
+  * La variable LOGNAME
+  * Processus et variables d'environnement
+  * Exportation des variables
+
+
+Bash Scripting 12 HOWTO
+-----------------------
+
+Ce HOWTO traite des options du shell. 
+
+  * Les options du shell
+  * Visualiser la liste des options du shell
+  * Activer et désactiver une option du shell
+  * L'option 'ignoreof'
+  * L'option 'noclobber'
+  * L'option 'emacs'
+  * L'option 'xtrace'
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

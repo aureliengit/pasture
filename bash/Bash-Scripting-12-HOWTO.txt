@@ -1,0 +1,121 @@
+=======================
+Bash Scripting 12 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 19 décembre 2015
+
+Ce HOWTO traite des options du shell. 
+
+
+  * Les options du shell
+  * Visualiser la liste des options du shell
+  * Activer et désactiver une option du shell
+  * L'option 'ignoreof'
+  * L'option 'noclobber'
+  * L'option 'emacs'
+  * L'option 'xtrace'
+
+
+Les options du shell
+--------------------
+
+Le shell propose des options permettant de paramétrer un certain nombre de
+fonctionnalités.
+
+
+Visualiser la liste des options du shell
+----------------------------------------
+
+La commande 'set' avec l'option '-o' affiche la liste des options du shell en
+indiquant si elles sont actuellement activées ou non.
+
+  $ set -o
+  allexport       off
+  braceexpand     on
+  emacs           on
+  errexit         off
+  errtrace        off
+  ...
+
+
+Activer et désactiver une option du shell
+-----------------------------------------
+
+Les options '-o' et '+o' de la commande interne 'set' permettent
+respectivement d'activer et de désactiver une option du shell. 
+
+Voici un exemple :
+
+  $ set -o | grep noclobber
+  noclobber       off
+  $ set -o noclobber
+  $ set -o | grep noclobber
+  noclobber       on
+  $ set +o noclobber
+  $ set -o | grep noclobber
+  noclobber       off
+
+  /!\ Effectivement, ce n'est pas très intuitif.
+
+
+L'option 'ignoreof'
+-------------------
+
+Si l'option 'ignoreeof' est activée, il devient impossible de quitter le shell
+en appuyant sur [Ctrl]+[D]. L'option est désactivée par défaut.
+
+  $ set -o | grep ignoreeof
+  ignoreeof       off
+  $ set -o ignoreeof
+  $ ^D
+  Utilisez « exit » pour quitter le shell.
+
+
+L'option 'noclobber'
+--------------------
+
+Lorsqu'une redirection est faite vers un fichier déjà existant, celui-ci est
+écrasé sans sommation (sous réserve des permissions). Pour être averti de
+l'existence du fichier, il faut activer l'option 'noclobber'. À partir de là,
+on pourra forcer l'écrasement en utilisant la redirection '>|'. 
+
+    $ set -o | grep noclobber
+    noclobber       off
+    $ echo Bonjour > fichier.txt
+    $ cat fichier.txt 
+    Bonjour
+    $ echo Au revoir > fichier.txt 
+    $ cat fichier.txt 
+    Au revoir
+    $ set -o noclobber
+    $ set -o | grep noclobber
+    noclobber       on
+    $ echo Merci > fichier.txt 
+    bash: fichier.txt : impossible d'écraser le fichier existant
+    $ echo Merci >| fichier.txt 
+    $ cat fichier.txt 
+    Merci
+
+
+L'option 'emacs'
+----------------
+
+L'option 'emacs' permet de paramétrer le rappel des commandes. Elle est
+activée par défaut.
+
+  $ set -o | grep emacs
+  emacs           on
+
+
+L'option 'xtrace'
+-----------------
+
+Enfin, l'option 'xtrace' est utilisée en programmation shell pour déboguer les
+scripts. Elle est désactivée par défaut.
+
+  $ set -o | grep xtrace
+  xtrace          off
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

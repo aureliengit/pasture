@@ -1,0 +1,98 @@
+=======================
+Bash Scripting 01 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 17 décembre 2015
+
+Ce HOWTO fournit une introduction générale au shell Bash.
+
+
+  * Définition du shell
+  * Caractéristiques du shell
+  * Historique du shell
+  * Scripts de démarrage
+  * Autres scripts
+
+
+Définition du shell
+-------------------
+
+Le shell est un programme ayant pour fonction d'assurer l'interface entre
+l'utilisateur et le système Linux. C'est un interpréteur de commandes.
+
+Plusieurs shells sont disponibles sur les plates-formes Linux.
+
+
+Caractéristiques du shell
+-------------------------
+
+Les interpréteurs de commandes disponibles en environnement Unix et Linux ont
+en commun les fonctionnalités suivantes :
+
+  - Ils proposent un jeu de caractères spéciaux permettant de déclencher des
+    actions particulières.
+
+  - Ils possèdent des commandes internes et des mots clés parmi lesquels
+    certains sont utilisés pour faire de la programmation.
+
+  - Ils utilisent des fichiers d'initialisation permettant à un utilisateur de
+    paramétrer son environnement de travail.
+
+Chaque shell propose ses propres caractères spéciaux, commandes internes, mots
+clés et fichiers de paramétrage. Heureusement, les interpréteurs les plus
+utilisés actuellement dérivent tous du shell Bourne et ont, par conséquent, un
+certain nombre de fonctionnalités en commun.
+
+
+Historique du shell
+-------------------
+
+Le shell qui est considéré comme le plus ancien est le Bourne Shell (sh). Il a
+été écrit dans les années 1970 par Steve Bourne aux laboratoires AT & T. Outre
+sa capacité à lancer des commandes, il offre des fonctionnalités de
+programmation. Le Bourne Shell est un shell ancien qui est de moins en moins
+utilisé sur les plates-formes Unix.
+
+Durant la même période, Bill Joy invente le C-Shell (csh), incompatible avec
+le Bourne Shell, mais qui offre des fonctionnalités supplémentaires telles
+que l'historique des commandes, le contrôle des tâches ou la possibilité de
+créer des alias de commandes. Ces trois aspects seront repris plus tard dans
+le Korn Shell. Le C-Shell est peu utilisé dans le monde Unix. 
+
+En 1983, David Korn reprend le Bourne Shell et l'enrichit. Ce nouvel
+interpréteur prendra le nom de Korn Shell (ksh). Il sera de plus en plus
+employé et deviendra un standard de fait. Le ksh88 (version datant de 1988)
+est, avec le Bourne Again Shell, le shell le plus utilisé actuellement. Il a
+servi de base à la normalisation POSIX du shell.
+
+En 1993, une nouvelle version du Korn Shell voit le jour (ksh93). Celle-ci
+présente une compatibilité arrière avec le ksh88, à quelques exceptions près.
+Le ksh93 est disponible sur certaines versions Unix récentes : Solaris et AIX.
+
+La Free Software Foundation propose le Bourne Again Shell (bash). Il est
+conforme à la norme POSIX à laquelle il a ajouté quelques extensions. Ce shell
+est l'interpréteur fourni en standard sur les systèmes Linux. Il est également
+disponible en standard ou en téléchargement sur les systèmes Unix. 
+
+
+Scripts de démarrage
+--------------------
+
+Sur certaines plates-formes, les scripts de démarrage sont interprétés par un
+Bourne Shell. Si l'on souhaite modifier ces scripts ou créer de nouveaux
+scripts de démarrage, il faut dans ce cas se restreindre à la syntaxe Bourne
+Shell. De manière plus générale, il faut utiliser la syntaxe qui correspond au
+shell qui interprète les scripts de démarrage.
+
+
+Autres scripts
+--------------
+
+Dans les cas les plus fréquents - scripts de traitement exécutés en mode de
+fonctionnement Unix normal - le développeur choisira soit le shell Bash, soit
+le Korn Shell 88 ou 93, selon le shell disponible sur sa plate-forme. En ce
+qui nous concerne, nous nous concentrerons sur le shell Bash.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,159 @@
+=======================
+Bash Scripting 08 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 19 décembre 2015
+
+Ce HOWTO traite du regroupement de commandes et des processus en arrière-plan.
+
+
+  * Regroupement de commandes
+  * Les parenthèses ( )
+  * Les accolades { }
+  * Conclusion
+  * Processus en arrière-plan
+
+
+Regroupement de commandes
+-------------------------
+
+Le regroupement de commandes peut être utilisé pour :
+
+  * rediriger la sortie d'écran de plusieurs commandes vers un même fichier ou
+    vers un tube ;
+
+  * faire exécuter plusieurs commandes dans le même environnement.
+
+Dans l'exemple qui suit, seule la sortie standard de la deuxième commande est
+redirigée dans le fichier 'resultat.txt' :
+
+  $ date ; ls > resultat.txt
+  ven. oct. 16 11:35:10 CEST 2015
+  $ cat resultat.txt 
+  fichier.log
+  readme.txt
+  resultat.txt
+  typescript
+
+Les parenthèses ( ) et les accolades { } permettent de regrouper les
+commandes. 
+
+
+Les parenthèses ( )
+-------------------
+
+Avec les parenthèses ( ), un shell enfant est systématiquement créé, et c'est
+ce dernier qui traite la ligne de commande :
+
+  $ (commande1 ; commande2 ; commande3)
+
+Ici, l'utilisateur se sert des parenthèses ( ) pour rediriger la sortie de
+deux commandes :
+
+  $ (date ; ls) > resultat.txt 
+  $ cat resultat.txt 
+  ven. oct. 16 11:38:55 CEST 2015
+  fichier.log
+  readme.txt
+  resultat.txt
+  typescript
+
+Dans l'exemple suivant, les commandes regroupées 'pwd' et 'ls' ont pour
+répertoire courant '/tmp' :
+
+  $ pwd
+  /home/kikinovak
+  $ (cd /tmp ; pwd ; ls) > liste.txt
+  $ cat liste.txt 
+  /tmp
+  7FE2ZX.tmp
+  8AY85X.tmp
+  8UBXZX.tmp
+  A6S6ZX.tmp
+  ...
+
+Lorsque l'exécution des trois commandes regroupées est terminée, le shell de
+premier niveau reprend la main, et son répertoire courant est toujours
+'/home/kikinovak' :
+
+  $ pwd
+  /home/kikinovak
+
+
+Les accolades { }
+-----------------
+
+Les deux commandes suivantes produisent le même résultat, mais la version avec
+les accolades { } est plus rapide :
+
+$ (date ; ls) > resultat.txt 
+$ { date ; ls ; } > resultat.txt 
+
+Au niveau de la syntaxe, les accolades ouvrante { et fermante } doivent être
+respectivement suivies et précédées par un espace. La dernière commande doit
+être suivie d'un point-virgule ';' :
+
+  $ { commande1 ; commande2 ; commande3 ; }
+
+À la différence des commandes regroupées entre parenthèses ( ), les commandes
+regroupées entre accolades { } sont traitées par le shell courant.
+
+Reprenons l'exemple précédent en remplaçant les parenthèses ( ) par des
+accolades { }. L'environnement du shell de premier niveau va être modifié, ce
+qui peut être gênant :
+
+  $ pwd
+  /home/kikinovak
+  $ { cd /tmp ; pwd ; ls ; } > ~/liste.txt 
+  $ cat ~/liste.txt 
+  /tmp
+  7FE2ZX.tmp
+  8AY85X.tmp
+  8UBXZX.tmp
+  A6S6ZX.tmp
+  ...
+  $ pwd
+  /tmp
+
+
+Conclusion
+----------
+
+Les parenthèses sont plus utilisées que les accolades pour deux raisons :
+
+  * leur syntaxe est plus simple à utiliser ;
+
+  * quel que soit le jeu de commandes, on est toujours sûr de retrouver
+    l'environnement de travail initial.
+
+L'utilisation des accolades se justifiera dans le cas d'une recherche de
+performances. 
+
+
+Processus en arrière-plan
+-------------------------
+
+Les notions d'arrière-plan et d'avant-plan sont gérées par le shell. 
+
+Par défaut, les commandes sont lancées en avant-plan. Dans ce mode, le shell
+parent s'endort en attendant la fin de la commande. Il reprend la main
+uniquement lorsque la commande est terminée. 
+
+Le caractère '&' est un caractère spécial du shell qui permet de lancer la
+commande en arrière-plan. Le shell lance la commande et réaffiche
+immédiatement son prompt en attente d'une nouvelle commande. Comme le shell et
+la commande s'exécutent en parallèle et qu'ils sont tous deux liés au même
+terminal, il est conseillé de rediriger les sorties de la commande. 
+
+Dans l'exemple qui suit, le shell affiche le PID de la commande (12421) ainsi
+que son index ([1]) dans la liste des tâches en arrière-plan lancées à partir
+de ce shell :
+
+  $ find / -size +2000 1>/tmp/resultat.txt 2>/dev/null &
+  [1] 12421
+  $ 
+
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,121 @@
+=======================
+Bash Scripting 05 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 18 décembre 2015
+
+Ce HOWTO traite de la substitution de noms de fichiers grâce à une série
+d'expressions complexes.
+
+
+  * Expressions complexes
+  * ?(expression)
+  * *(expression)
+  * +(expression)
+  * @(expression)
+  * !(expression)
+  * Alternatives
+
+
+Expressions complexes
+---------------------
+
+Pour utiliser les expressions complexes en Bash, il faut préalablement activer
+l'option 'extglob' avec la commande suivante :
+
+  $ shopt -s extglob
+
+Voici le contenu du répertoire qui sera utilisé dans les exemples suivants :
+
+  $ ls
+  fic               fic866866.log  fic866.log  fic868.log  readme.txt
+  fic866866866.log  fic866868.log  fic867.log  fic.log     typescript
+
+
+?(expression)
+-------------
+
+L'expression '?(expression)' sera présente 0 ou 1 fois.
+
+Fichiers dont le nom commence par 'fic' suivi de 0 ou 1 occurrence de '866',
+suivi de '.log' :
+
+  $ ls fic?(866).log
+  fic866.log  fic.log
+
+
+*(expression)
+-------------
+
+L'expression '*(expression)' sera présente entre 0 et n fois. 
+
+Fichiers dont le nom commence par 'fic', suivi de 0 à n occurrence(s) de
+'866', suivi de '.log' :
+
+  $ ls fic*(866).log
+  fic866866866.log  fic866866.log  fic866.log  fic.log
+
+
++(expression)
+-------------
+
+L'expression '+(expression)' sera présente entre 1 et n fois.
+
+Fichiers dont le nom commence par 'fic', suivi d'au moins une occurrence de
+'866', suivi de '.log' :
+
+  $ ls fic+(866).log
+  fic866866866.log  fic866866.log  fic866.log
+
+
+@(expression)
+-------------
+
+L'expression '@(expression)' sera présente exactement 1 fois.
+
+Fichiers dont le nom commence par 'fic', suivi exactement d'une occurrence de
+'866', suivi de '.log' :
+
+  $ ls fic@(866).log
+  fic866.log
+
+
+!(expression)
+-------------
+
+L'expression '!(expression)' ne sera pas présente.
+
+Fichiers dont le nom commence par 'fic', suivi d'une expression qui n'est pas
+la chaîne '866', suivi de '.log' :
+
+  $ ls fic!(866).log
+  fic866866866.log  fic866866.log  fic866868.log  fic867.log  fic868.log
+  fic.log
+
+Fichiers dont le nom ne commence pas par 'fic' :
+
+  $ ls !(fic*)
+  readme.txt  typescript
+
+
+Alternatives
+------------
+
+Une barre verticale '|' à l'intérieur d'une expression complexe prend le sens
+de "ou bien". 
+
+Fichiers dont le nom commence par 'fic', suivi de '866' ou '867', suivi de
+'.log' :
+
+  $ ls fic@(866|867).log
+  fic866.log  fic867.log
+
+Fichiers dont le nom commence par 'fic', suivi de 1 à n occurrence(s) de '866'
+ou '868', suivi de '.log' :
+
+  $ ls fic+(866|868).log
+  fic866866866.log  fic866866.log  fic866868.log  fic866.log  fic868.log
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

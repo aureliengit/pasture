@@ -1,0 +1,139 @@
+=======================
+Bash Scripting 04 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 17 décembre 2015
+
+Ce HOWTO traite de la substitution de noms de fichiers grâce à une série
+d'expressions basiques.
+
+
+  * Substitution de noms de fichiers
+  * Le caractère '*'
+  * Le caractère '?'
+  * Les crochets '[ ]'
+
+
+Substitution de noms de fichiers
+--------------------------------
+
+De nombreuses commandes prennent des noms de fichiers en argument. Ces
+derniers peuvent être cités littéralement ou être spécifiés de manière plus
+générique. Le shell propose un certain nombre de caractères spéciaux qui
+permettent de fabriquer des expressions utilisées comme modèles de noms de
+fichiers.
+
+
+Le caractère '*'
+----------------
+
+Le caractère '*' représente une suite de caractères quelconques. Voici
+quelques exemples.
+
+  $ ls
+  f12  f1.i  FICa  fic.c  fic.s  monscript.pl  MONSCRIPT.pl  ours.c
+
+  /!\ Pour créer tous ces fichiers, on pourra utiliser la commande 'touch'.
+
+Afficher tous les noms de fichier se terminant par '.c' :
+
+  $ ls *.c
+  fic.c  ours.c
+
+Afficher tous les noms de fichier commençant par la lettre 'f' :
+
+  $ ls f*
+  f12  f1.i  fic.c  fic.s
+
+
+Le caractère '?'
+----------------
+
+Le caractère "?" représente un caractère quelconque. Voici quelques exemples.
+
+Afficher tous les noms de fichier ayant une extension composée d'un seul
+caractère :
+
+  $ ls *.?
+  f1.i  fic.c  fic.s  ours.c
+
+Afficher tous les noms de fichier composés de quatre caractères :
+
+  $ ls ????
+  f1.i  FICa
+
+Les crochets '[ ]'
+--------------------
+
+Les crochets '[ ]' permettent de spécifier la liste des caractères que l'on
+attend à une position bien précise dans le nom du fichier. Il est également
+possible d'utiliser les notions d'intervalle et de négation. 
+
+  /!\ Les exemples cités ci-dessous peuvent produire des résultats surprenants
+  en fonction de certaines variables d'environnement. Dans le doute, on fera
+  ceci :
+    
+    $ LANG=C
+    $ LC_COLLATE=C
+
+  Pour chacun des exemples, une alternative est donnée qui fonctionne
+  parfaitement pour des variables d'environnement LANG et LC_COLLATE
+  différentes, par exemple 'fr_FR.utf8'.
+
+Fichiers dont le nom commence par 'f' ou 'o' et se termine par le caractère
+'.' suivi d'une minuscule :
+
+  $ ls [fo]*.[a-z]
+  f1.i  fic.c  fic.s  ours.c
+
+Alternativement :
+
+  $ ls [fo]*.[[:lower:]]
+  f1.i  fic.c  fic.s  ours.c
+
+Fichiers dont le nom comporte en deuxième caractère une majuscule ou un
+chiffre ou la lettre 'i'. Les deux premiers caractères seront suivis d'une
+chaîne quelconque :
+
+  $ ls ?[A-Z0-9i]*
+  FICa  MONSCRIPT.pl  f1.i  f12  fic.c  fic.s
+
+Alternativement :
+
+  $ ls ?[[:upper:]0-9i]*
+  f12  f1.i  FICa  fic.c  fic.s  MONSCRIPT.pl
+
+Il est également possible d'exprimer la négation de tous les caractères
+spécifiés à l'intérieur d'une paire de crochets. Ceci se fait en plaçant un
+'!' en première position à l'intérieur de celle-ci.
+
+Noms de fichier ne commençant pas par une minuscule :
+
+  $ ls [!a-z]*
+  FICa  MONSCRIPT.pl
+
+Alternativement :
+
+  $ ls [![:lower:]]*
+  FICa  MONSCRIPT.pl
+
+Noms de fichier ne commençant pas par une majuscule :
+
+  $ ls [!A-Z]*
+  f1.i  f12  fic.c  fic.s  monscript.pl  ours.c
+
+Alternativement :
+
+  $ ls [![:upper:]]*
+  f12  f1.i  fic.c  fic.s  monscript.pl  ours.c
+
+Supprimer tous les fichiers dont le nom se termine par '.c' ou par '.s' :
+
+  $ rm -i *.c *.s
+  rm : supprimer fichier « fic.c » ? o
+  rm : supprimer fichier « ours.c » ? o
+  rm : supprimer fichier « fic.s » ? o
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
