@@ -1,0 +1,52 @@
+Sun Oct  2 16:45:01 CEST 2016
+xap/owncloud-client-2.2.4-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Mon Sep 19 09:05:12 CEST 2016
+xap/virtualbox-kernel-5.0.26_4.4.19-x86_64-2_microlinux.txz: Rebuilt.
+xap/owncloud-client-2.2.3-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Sep  3 10:10:48 CEST 2016
+xap/CherryTree-0.37.4-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sun Jul 31 18:27:35 CEST 2016
+xap/blender-2.77a-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sun Jul 31 12:50:37 CEST 2016
+d/fpc-2.6.4-x86_64-1_microlinux.txz: Added.
+d/fpc-source-2.6.4-noarch-1_microlinux.txz: Added.
+d/lazarus-1.2.6-x86_64-1_microlinux.txz: Added.
+xap/winff-20150729-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat Jul 30 10:37:51 CEST 2016
+xap/simple-scan-2.32.0.2-x86_64-1_microlinux.txz: Added.
+y/aisleriot-3.6.2-x86_64-1_microlinux.txz: Added.
+xap/homebank-5.0.9-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri Jul 29 17:40:17 CEST 2016
+xap/filezilla-3.19.0-x86_64-1_microlinux.txz: Added.
+xap/remmina-20160509-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Thu Jul 28 09:50:56 CEST 2016
+xap/aMule-2.3.1-x86_64-1_microlinux.txz: Added.
+xap/librecad-2.0.11-x86_64-1_microlinux.txz: Added.
+xap/easytag-2.1.10-x86_64-1_microlinux.txz: Added.
+xap/anki-2.0.36-noarch-1_microlinux.txz: Added.
++--------------------------+
+Wed Jul 27 19:42:02 CEST 2016
+xap/HandBrake-0.9.9-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue Jul 26 16:23:48 CEST 2016
+xap/virtualbox-5.0.26-x86_64-1_microlinux.txz: Added.
+xap/virtualbox-kernel-5.0.26_4.4.14-x86_64-1_microlinux.txz: Added.
+xap/virtualbox-extension-pack-5.0.26-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat Jul 23 10:40:13 CEST 2016
+ap/qemu-2.4.1-x86_64-1_microlinux.txz: Added.
+xap/virt-manager-1.4.0-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Thu Jul 21 10:42:36 CEST 2016
+xap/owncloud-client-2.2.2-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue Jul 19 10:44:31 CEST 2016
+xap/gtkcdlabel-1.15-noarch-1_microlinux.txz: Added.
++--------------------------+

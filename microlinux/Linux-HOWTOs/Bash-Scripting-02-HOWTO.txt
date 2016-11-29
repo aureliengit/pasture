@@ -1,0 +1,659 @@
+=======================
+Bash Scripting 02 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=======================
+
+Dernière révision : 26 octobre 2015
+
+Voici la deuxième partie du HOWTO qui présente les fonctionnalités de base de
+la programmation shell.
+
+
+  * Exécution de tests
+  * Les opérateurs du shell
+  * Arithmétique
+  * Mise au point d'un script
+
+
+Exécution de tests
+------------------
+
+Les commandes '[ ]' et '[[ ]]' permettent de réaliser des tests.
+
+  - La commande '[ ]' est utilisable également sous le nom de 'test'. Il
+    s'agit de la commande originelle, également compatible avec le shell
+    Bourne.
+
+  - La commande '[[ ]]' est un sur-ensemble de la précédente. Elle n'est pas
+    compatible avec le shell Bourne.
+
+La commande '[ ]' (ou 'test') permet de faire des tests sur des fichiers, des
+chaînes de caractères et des nombres. Elle renvoie le code 0 (vrai) ou 1
+(faux), que l'utilisateur peut consulter en faisant afficher la valeur de $?.
+
+La commande 'test' propose deux syntaxes équivalentes :
+
+  $ test expression 
+
+Ou :
+
+  $ [ expression ]
+
+La paire de crochets représente la commande 'test'. Les crochets ouvrant et
+fermant sont respectivement suivis et précédés d'un espace. Cette syntaxe est
+plus agréable à utiliser. Voici quelques exemples en guise d'illustration.
+
+'/etc/passwd' est un fichier ordinaire :
+
+  $ test -f /etc/passwd
+  $ echo $?
+  0
+
+Même test, mais avec l'autre syntaxe :
+
+  [ -f /etc/passwd ]
+  $ echo $?
+  0
+
+Test d'un fichier qui n'existe pas :
+
+  $ [ -f /tmp/yatahongaga ]
+  $ echo $?
+  1
+
+'/tmp' est un répertoire :
+
+  $ [ -d /tmp ]
+  $ echo $?
+  0
+
+Le fichier contenu dans la variable "file1" n'est pas un répertoire :
+
+  $ file1=/etc/passwd
+  $ test -d $file1
+  $ echo $?
+  1
+
+L'utilisateur n'a pas le droit d'écriture sur ce fichier :
+
+  $ test -w $file1
+  $ echo $?
+  1
+
+Voici un tableau récapitulatif des tests les plus courants :
+
+  +------------+-----------------------------------------------+
+  | Expression |                  Code retour                  |
+  +------------+-----------------------------------------------+
+  | -e fichier | 0 si le fichier existe                        |
+  | -s fichier | 0 si le fichier n'est pas vide                |
+  | -f fichier | 0 si le fichier est de type ordinaire         |
+  | -d fichier | 0 si le fichier est un répertoire             |
+  | -h fichier | 0 si le fichier est un lien symbolique        |
+  | -b fichier | 0 si le fichier est de type spécial bloc      |
+  | -c fichier | 0 si le fichier est de type spécial caractère |
+  | -r fichier | 0 si le fichier est accessible en lecture     |
+  | -w fichier | 0 si le fichier est accessible en écriture    |
+  | -x fichier | 0 si le fichier est exécutable                |
+  +------------+-----------------------------------------------+
+
+En dehors des fichiers, on peut également effectuer des tests sur les chaînes
+de caractères. Une chaîne peut être composée de n'importe quelle suite de
+caractères, y compris des chiffres. Il est recommandé de mettre le nom des
+variables entre guillemets. 
+
+Initialisation de deux chaînes :
+
+  $ ch1=root
+  $ ch2=kikinovak
+
+Les deux chaînes ne sont pas égales :
+
+  $ [ "$ch1" = "$ch2" ]
+  $ echo $?
+  1
+
+La variable "ch1" n'est pas vide :
+
+  $ [ -n "$ch1" ]
+  $ echo $?
+  0
+
+Une autre façon de vérifier que la variable "ch1" n'est pas vide :
+
+  $ [ -z "$ch1" ]
+  $ echo $?
+  1
+
+Les guillemets permettent de transformer du vide en "chaîne vide" :
+
+  $ [ -n "$ch3" ]
+  $ echo $?
+  1
+
+Voici une petite vue d'ensemble sur les tests que l'on peut effectuer sur les
+chaînes de caractères :
+
+  +------------+-----------------------------------------+
+  | Expression |               Code retour               |
+  +------------+-----------------------------------------+
+  | -z chaine1 |  0 si la chaîne est de longueur 0       |
+  | -n chaine1 |  0 si la chaîne n'est pas de longueur 0 |
+  | ch1 = ch2  |  0 si les deux chaînes sont égales      |
+  | ch1 != ch2 |  0 si les deux chaînes sont différentes |
+  | chaine1    |  0 si la chaîne n'est pas vide          |
+  +------------+-----------------------------------------+
+
+On peut également effectuer des tests sur les nombres. Dans l'exemple
+ci-dessous, on commence par saisir deux nombres au clavier.
+
+  $ read nb1
+  12
+  $ read nb2
+  -3
+  $ echo $nb1
+  12
+  $ echo $nb2
+  -3
+
+Lorsqu'on compare deux chiffres, il n'est pas indispensable de mettre des
+guillemets autour des variables.
+
+Est-ce que la valeur de "nb1" est inférieure à "nb2" ?
+
+  $ [ $nb1 -lt $nb2 ]
+  $ echo $?
+  1
+
+Est-ce que "nb1" est différent de "nb2" ?
+
+  $ [ $nb1 -ne $nb2 ]
+  $ echo $?
+  0
+
+Voici les différents tests que l'on peut effectuer sur les nombres :
+
+  +-------------+-----------------+
+  | Expression  |   Code retour   |
+  +-------------+-----------------+
+  | nb1 -eq nb2 | 0 si nb1 =  nb2 |
+  | nb1 -ne nb2 | 0 si nb1 != nb2 |
+  | nb1 -lt nb2 | 0 si nb1 <  nb2 |
+  | nb1 -le nb2 | 0 si nb1 <= nb2 |
+  | nb1 -gt nb2 | 0 si nb1 >  nb2 |
+  | nb1 -ge nb2 | 0 si nb1 >= nb2 |
+  +-------------+-----------------+
+
+Les tests peuvent être combinés avec les trois opérateurs logiques "!"
+(négation), '-a' (AND = "et" logique) et '-o' (OR = "ou logique). Il doit y
+avoir un espace autour des opérateurs "!", "-a" et "-o".
+
+La commande 'test' renvoie "vrai" si '/etc/passwd' n'est pas un répertoire :
+
+  $ [ ! -d /etc/passwd ]
+  $ echo $?
+  0
+
+La commande 'test' renvoie "vrai" si $rep est un répertoire et si
+l'utilisateur a le droit de le traverser :
+
+  $ rep=/tmp
+  $ echo $rep
+  /tmp
+  $ [ -d $rep -a -x $rep ]
+  $ echo $?
+  0
+
+Concrètement, la commande 'test' est utilisée avec les structures de contrôle.
+La structure de contrôle 'if' est présentée ici dans le but d'illustrer la
+commande :
+
+  if commande1
+  then
+    commande2
+    commande3
+    ...
+  else
+    commande4
+    ...
+  fi
+
+Ou encore :
+
+  if commande1 ; then
+    commande2
+    commande3
+    ...
+  else
+    commande4
+    ...
+  fi
+
+Le principe est le suivant : la commande située à droite du 'if' (commande1)
+est lancée. Si le code de retour de la commande vaut 0 (vrai), la première
+partie du 'if' est exécutée (commande2 et commande3). Dans le cas contraire
+($? supérieur à 0), c'est la deuxième partie qui est exécutée (commande4). La
+partie 'else' est facultative.
+
+Dans l'exemple qui suit, le script 'testarg.sh' teste le nombre d'arguments
+reçus.
+
+  $ nl testarg.sh 
+       1  #!/bin/bash
+       2  #
+       3  # Un script qui teste le nombre d'arguments reçus
+         
+       4  if [ $# -ne 2 ] ; then
+       5    echo "Usage: $0 arg1 arg2"
+       6    exit 1
+       7  fi
+       8  echo "Le nombre d'arguments est correct."
+       9  exit 0
+
+Avec deux arguments :
+
+  $ ./testarg.sh fichier1 fichier2
+  Le nombre d'arguments est correct.
+
+Avec trois arguments :
+
+  $ ./testarg.sh fichier1 fichier2 fichier3
+  Usage: ./testarg.sh arg1 arg2
+
+La commande '[[ ]]' est une version enrichie de la commande 'test'. Les
+opérateurs présentés ci-dessus sont toujours valables, à l'exception de '-a'
+et '-o'. Entre autres choses, la commande permet de travailler avec les
+expressions complexes.
+
+Le script ci-dessous teste si la valeur saisie est un nombre :
+
+  $ nl test_nombre.sh
+       1  #!/bin/bash
+       2  #
+       3  # Script pour tester si la valeur saisie est un nombre
+       4  #
+       5  echo -e "Entrez un nombre : \c"
+       6  read nombre
+         
+       7  # Activer les expressions complexes
+       8  shopt -s extglob
+         
+       9  # On teste si le nombre est composé d'une suite de chiffres éventuellement
+      10  # précédée d'un signe + ou -
+         
+      11  if [[ $nombre = ?([+-])+([0-9]) ]]; then
+      12    echo "$nombre est un nombre."
+      13    exit 0
+      14  fi
+         
+      15  echo "$nombre n'est pas un nombre."
+      16  exit 1
+
+Exécution du script :
+
+  $ ./test_nombre.sh 
+  Entrez un nombre : 456
+  456 est un nombre.
+  $ ./test_nombre.sh 
+  Entrez un nombre : +456
+  +456 est un nombre.
+  $ ./test_nombre.sh 
+  Entrez un nombre : -456
+  -456 est un nombre.
+  $ ./test_nombre.sh 
+  Entrez un nombre : 78*
+  78* n'est pas un nombre.
+  $ ./test_nombre.sh 
+  Entrez un nombre : az78
+
+
+Les opérateurs du shell
+-----------------------
+
+Ces opérateurs permettent d'exécuter une commande - ou de ne pas l'exécuter -
+en fonction du code retour d'une autre commande. 
+
+  +-----------+----------------+
+  | Opérateur |  Signification |
+  +-----------+----------------+
+  |    &&     |  ET logique    |
+  |    ||     |  OU logique    |
+  +-----------+----------------+
+
+Dans l'exemple ci-dessous, la deuxième commande est exécutée uniquement si la
+première renvoie un code 0 (vrai). L'expression globale est vraie si les deux
+commandes renvoient 0 (vrai) :
+
+  $ commande1 && commande2
+
+Le répertoire '/tmp/svg' n'existe pas, la commande 'cd' n'est donc pas
+exécutée :
+
+  $ ls -d /tmp/svg
+  ls: impossible d'accéder à /tmp/svg: Aucun fichier ou dossier de ce type
+  $ pwd
+  /home/kikinovak
+  $ [[ -d /tmp/svg ]] && cd /tmp/svg
+  $ echo $?
+  1
+  $ pwd
+  /home/kikinovak
+
+Le répertoire '/tmp/svg' existe, la commande 'cd' est donc exécutée :
+
+  $ mkdir -v /tmp/svg
+  mkdir: création du répertoire « /tmp/svg »
+  $ pwd
+  /home/kikinovak
+  $ [[ -d /tmp/svg ]] && cd /tmp/svg
+  $ pwd
+  /tmp/svg
+
+Cette action peut également être implémentée avec la structure de contrôle
+'if' :
+
+  $ ls -d /tmp/svg/
+  /tmp/svg/
+  $ if [[ -d /tmp/svg ]]; then
+  > cd /tmp/svg
+  > fi
+  $ pwd
+  /tmp/svg
+
+Dans l'exemple ci-dessous, la deuxième commande est exécutée uniquement si la
+première renvoie un code 1 (faux). L'expression globale est vraie si au moins
+l'une des deux commandes renvoie 0 (vrai) :
+
+  $ commande1 || commande2
+
+Le répertoire '/tmp/svg' n'existe pas, la commande 'echo' est donc exécutée :
+
+  $ ls -d /tmp/svg
+  ls: impossible d'accéder à /tmp/svg: Aucun fichier ou dossier de ce type
+  $ [[ -d /tmp/svg ]] || echo "Le répertoire /tmp/svg n'existe pas."
+  Le répertoire /tmp/svg n'existe pas.
+
+Le répertoire '/tmp/svg' existe, la commande 'echo' n'est donc pas exécutée :
+
+  $ mkdir -v /tmp/svg
+  mkdir: création du répertoire « /tmp/svg »
+  $ [[ -d /tmp/svg ]] || echo "Le répertoire /tmp/svg n'existe pas."
+
+Cette action peut également être implémentée avec la structure de contrôle
+'if' :
+
+  $ ls -d /tmp/svg
+  ls: impossible d'accéder à /tmp/svg: Aucun fichier ou dossier de ce type
+  $ if [[ ! -d /tmp/svg ]]
+  > then
+  > echo "Le répertoire /tmp/svg n'existe pas."
+  > fi
+  Le répertoire /tmp/svg n'existe pas.
+
+
+Arithmétique
+------------
+
+Le shell permet nativement de réaliser des calculs avec les nombres entiers,
+grâce à la commande 'expr'. Certains opérateurs sont fabriqués avec des
+caractères ayant une signification spéciale pour le shell. Ils doivent être
+précédés d'un antislash "\" pour éviter d'être interprétés. 
+
+  $ expr nombre1 <opérateur> nombre2
+
+Quelques exemples :
+
+  $ expr 4 + 7
+  11
+  $ expr 4 - 7
+  -3
+  $ expr 7 \* 8
+  56
+  $ expr 10 / 2
+  5
+
+Rien ne nous empêche d'utiliser des variables :
+
+  $ x=5
+  $ expr $x + 6
+  11
+
+On peut même récupérer le résultat de la commande dans une variable :
+
+  $ resultat=$(expr $x + 6)
+  $ echo $resultat
+  11
+
+Regroupement d'expressions :
+
+  $ y=2
+  $ resultat=$(expr $y \* 3 + 1)
+  $ echo $resultat
+  7
+  $ resultat=$(expr $y \* \( 3 + 1 \))
+  $ echo $resultat
+  8
+
+Le script suivant compare deux nombres. L'affichage de la commande 'expr'
+n'est pas exploité, la sortie standard est donc redirigée vers '/dev/null'.
+
+  $ nl plusgrandque.sh
+       1  #!/bin/bash
+       2  #
+       3  # Test du nombre d'arguments
+       4  if [[ $# -ne 2 ]]; then
+       5    echo "Mauvais nombre d'arguments..."
+       6    echo "Usage : $0 nombre1 nombre2"
+       7    exit 1
+       8  fi
+         
+       9  # Comparer nombre1 et nombre2 avec expr
+      10  if expr $1 \> $2 > /dev/null; then
+      11    echo "$1 est plus grand que $2."
+      12  fi
+
+  $ ./plusgrandque.sh 45 23
+  45 est plus grand que 23.
+
+La commande '(( ))' présente des avantages sur la commande 'expr' :
+
+  - Elle dispose de nombreux opérateurs ;
+
+  - Les arguments n'ont pas besoin d'être séparés par des espaces ;
+
+  - Les variables n'ont pas besoin d'être préfixées par "$" ;
+
+  - Les caractères spéciaux du shell n'ont pas besoin d'être protégés ;
+
+  - Les affectations se font dans la commande ;
+
+  - Son exécution est plus rapide.
+
+Voici une liste non exhaustive des opérateurs de la commande '(( ))'.
+
+  +------------+---------------------+
+  | Opérateur  |    Signification    |
+  +------------+---------------------+
+  | nb1 + nb2  | Addition            |
+  | nb1 - nb2  | Soustraction        |
+  | nb1 * nb2  | Multiplication      |
+  | nb1 / nb2  | Division            |
+  | nb1 % nb2  | Modulo              |
+  | nb1 ++     | Incrémente nb1 de 1 |
+  | nb1 --     | Décrémente nb1 de 1 |
+  | nb1 > nb2  | Vrai si nb1 > nb2   |
+  | nb1 < nb2  | Vrai si nb1 < nb2   |
+  | nb1 == nb2 | Vrai si nb1 = nb2   |
+  | nb1 != nb2 | Vrai si nb1 != nb2  |
+  +------------+---------------------+
+
+Dans l'exemple ci-dessous, on ajoute 10 à la variable "x" :
+
+  $ x=10
+  $ (( x = $x + 10 ))
+  $ echo $x
+  20
+
+Les espaces ne sont pas obligatoires :
+
+  $ ((x=$x+10))
+  $ echo $x
+  30
+
+Le symbole "$" peut être omis :
+
+  $ ((x=x+10))
+  $ echo $x
+  40
+
+Encore une autre écriture :
+
+  $ ((x+=10))
+  $ echo $x
+  50
+
+Le script 'egal.sh' indique si deux nombres sont égaux.
+
+  $ nl egal.sh 
+       1  #!/bin/bash
+       2  #
+       3  # Un script qui indique si deux nombres sont égaux
+       4  #
+       5  # Comparer $1 et $2 avec (( ))
+       6  if (( $1 == $2 )); then
+       7    echo "$1 et $2 sont égaux."
+       8  else
+       9    echo "$1 et $2 sont différents."
+      10  fi
+
+Exécution du script :
+
+  $ ./egal.sh 46 6
+  46 et 6 sont différents.
+  $ ./egal.sh 6 6
+  6 et 6 sont égaux.
+
+La commande 'let "expression"' est égale à '((expression))'.
+
+  $ x=10
+  $ let "x = x + 10"
+  $ echo $x
+  20
+
+La commande 'bc' ("basic calculator") permet d'effectuer des calculs sur les
+flottants.
+
+  $ ht=153
+  $ tva=0.196
+  $ echo "$ht * $tva"
+  153 * 0.196
+  $ echo "$ht * $tva" | bc
+  29.988
+
+Il est également possible d'utiliser la commande 'awk' pour les calculs sur
+les flottants :
+
+  $ echo "$ht $tva" | awk '{print $1 * $2}'
+  29.988
+
+La même chose avec un formatage :
+
+  $ echo "$ht $tva" | awk '{printf("%.2f\n", $1 * $2)}'
+  29.99
+
+Les caractères spéciaux $(( )) du shell permettent de substituer une
+expression arithmétique par son résultat. 
+
+  $ x=2
+  $ echo "Après incrémentation, x vaut : $(( x = x + 1))"
+  Après incrémentation, x vaut : 3
+
+
+Mise au point d'un script
+-------------------------
+
+L'option '-x' permet de visualiser les commandes telles qu'elles sont
+exécutées, c'est-à-dire après traitement des caractères spéciaux du shell. 
+
+Activer l'option :
+
+  set -x
+
+Ou bien :
+
+  set -o xtrace
+
+Désactiver l'option :
+
+  set +x
+
+Ou bien :
+
+  set +o xtrace
+
+Alternativement, on peut invoquer le shell interpréteur avec l'option '-x' :
+
+  $ sh -x monscript.sh
+
+Voici le script 'affiche.sh', dans lequel une erreur a été introduite. Le
+développeur du script a écrit "fic" au lieu de "$fic" :
+
+$ nl affiche.sh
+     1  #!/bin/bash
+     2  echo -e "Nom du fichier à visualiser : \c"
+     3  read fic
+     4  if [ -f fic ]; then
+     5    cat $fic
+     6  else
+     7    echo "Fichier inexistant."
+     8  fi
+
+Exécution du script sans mise au point. Il semble surprenant voire inquiétant
+que le fichier '/etc/passwd' ne soit pas trouvé :
+
+  $ ./affiche.sh 
+  Nom du fichier à visualiser : /etc/passwd
+  Fichier inexistant.
+
+Exécution du script en activant l'option '-x'. Les lignes affichées pour la
+mise au point du script sont précédées d'un signe "+". On constate que la
+variable "fic" n'est pas substituée par sa valeur :
+
+  $ sh -x ./affiche.sh
+  + echo -e 'Nom du fichier à visualiser : \c'
+  Nom du fichier à visualiser : + read fic
+  /etc/passwd
+  + '[' -f fic ']'
+  + echo 'Fichier inexistant.'
+  Fichier inexistant.
+
+L'activation de l'option peut également se faire à l'intérieur du script. On en
+profite pour corriger l'erreur :
+
+  $ nl affiche.sh
+       1  #!/bin/bash
+       2  set -x
+       3  echo -e "Nom du fichier à visualiser : \c"
+       4  read fic
+       5  if [ -f $fic ]; then
+       6    cat $fic
+       7  else
+       8    echo "Fichier inexistant."
+       9  fi
+
+Cette fois-ci, la variable est bien substituée par sa valeur :
+
+  $ ./affiche.sh
+  + echo -e 'Nom du fichier à visualiser : \c'
+  Nom du fichier à visualiser : + read fic
+  /etc/passwd
+  + '[' -f /etc/passwd ']'
+  + cat /etc/passwd
+  root:x:0:0::/root:/bin/bash
+  bin:x:1:1:bin:/bin:/bin/false
+  daemon:x:2:2:daemon:/sbin:/bin/false
+  adm:x:3:4:adm:/var/log:/bin/false
+  ...
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

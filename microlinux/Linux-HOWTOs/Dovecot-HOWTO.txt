@@ -1,0 +1,273 @@
+=============
+Dovecot HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=============
+
+Dernière révision : 31 janvier 2016
+
+Ce HOWTO décrit la mise en place d'un serveur  IMAP avec Dovecot sous
+Slackware Linux.
+
+
+  * Introduction
+  * Prérequis
+  * Installation
+  * Configuration initiale de Dovecot
+  * Ajouter l'authentification SMTP à Postfix
+  * Utiliser le port 587 pour l'envoi
+  * Paramétrer Mozilla Thunderbird
+  * Supprimer Dovecot
+
+
+Introduction
+------------
+
+Dovecot est un serveur IMAP et POP3 pour les systèmes d'exploitation UNIX et
+dérivés. Nous le configurons ici pour le seul protocole IMAP.
+
+
+Prérequis
+---------
+
+Pour nos tests, on utilisera une adresse kikinovak@slackbox.fr, qu'on aura
+configurée dans Postfix.
+
+Dans le pare-feu, il faudra ouvrir le port 993 (IMAPS = IMAP over SSL) en TCP.
+
+Dovecot utilise un certificat SSL/TLS, qu'il faudra générer au préalable. Pour
+les détails, voir le SSL-TLS-Certificate-HOWTO.
+
+
+Installation
+------------
+
+Dovecot ne fait pas partie d'une installation standard de Slackware.  On va
+donc le compiler à partir des sources, en utilisant le script de
+SlackBuilds.org. 
+
+Créer quelques utilisateurs et groupes système nécessaires pour Dovecot :
+
+  # groupadd -g 202 dovecot
+  # useradd -d /dev/null -s /bin/false -u 202 -g 202 dovecot
+  # groupadd -g 248 dovenull
+  # useradd -d /dev/null -s /bin/false -u 248 -g 248 dovenull
+
+Au final, on doit avoir quelque chose comme ceci :
+
+  # grep dove /etc/passwd
+  dovecot:x:202:202::/dev/null:/bin/false
+  dovenull:x:248:248::/dev/null:/bin/false
+  # grep dove /etc/group
+  dovecot:x:202:
+  dovenull:x:248:
+
+Lancer la compilation de Dovecot et installer le paquet résultant.
+
+  /!\ Là encore, comme pour Postfix, si l'on choisit le paquet MLES, la
+  création des utilisateurs et des groupes système est gérée automatiquement 
+  par le script de post-installation.
+
+
+Configuration initiale de Dovecot
+---------------------------------
+
+Éditer '/etc/dovecot/dovecot.conf' :
+
+--8<---------- /etc/dovecot/dovecot.conf -------------------------------------
+# /etc/dovecot/dovecot.conf
+protocols = imap 
+listen = *
+ssl_cert = </etc/letsencrypt/live/mail.slackbox.fr/fullchain.pem
+ssl_key = </etc/letsencrypt/live/mail.slackbox.fr/privkey.pem
+mail_location = maildir:~/Maildir
+auth_mechanisms = plain
+passdb {
+  driver = shadow
+  args   =
+}
+passdb {
+  driver = passwd
+  args   =
+}
+userdb {
+  driver = passwd
+  args   =
+}
+--8<--------------------------------------------------------------------------
+
+Activer et démarrer Dovecot :
+
+  # chmod +x /etc/rc.d/rc.dovecot
+  # /etc/rc.d/rc.dovecot start
+
+Se connecter avec Mutt, en local ou à distance :
+
+  $ mutt -f imaps://kikinovak@slackbox.fr
+
+
+Ajouter l'authentification SMTP à Postfix
+-----------------------------------------
+
+Postfix supporte certes le protocole SASL ("Simple Authentication and Security
+Layer"), mais ne peut pas gérer l'authentification par lui-même. En revanche,
+Dovecot peut le faire pour lui. 
+
+Dans un premier temps, on va ajouter la stance suivante à
+'/etc/dovecot/dovecot.conf', qui concerne l'authentification par le biais du
+fichier socket '/var/spool/postfix/private/auth' :
+
+--8<---------- /etc/dovecot/dovecot.conf -------------------------------------
+...
+service auth {
+  unix_listener auth-userdb {
+    mode = 0600
+    user = postfix
+    group = postfix
+  }
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0666
+  }
+  user = $default_internal_user
+}
+--8<--------------------------------------------------------------------------
+
+Ensuite, il faut ajouter le mécanisme d'authentification 'login' comme ceci :
+
+--8<---------- /etc/dovecot/dovecot.conf -------------------------------------
+...
+auth_mechanisms = plain login
+...
+--8<--------------------------------------------------------------------------
+
+  > Ce mécanisme supplémentaire est nécessaire pour que l'authentification
+    fonctionne avec Outlook Express.
+
+Au total, notre fichier '/etc/dovecot/dovecot.conf' ressemble donc à ceci :
+
+--8<---------- /etc/dovecot/dovecot.conf -------------------------------------
+protocols = imap 
+listen = *
+ssl_cert = </etc/letsencrypt/live/mail.slackbox.fr/fullchain.pem
+ssl_key = </etc/letsencrypt/live/mail.slackbox.fr/privkey.pem
+mail_location = maildir:~/Maildir
+auth_mechanisms = plain login
+passdb {
+  driver = shadow
+  args   =
+}
+passdb {
+  driver = passwd
+  args   =
+}
+userdb {
+  driver = passwd
+  args   =
+}
+service auth {
+  unix_listener auth-userdb {
+    mode = 0600
+    user = postfix
+    group = postfix
+  }
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0666
+  }
+  user = $default_internal_user
+}
+--8<--------------------------------------------------------------------------
+
+Ensuite, il faut ajouter quelques lignes à la fin du fichier de configuration
+de Postfix :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+smtpd_tls_cert_file    = /etc/letsencrypt/live/mail.slackbox.fr/fullchain.pem
+smtpd_tls_key_file     = /etc/letsencrypt/live/mail.slackbox.fr/privkey.pem
+smtpd_tls_security_level        = may
+smtpd_sasl_auth_enable          = yes
+broken_sasl_auth_clients        = yes
+smtpd_sasl_tls_security_options = $smtp_sasl_security_options
+smtpd_sasl_type                 = dovecot
+smtpd_sasl_path                 = /var/spool/postfix/private/auth
+smtpd_recipient_restrictions    = permit_mynetworks,
+                                  permit_sasl_authenticated,
+                                  reject_unauth_destination
+--8<--------------------------------------------------------------------------
+
+Et pour finir, prendre en compte la nouvelle configuration :
+
+  # /etc/rc.d/rc.dovecot restart
+  # /etc/rc.d/rc.postfix restart
+
+
+Utiliser le port 587 pour l'envoi
+---------------------------------
+
+Certains FAI bloquent l'accès au port 25. Dans ce cas, il faut configurer
+Postfix pour passer par le port 587 pour l'envoi de messages.
+
+Éditer '/etc/postfix/master.cf' et décommenter la ligne suivante :
+
+--8<---------- /etc/postfix/master.cf ----------------------------------------
+smtp       inet  n    -    n    -    -    smtpd
+#smtp      inet  n    -    n    -    1    postscreen
+#smtpd     pass  -    -    n    -    -    smtpd
+#dnsblog   unix  -    -    n    -    0    dnsblog
+#tlsproxy  unix  -    -    n    -    0    tlsproxy
+submission inet  n    -    n    -    -    smtpd  --> décommenter
+--8<--------------------------------------------------------------------------
+
+Relancer Postfix :
+
+  # /etc/rc.d/rc.postfix restart
+
+
+Paramétrer Mozilla Thunderbird
+------------------------------
+
+Gestion des comptes > Ajouter un compte de messagerie
+
+Renseigner le nom et le prénom, l'adresse mail et le mot de passe, puis
+cliquer sur 'Continuer'. Dans la fenêtre subséquente, cliquer sur
+'Configuration manuelle'.
+
+Exemple de configuration :
+
+  Serveur entrant            : IMAP
+  Nom du serveur             : mail.slackbox.fr
+  Port                       : 993
+  Nom d'utilisateur          : kikinovak
+  Sécurité connexion         : SSL/TLS
+  Authentification           : Mot de passe normal
+  Serveur sortant            : mail.slackbox.fr
+  Port                       : 587
+  Sécurité de la connexion   : STARTTLS
+  Méthode d'authentification : Mot de passe normal
+  Nom d'utilisateur          : kikinovak
+
+
+Supprimer Dovecot
+-----------------
+
+Arrêter le service :
+
+  # /etc/rc.d/rc.dovecot stop
+
+Supprimer le paquet :
+
+  # removepkg dovecot
+
+Supprimer les fichiers de configuration :
+
+  # rm -rf /etc/dovecot/
+
+Supprimer le script de démarrage :
+
+  # rm -f /etc/rc.d/rc.dovecot
+
+Supprimer les utilisateurs et les groupes système correspondants :
+
+  # userdel -r dovecot  --> supprime également le groupe 'dovecot'
+  # userdel -r dovenull --> supprime également le groupe 'dovenull'
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

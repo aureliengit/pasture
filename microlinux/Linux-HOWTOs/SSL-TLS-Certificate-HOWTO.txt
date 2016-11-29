@@ -1,0 +1,746 @@
+=========================
+SSL/TLS Certificate HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=========================
+
+Dernière révision : 8 janvier 2016
+
+Ce HOWTO décrit la gestion des certificats SSL/TLS gratuits sur un serveur
+Slackware Linux.
+
+
+  * Les certificats électroniques
+  * Créer un certificat gratuit et valide avec Let's Encrypt
+  * Créer un certificat auto-signé
+  * Créer un certificat gratuit et valide avec StartSSL
+
+
+=============================
+Les certificats électroniques
+=============================
+
+
+Un certificat électronique peut être vu comme une carte d'identité numérique. Il est
+utilisé principalement :
+
+  * pour identifier et authentifier une personne physique ou morale ;
+  
+  * pour chiffrer des échanges.
+
+Il est signé par un tiers de confiance qui atteste du lien entre l'identité
+physique et l'entité numérique. Le standard le plus utilisé pour la création
+des certificats numériques est le X.509.
+
+Les prix des certificats électroniques sont extrêmement variables, et
+certaines entreprises comme par exemple Verisign les font payer très cher. En
+revanche, il est tout à fait possible de les avoir gratuitement :
+
+  1. en utilisant le client Let's Encrypt ;
+
+  2. en générant un certificat auto-signé ;
+
+  3. en passant par un certificat de StartCom.
+
+
+========================================================
+Créer un certificat gratuit et valide avec Let's Encrypt
+========================================================
+
+
+Let's Encrypt est une autorité de certification lancée le 3 décembre 2015 en
+version bêta publique. Elle fournit des certificats SSL/TLS gratuits grâce à
+un client installé sur le serveur qui automatise la plupart des tâches. On
+n'est donc plus obligé de payer une fortune et/ou de sauter à travers des
+cerceaux en feu pour créer et renouveler les certificats. 
+
+Les certificats générés avec Let's Encrypt sont reconnus par l'ensemble des
+navigateurs Web modernes. Cette technologie repose sur le protocole ACME
+("Automated Certificate Management Environment").
+
+
+Installation
+------------
+
+Le dépôt SlackBuilds.org fournit un script pour construire et installer le
+paquet 'letsencrypt'. Il dépend d'une quantité importante de modules Python.
+Sur mes serveurs tournant sous Slackware64 14.0 et 14.1, j'ai dû en installer
+pas moins de vingt-sept. Les dépendances sont toutes disponibles sur
+SlackBuilds.org.  
+
+Voici l'ordre dans lequel on peut construire les paquets :
+
+  1.  psutil
+  2.  pysetuptools
+  3.  pytz
+  4.  werkzeug
+  5.  mock
+  6.  configobj
+  7.  pyparsing
+  8.  zope.interface
+  9.  zope.event
+  10. zope.component
+  11. pycparser
+  12. ipaddress
+  13. enum34
+  14. six
+  15. idna
+  16. cffi
+  17. pyasn1
+  18. cryptography
+  19. pyOpenSSL
+  20. ndg_httpsclient
+  21. python2-pythondialog
+  22. augeas
+  23. python-augeas
+  24. python-requests
+  25. pyrfc3339
+  26. python-parsedatetime
+  27. python-configparse
+  28. letsencrypt
+
+
+Plug-ins
+--------
+
+Le client Let's Encrypt supporte une série de plug-ins pour Apache et Nginx.
+Pour l'instant, ces plug-ins fonctionnent uniquement sous Debian. On se
+contentera donc du plug-in Standalone, qui fonctionne très bien sous
+Slackware.
+
+Afficher les plug-ins installés :
+
+  # letsencrypt plugins
+  * webroot
+  Description: Webroot Authenticator
+  Interfaces: IAuthenticator, IPlugin
+  Entry point: webroot = letsencrypt.plugins.webroot:Authenticator
+  * standalone
+  Description: Automatically use a temporary webserver
+  Interfaces: IAuthenticator, IPlugin
+  Entry point: standalone = letsencrypt.plugins.standalone:Authenticator
+
+
+Générer un certificat
+---------------------
+
+Pour commencer, nous allons générer un certificat pour le domaine
+'scholae.fr'. Étant donné que la requête utilise le port 443, il faut d'abord
+arrêter le serveur Web :
+
+  # /etc/rc.d/rc.httpd stop
+
+Invoquons la commande suivante :
+
+  # letsencrypt certonly --standalone-supported-challenges tls-sni-01 \
+    --email info@microlinux.fr --renew-by-default --agree-tos --text \
+    --standalone -d www.scholae.fr -d scholae.fr \
+    --webroot-path /srv/httpd/vhosts/scholae-secure/htdocs
+
+Si tout se passe bien, nous recevons la réponse suivante :
+
+   - Congratulations! Your certificate and chain have been saved at
+     /etc/letsencrypt/live/www.scholae.fr/fullchain.pem. Your cert will
+     expire on 2016-03-28. To obtain a new version of the certificate in
+     the future, simply run Let's Encrypt again.
+   - Your account credentials have been saved in your Let's Encrypt
+     configuration directory at /etc/letsencrypt. You should make a
+     secure backup of this folder now. This configuration directory will
+     also contain certificates and private keys obtained by Let's
+     Encrypt so making regular backups of this folder is ideal.
+  
+Les fichiers générés se trouvent tous dans le répertoire
+'/etc/letsencrypt/live/<domaine>'. On va donc jeter un oeil :
+
+  # ls -1 /etc/letsencrypt/live/www.scholae.fr/
+  cert.pem  
+  chain.pem  
+  fullchain.pem  
+  privkey.pem
+
+À quoi correspondent ces fichiers ?
+
+  * privkey.pem - C'est la clé privée pour le certificat. Ce fichier ne doit
+    surtout pas être divulgué. Le serveur doit pouvoir y accéder pour que
+    SSL/TLS fonctionne. C'est ce qu'Apache utilisera comme fichier
+    'SSLCertificateKeyFile'.
+
+  * cert.pem - Le certificat du serveur. C'est ce qui correspond au
+    'SSLCertificateFile' d'Apache.
+
+  * chain.pem - Les certificats requis par le navigateur hormis le certificat
+    du serveur. Requis par Apache < 2.4.8 pour le 'SSLCertificateChainFile'. 
+
+  * fullchain.pem - Tous les certificats, y compris celui du serveur. Il
+    s'agit là de la concaténation de 'chain.pem' et de 'cert.pem'. C'est
+    requis par Apache >= 2.4.8 pour le 'SSLCertificateFile'. 
+
+
+Utiliser et tester le certificat
+--------------------------------
+
+Pour commencer, on peut mettre en place un hébergement sécurisé avec le
+serveur Web Apache. La procédure détaillée fait l'objet d'un HOWTO à part :
+
+  * Apache-SSL-HOWTO
+
+Voici la stance correspondante dans la configuration d'Apache :
+
+--8<---------- /etc/httpd/extra/httpd-ssl.conf -------------------------------
+<VirtualHost 62.210.209.120:443>
+DocumentRoot "/srv/httpd/vhosts/scholae-secure/htdocs"
+...
+SLCertificateFile "/etc/letsencrypt/live/www.scholae.fr/cert.pem"
+SSLCertificateKeyFile "/etc/letsencrypt/live/www.scholae.fr/privkey.pem"
+SSLCertificateChainFile "/etc/letsencrypt/live/www.scholae.fr/fullchain.pem"
+...
+</VirtualHost>
+--8<--------------------------------------------------------------------------
+
+Relancer Apache pour prendre en compte les modifications.
+
+L'hébergement sécurisé peut être testé avec l'outil de reporting SSL Labs :
+
+  * https://www.ssllabs.com/ssltest/
+
+Voici ce que nous devons obtenir, à peu de choses près :
+
+  Common names              scholae.fr
+  Alternative names         www.scholae.fr scholae.fr
+  Prefix handling           Both (with and without WWW)
+  Valid from                Fri, 01 Jan 2016 06:19:00 UTC
+  Valid until               Thu, 31 Mar 2016 06:19:00 UTC 
+  Key                       RSA 2048 bits (e 65537)
+  Weak key (Debian)         No
+  Issuer                    Let's Encrypt Authority X1
+  Signature algorithm       SHA256withRSA
+  Extended Validation       No
+  Certificate Transparency  No
+  Revocation information    OCSP
+  Trusted                   Yes
+
+
+Renouveler un certificat
+------------------------
+
+La durée de vie d'un certificat est de 90 jours, ce qui n'est pas beaucoup.
+Pour prolonger la validité d'un certificat, il suffit de le renouveler en
+réinvoquant exactement la même commande utilisée pour le générer initialement.
+
+
+Certificats et permissions
+--------------------------
+
+Si l'on souhaite utiliser plusieurs applications sécurisées pour un même
+domaine (Web, courrier, messagerie XMPP), on se retrouve confronté à un
+problème de permissions. Concrètement, si le serveur Web ainsi que le serveur
+de messagerie Prosody doivent accéder en lecture au certificat et à la clé
+privée, on peut utiliser la solution qui suit.
+
+On crée un groupe système 'certs', on ajoute les utilisateurs système
+respectifs à ce groupe et on règle les permissions des fichiers en fonction,
+c'est-à-dire root:certs. Concrètement :
+
+  # groupadd -g 240 certs
+  # chgrp -R certs /etc/letsencrypt
+  # chmod -R g=rx /etc/letsencrypt
+
+Si l'on souhaite qu'une application accède au certificat et à la clé privée,
+il suffit qu'on ajoute l'utilisateur correspondant au groupe système 'certs'.
+Exemple pour la messagerie XMPP Prosody :
+
+  # usermod -a -G certs prosody
+
+Notez que ce n'est pas la peine d'ajouter l'utilisateur 'apache' au groupe
+'certs'. Au démarrage, le serveur Apache s'exécute avec les droits root, puis
+lance une série de processus enfants avec des droits restreints :
+
+  # ps aux | grep httpd | grep -v grep
+  root   3168 0.0 0.2 130500  4304 ?  Ss  08:13   0:00 /usr/sbin/httpd -k start
+  apache 3169 0.0 0.2 878216  5968 ?  Sl  08:13   0:01 /usr/sbin/httpd -k start
+  apache 3170 0.0 0.3 878216  6672 ?  Sl  08:13   0:01 /usr/sbin/httpd -k start
+  apache 3171 0.0 0.3 878216  6488 ?  Sl  08:13   0:01 /usr/sbin/httpd -k start
+  apache 3254 0.0 0.3 878216  6556 ?  Sl  08:14   0:01 /usr/sbin/httpd -k start
+
+
+Automatiser la procédure
+------------------------
+
+La procédure de génération et de renouvellement peut être automatisée à l'aide
+d'un petit script. Par exemple :
+
+--8<---------- mkcert-scholae.fr.sh ------------------------------------------
+#!/bin/bash
+#
+# Create/renew SSL/TLS certificates for scholae.fr
+
+ENCRYPT="/usr/bin/letsencrypt"
+CHGRP="/usr/bin/chgrp"
+CHMOD="/usr/bin/chmod"
+CERTGRP="certs"
+EMAIL="info@microlinux.fr"
+OPTIONS="certonly \
+         --standalone-supported-challenges tls-sni-01 \
+         --email $EMAIL \
+         --renew-by-default \
+         --agree-tos \
+         --text \
+         --standalone"
+
+# Create $CERTGRP group 
+if ! grep -q "^$CERTGRP:" /etc/group ; then
+  groupadd -g 240 $CERTGRP
+  echo ":: Added $CERTGRP group."
+  sleep 3
+fi
+
+# Stop Apache
+echo ":: Stopping Apache."
+if ps ax | grep -v grep | grep httpd > /dev/null ; then
+  /etc/rc.d/rc.httpd stop 1 > /dev/null 2&>1
+  sleep 5
+fi
+
+$ENCRYPT $OPTIONS -d www.scholae.fr -d scholae.fr \
+  --webroot-path /srv/httpd/vhosts/scholae-secure/htdocs
+
+$ENCRYPT $OPTIONS -d mail.scholae.fr \
+  --webroot-path /srv/httpd/vhosts/scholae-webmail/htdocs
+
+$ENCRYPT $OPTIONS -d compta.scholae.fr \
+  --webroot-path /srv/httpd/vhosts/scholae-compta/htdocs
+
+# Fix permissions
+echo ":: Setting permissions."
+$CHGRP -R $CERTGRP /etc/letsencrypt
+$CHMOD -R g=rx /etc/letsencrypt
+
+# Start Apache
+echo ":: Starting Apache."
+/etc/rc.d/rc.httpd start
+--8<--------------------------------------------------------------------------
+
+Si l'on range ce script dans '/etc/cron.monthly/', les certificats sont
+renouvelés tous les 1er du mois à 4h20 du matin. 
+
+
+Révoquer un certificat
+----------------------
+
+Si jamais, pour une raison ou pour une autre, on a besoin de révoquer un
+certificat, on peut le faire comme ceci :
+
+  # cd /etc/letsencrypt/live/www.scholae.fr/
+  # letsencrypt revoke --cert-path cert.pem
+
+
+Effectuer des tests
+-------------------
+
+Les serveurs de Let's Encrypt sont actuellement soumis à des restrictions
+assez sévères quant au nombre de comptes par IP et de certificats par domaine.
+Si l'on souhaite uniquement se faire la main, on peut utiliser l'option
+'--test-cert' pour générer des certificats "en bois" :
+
+  # letsencrypt --test-cert certonly 
+
+
+==============================
+Créer un certificat auto-signé
+==============================
+
+
+Les certificats auto-signés sont des certificats à usage interne. Signé par un
+serveur local, ce type de certificat permet de garantir la confidentialité des
+échanges au sein d'une organisation, par exemple pour le besoin d'un intranet.
+
+
+Créer un certificat auto-signé simple
+-------------------------------------
+
+Sur un système Linux, le répertoire '/etc/ssl/certs' contient les certificats
+du système. Les clés privées sont censées être rangées dans le répertoire
+'/etc/ssl/private'. Il s'agit là d'une convention, et non d'une obligation.
+Étant donné que '/etc/ssl/certs' contient déjà une multitude de certificats,
+nous allons créer un répertoire '/etc/ssl/mycerts', dans lequel nous allons
+ranger nos propres certificats :
+
+  # mkdir /etc/ssl/mycerts
+
+La génération d'un certificat auto-signé et de la clé privée correspondante
+peut s'effectuer en une seule commande, comme ceci :
+
+  # openssl req -new -x509 -days 3650 -nodes -newkey rsa:4096 -sha256 \
+      -out /etc/ssl/mycerts/slackbox.fr.crt \
+      -keyout /etc/ssl/private/slackbox.fr.key
+
+La commande est interactive et vous somme de répondre à une série de
+questions. Attention, le champ "Common Name" doit correspondre EXACTEMENT à
+l'URL du site sécurisé :
+
+  -----
+  Country Name (2 letter code) [AU]:FR
+  State or Province Name (full name) [Some-State]:Gard
+  Locality Name (eg, city) []:Montpezat
+  Organization Name (eg, company) [Internet Widgits Pty Ltd]:Microlinux
+  Organizational Unit Name (eg, section) []:.
+  Common Name (e.g. server FQDN or YOUR name) []:slackbox.fr
+  Email Address []:postmaster@slackbox.fr
+
+Voici une vue en détail des options utilisées :
+
+  > 'req' initie une demande de signature de certificat (CSR ou "Certificate
+    Signing Request") ; 
+
+  > '-new' génère une nouvelle demande de certificat, qui demande à
+    l'utilisateur de saisir un certain nombre de valeurs pour les champs ;
+
+  > '-x509' produit un certificat X.509 auto-signé au lieu d'une demande de
+    signature de certificat (CSR) ;
+
+  > '-days n' spécifie la durée de validité du certificat (n jours) ;
+
+  > '-newkey rsa:4096' crée une nouvelle clé privée ;
+
+  > 'sha256' spécifie l'algorithme pour la signature ;
+
+  > '-nodes' indique que la clé privée ne doit pas être encryptée ;
+
+  > '-out fichier.crt' spécifie le fichier dans lequel sera écrit le
+    certificat ;
+
+  > '-keyout fichier.key' définit l'emplacement de la clé.
+
+Sécuriser la clé privée :
+
+  # chmod 0600 /etc/ssl/private/slackbox.fr.key
+
+Créer un lien symbolique vers /etc/ssl/certs :
+
+  # cd /etc/ssl/certs
+  # ln -s ../mycerts/slackbox.fr.crt .
+
+
+Utiliser et tester le certificat
+--------------------------------
+
+Là aussi, on mettra en place un hébergement sécurisé sur Apache grâce au HOWTO
+détaillé :
+
+  * Apache-SSL-HOWTO
+
+Aller sur le site de l'outil de reporting SSL Labs :
+
+  * https://www.ssllabs.com/ssltest/
+
+Pour notre premier certificat auto-signé, on obtient le résultat suivant :
+
+  Server Key and Certificate #1
+  -----------------------------
+
+  Common names              slackbox.fr
+  Alternative names         -
+  Prefix handling           Not valid for "www.slackbox.fr"   CONFUSING
+  Valid from                Wed, 23 Sep 2015 05:42:37 UTC
+  Valid until               Sat, 20 Sep 2025 05:42:37 UTC 
+  Key                       RSA 4096 bits (e 65537)
+  Weak key (Debian)         No
+  Issuer                    slackbox.fr   Self-signed 
+  Signature algorithm       SHA256withRSA
+  Extended Validation       No
+  Certificate Transparency  No
+  Revocation information    None
+  Trusted                   No   NOT TRUSTED (Why?)
+
+La partie "NOT TRUSTED" peut se comprendre, étant donné qu'il s'agit d'un
+certificat auto-signé. Quant à "Prefix handling - CONFUSING", cela tient au
+fait qu'il faudrait un certificat valable pour les deux hébergements, un pour
+"slackbox.fr" et un autre pour "www.slackbox.fr". C'est ce que nous allons
+entreprendre.
+
+
+Certificats et permissions
+--------------------------
+
+Comme dans le cas de figure précédent avec le client Let's Encrypt, nous nous
+retrouvons avec un problème de permissions. Ici, on a deux solutions pour
+rendre le certificat et la clé accessibles en lecture à plusieurs
+applications. 
+
+  1. Soit on génère un couple certificat/clé privée pour chaque application,
+  et on attribue les fichiers <domaine>.key et <domaine>.crt à l'utilisateur
+  de l'applications (apache:apache, prosody:prosody, etc.) ;
+
+  2. Soit on crée un groupe système 'certs', on ajoute les utilisateurs
+  système respectifs à ce groupe et on règle les permissions des fichiers en
+  fonction, c'est-à-dire root:certs. En théorie, cette deuxième solution rend
+  le serveur un tantinet plus vulnérable, mais on va quand-même l'utiliser en
+  pratique, étant donné qu'elle nous évite de sauter à travers des cerceaux en
+  feu en créant un certificat à part pour chaque application sécurisée.
+
+Concrètement :
+
+  # useradd -g 240 certs
+  # chown root:certs /etc/ssl/mycerts/*.crt
+  # chmod 0640 /etc/ssl/mycerts/*.crt
+  # chown root:certs /etc/ssl/private/*.key
+  # chmod 0640 /etc/ssl/private/*.key
+
+Si l'on souhaite qu'une application accède au certificat et à la clé privée,
+il suffit qu'on ajoute l'utilisateur correspondant au groupe système 'certs'.
+Exemple pour la messagerie XMPP Prosody :
+
+  # usermod -a -G certs prosody
+
+
+Créer un certificat auto-signé multi-domaines
+---------------------------------------------
+
+Un certificat multi-domaines sera valable pour plusieurs domaines. Pour notre
+domaine "slackbox.fr", on aura ceci par exemple :
+
+  * slackbox.fr
+  * www.slackbox.fr
+  * mail.slackbox.fr
+  * ftp.slackbox.fr
+  * etc.
+
+La génération d'un tel certificat est un tout petit peu plus compliquée. Pour
+commencer, créer et éditer le fichier de configuration suivant :
+
+--8<---------- /etc/ssl/mycerts/slackbox.fr.cnf ------------------------------
+[req]
+distinguished_name          = req_distinguished_name
+string_mask                 = nombstr
+req_extensions              = v3_req
+
+[req_distinguished_name]
+organizationName            = Organization Name (company)
+emailAddress                = Email Address
+emailAddress_max            = 40
+localityName                = Locality Name
+stateOrProvinceName         = State or Province Name
+countryName                 = Country Name (2 letter code)
+countryName_min             = 2
+countryName_max             = 2
+commonName                  = Common Name
+commonName_max              = 64
+organizationName_default    = Microlinux
+emailAddress_default        = info@microlinux.fr
+localityName_default        = Montpezat
+stateOrProvinceName_default = Gard
+countryName_default         = FR
+commonName_default          = slackbox.fr
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = slackbox.fr
+DNS.2 = www.slackbox.fr
+DNS.3 = mail.slackbox.fr
+DNS.4 = ftp.slackbox.fr
+--8<--------------------------------------------------------------------------
+
+Générer la clé privée :
+
+  # openssl genrsa -out /etc/ssl/private/slackbox.fr.key 4096
+
+Sécuriser cette clé :
+
+  # chmod 0600 /etc/ssl/private/slackbox.fr.key
+
+Générer une demande de signature de certificat (CSR) :
+
+  # openssl req -new -sha256 \
+      -out /etc/ssl/mycerts/slackbox.fr.csr \
+      -key /etc/ssl/private/slackbox.fr.key \
+      -config /etc/ssl/mycerts/slackbox.fr.cnf
+
+Si l'on a correctement édité le fichier de configuration, il suffira de
+confirmer les valeurs par défaut dans le dialogue qui s'ensuit.
+
+  -----
+  Organization Name (company) [Microlinux]:
+  Email Address [info@microlinux.fr]:
+  Locality Name [Montpezat]:
+  Country Name (2 letter code) [FR]:
+  Common Name [slackbox.fr]:
+
+Signer et générer le certificat :
+
+  # openssl x509 -req -sha256 -days 3650 \
+      -in /etc/ssl/mycerts/slackbox.fr.csr \
+      -signkey /etc/ssl/mycerts/slackbox.fr.key \
+      -out /etc/ssl/mycerts/slackbox.fr.crt \
+      -extensions v3_req \
+      -extfile /etc/ssl/mycerts/slackbox.fr.cnf
+
+Pour finir, c'est une bonne idée de créer un lien symbolique dans
+'/etc/ssl/certs' :
+
+  # cd /etc/ssl/certs
+  # ln -s ../mycerts/slackbox.fr.crt .
+
+Si l'on teste ce nouveau certificat avec l'outil de reporting de SSL Labs, on
+obtient le résultat suivant :
+
+  Server Key and Certificate #1
+  -----------------------------
+
+  Common names              slackbox.fr
+  Alternative names         slackbox.fr www.slackbox.fr mail.slackbox.fr 
+                            ftp.slackbox.fr
+  Prefix handling           Both (with and without WWW)
+  ...
+
+
+Automatiser la génération d'un certificat auto-signé
+----------------------------------------------------
+
+Comme nous venons de le voir, la génération d'un certificat auto-signé valable
+pour plusieurs domaines est une procédure passablement fastidieuse. Pour nous
+éviter d'avoir à éditer un fichier de configuration à rallonge et saisir des
+commandes avec des options à n'en plus finir, nous allons tout simplement
+scripter la procédure. 
+
+Un exemple de script se trouve dans mon dépôt Github, à l'adresse suivante :
+
+  # git clone https://github.com/kikinovak/microlinux
+
+Le script 'mkcrt.sh' se trouve dans le répertoire 'microlinux/tools'. 
+
+Pour l'utiliser, la meilleure solution consiste à le copier en un endroit
+approprié, comme par exemple '/etc/ssl/mycerts', en le renommant en fonction
+du domaine pour lequel on établit le certificat. 
+
+
+===================================================
+Créer un certificat gratuit et valide avec StartSSL
+===================================================
+
+
+La société StartCom fournit des certificats gratuits pour un domaine et un
+unique sous-domaine. Son avantage par rapports à des prestataires similaires
+comme CACert, c'est qu'il est valide au niveau des navigateurs Web du marché
+(Firefox, Google Chrome, Safari) et qu'il évite donc à l'utilisateur de devoir
+ajouter une exception pour les sites qui l'utilisent.
+
+L'inconvénient de StartSSL, c'est que la procédure de création du certificat
+est passablement complexe.
+
+Aller sur le site de StartSSL :
+
+  * https://www.startssl.com
+
+Les traductions françaises du site sont parfois un peu fantaisistes. Nous
+allons donc basculer vers l'anglais, en cliquant sur le petit drapeau
+américain en haut de la page.
+
+Ouvrir le panneau de contrôle : 'Control Panel > Sign-up'
+
+Mettre les informations réelles. Ces informations doivent être liées à un
+invididu et non à une organisation.
+
+Le site renvoie par e-mail un code d'authentification, qu'il faut coller dans
+le champ approprié dans le navigateur.
+
+Une fois que le compte est validé par l'équipe de StartSSL, on reçoit un
+e-mail donnant un accès valable pour une journée pour créer le certificat
+client. Ce certificat sera installé automatiquement sur la machine afin de
+vous identifier sur le site de StartSSL.
+
+En cliquant sur le lien de l'e-mail, on doit d'abord créer la clé, puis on
+installe le certificat dans le navigateur. 
+
+Pour sauvegarder ce certificat dans Firefox, ouvrir 'Édition > Préférences >
+Avancé > Certificats > Afficher les certificats > Vos certificats : Afficher
+le certificat' et le sauvegarder, en le nommant 'StartSSL'.  Choisir un mot de
+passe pour la sauvegarde du certificat. Le fichier sera enregistré sous le nom
+'StartSSL.p12'.
+
+Retourner sur le site et s'authentifier en cliquant sur le bouton de connexion
+en haut à droite. 
+
+  /!\ Il se peut que cette tentative de connexion échoue et retourne une
+  erreur 'ssl_error_unknown_ca_alert'. Dans ce cas, la solution consiste à
+  repérer et supprimer tous les certificats StartCom marqués "Sécurité
+  personnelle" du navigateur. 
+
+Ouvrir l'onglet 'Validations Wizard' et choisir 'Type: Domain Name
+Validation'.
+
+Saisir le nom de domaine, par exemple 'http://slackbox.fr'.
+
+Ensuite, saisir l'adresse mail qui servira à vérifier le propriétaire du nom
+de domaine, par exemple 'postmaster@slackbox.fr'. StartCom envoie un code de
+vérification à cette adresse, qu'il faudra saisir dans le champ approprié. 
+
+Ouvrir l'onglet 'Certificates Wizard' et choisir 'Certificate Target: Web
+Server SSL/TLS Certificate'. 
+
+Choisir un mot de passe et générer une clé privée. Copier/coller le contenu du
+formulaire qui s'affiche dans un fichier texte que l'on nommera
+'slackbox.fr.key'.  Ensuite, décrypter cette clé privée en utilisant la
+commande suivante :
+
+  $ openssl rsa -in slackbox.fr.key -out slackbox.fr.key
+
+Là, il faudra saisir le mot de passe que l'on vient de choisir. 
+
+Choisir le domaine pour le certificat, par exemple : slackbox.fr.
+
+Choisir un sous-domaine, par exemple : http://www.slackbox.fr.
+
+Le mail qui confirme la création du certificat sera envoyé à l'adresse
+postmaster@slackbox.fr. Bien évidemment, il faudra disposer d'un serveur mail
+fonctionnel pour le domaine. 
+
+Sur le site de StartCom, ouvrir la 'Tool Box' et choisir 'Retrieve
+Certificate'. Copier/coller le contenu du champ dans un fichier
+'slackbox.fr.crt'.
+
+Sur le serveur, créer un répertoire '/etc/ssl/startssl' et ranger les deux
+fichiers 'slackbox.fr.{key,crt}' dans ce répertoire. Il nous faudra également
+récupérer deux autres certificats sur le site de StartSSL, l'intermediate et
+le root CA, nécessaires sur le serveur :
+
+  # cd /etc/ssl/startssl
+  # wget \
+  https://www.startssl.com/certs/class1/sha2/pem/sub.class1.server.sha2.ca.pem
+  # https://www.startssl.com/certs/ca.pem
+
+Voici les fichiers que l'on doit avoir au total :
+
+  # cd /etc/ssl/startssl/
+  # ls -l
+  total 16
+  -rw-r----- 1 root certs 2760 mai    7  2008 ca.pem
+  -rw-r----- 1 root certs 2228 sept. 25 09:11 slackbox.fr.crt
+  -rw-r----- 1 root certs 1675 sept. 25 09:11 slackbox.fr.key
+  -rw-r----- 1 root certs 2090 févr.  4  2015 sub.class1.server.sha2.ca.pem
+
+Dans la configuration de l'hôte virtuel sécurisé, voici comment sont définis
+les fichiers de certificats :
+
+--8<---------- /etc/httpd/extra/httpd-ssl.conf -------------------------------
+...
+<VirtualHost 195.154.65.130:443>
+DocumentRoot "/srv/httpd/vhosts/slackbox-secure/htdocs"
+...
+SLCertificateFile "/etc/ssl/startssl/slackbox.fr.crt"
+SSLCertificateKeyFile "/etc/ssl/startssl/slackbox.fr.key"
+SSLCertificateChainFile "/etc/ssl/startssl/sub.class1.server.sha2.ca.pem"
+SSLCACertificateFile "/etc/ssl/startssl/ca.pem"
+...
+</VirtualHost>
+...
+--8<--------------------------------------------------------------------------
+
+Il ne reste plus qu'à redémarrer Apache et vérifier la sécurité du site avec
+l'outil de reporting.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,178 @@
+===============
+Xfce 4.12 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+===============
+
+Dernière révision : 11 avril 2015
+
+Ce HOWTO décrit la configuration du bureau Xfce 4.12 sous Slackware Linux.
+
+
+  * Configuration initiale de Xfce
+  * Création du profil
+  * Supprimer les partitions du bureau
+
+
+Configuration initiale de Xfce
+------------------------------
+
+Créer un utilisateur 'template' pour le modèle de configuration.
+
+Premier démarrage : Utiliser les paramètres par défaut.
+
+Style : Clearlooks Phenix
+
+Icônes : Elementary Xfce
+
+Police de l'interface : Droid Sans 11
+
+Icônes du bureau :
+
+  [ ] Répertoire personnel
+
+  [ ] Système de fichiers
+
+  [ ] Corbeille
+
+  [X] Périphériques amovibles
+
+Arrière-plan : opensuse-1600x1200.jpg
+
+Économiseur d'écran : un seul > GLMatrix
+
+Nombre d'espaces de travail : 2
+
+Gestionnaire de fenêtres : Default
+
+Peaufinage des fenêtres > Compositeur :
+
+  [*] Activer le compositeur d'affichage
+
+  [*] Affichage direct des fenêtres plein écran
+
+  [*] Afficher l'ombre sous les fenêtres normales
+
+  [ ] Afficher l'ombre sous les fenêtres contextuelles
+
+  [ ] Afficher l'ombre sous les fenêtres du dock
+
+  Opacité des décorations des fenêtres : laisser tel quel
+
+  Opacité des fenêtres inactives : réduire d'un cran
+
+  Opacité des fenêtres durant leur déplacement : réduire de deux crans
+
+  Opacité des fenêtres durant leur redimensionnement : réduire d'un cran
+
+  Opacité des fenêtres contextuelles : laisser tel quel
+
+Remplacer le Menu d'applications classique par le Menu Whisker.
+
+  Affichage : Icône et texte
+
+  Icône : start-here-slackware (emplacements)
+
+Ajouter des favoris pour les applications de base :
+
+  * Thunar
+  * Mozilla Firefox
+  * Mozilla Thunderbird
+  * Pidgin
+  * LibreOffice Writer
+  * LibreOffice Calc
+  * LibreOffice Impress
+  * gThumb
+  * Audacious
+  * MPlayer
+
+  [*] Changer de catégories au survol
+
+  [ ] Changer d'utilisateur
+
+  [ ] Modifier les applications
+
+  [ ] Modifier le profil
+
+Supprimer les actions de recherche du menu Whisker.
+
+Déplacer la zone de notifications à gauche du sélecteur de bureaux virtuels.
+
+Ajouter l'applet de mixage entre la zone de notifications et le sélecteur de
+bureaux virtuels.
+
+Ajouter l'applet du gestionnaire d'alimentation entre l'applet de mixage et le
+sélecteur de bureaux virtuels.
+
+Tableau de bord > Tableau de bord 2 : supprimer 
+
+Démarrer le lanceur d'applications Plank et ouvrir les Préférences :
+
+  $ plank --preferences
+
+  Thème : Transparent
+
+  Taille d'icône : 38
+
+  Zoom sur icône : activé - 120 %
+
+  Afficher l'icône du dock : désactivé
+
+Ajouter des lanceurs pour les applications de base :
+
+  * Thunar
+  * Mozilla Firefox
+  * Mozilla Thunderbird
+  * LibreOffice 
+  * gThumb
+  * Audacious
+  * MPlayer ou VLC
+
+Dans les Paramètres Xfce > Sessions et démarrage, définir le lancement
+automatique de Plank à l'ouverture d'une session.
+
+  Nom         : Plank
+
+  Description : Lanceur d'applications
+
+  Commande    : /usr/bin/plank
+
+Peaufiner Xfce Terminal.
+
+Thunar : augmenter d'un cran la taille des icônes
+
+
+Création du profil
+------------------
+
+  # mkdir -pv /etc/skel/.config/xfce4
+  # cp -Rv /home/template/.config/xfce4/{panel,terminal,xfconf} \
+      /etc/skel/.config/xfce4/
+  # cp -Rv /home/template/.config/{plank,autostart} /etc/skel/.config/ 
+
+La configuration de Whiskermenu se trouve dans 'xfce4/panel/'.
+
+Empaqueter la configuration :
+
+  # cd /etc/skel
+  # tar cvjf config.tar.bz2 .config/
+
+
+Supprimer les partitions du bureau
+----------------------------------
+
+Si le bureau affiche les partitions système comme points de montage sur une
+installation multiboot, on peut s'en débarrasser en éditant '/etc/fstab' comme
+ceci :
+
+--8<---------- /etc/fstab ----------------------------------------------------
+...
+/dev/sda5        /mnt/sda5        ext4        defaults,noauto  0   0
+/dev/sda6        /mnt/sda6        ext4        defaults,noauto  0   0
+/dev/sda7        /mnt/sda7        ext4        defaults,noauto  0   0
+/dev/sda8        /mnt/sda8        ext4        defaults,noauto  0   0
+/dev/sda9        /mnt/sda9        ext4        defaults,noauto  0   0
+/dev/sda10       /mnt/sda10       ext4        defaults,noauto  0   0
+--8<--------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

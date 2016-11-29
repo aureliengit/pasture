@@ -1,0 +1,49 @@
+Sun Oct  2 16:31:15 CEST 2016
+xap/owncloud-client-2.2.4-i586-1_microlinux.txz: Upgraded.
++--------------------------+
+Mon Sep 19 08:45:37 CEST 2016
+xap/virtualbox-kernel-5.0.26_4.4.19_smp-i586-2_microlinux.txz: Rebuilt.
+xap/owncloud-client-2.2.3-i586-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Sep  3 10:07:14 CEST 2016
+xap/CherryTree-0.37.4-i586-1_microlinux.txz: Added.
++--------------------------+
+Sun Jul 31 18:17:50 CEST 2016
+xap/blender-2.77a-i686-1_microlinux.txz: Added.
++--------------------------+
+Sun Jul 31 11:27:23 CEST 2016
+d/fpc-2.6.4-i386-1_microlinux.txz: Added.
+d/fpc-source-2.6.4-noarch-1_microlinux.txz: Added.
+d/lazarus-1.2.6-i386-1_microlinux.txz: Added.
+xap/winff-20150729-i586-1_microlinux.txz: Added.
++--------------------------+
+Sat Jul 30 08:46:27 CEST 2016
+xap/simple-scan-2.32.0.2-i586-1_microlinux.txz: Added.
+y/aisleriot-3.6.2-i586-1_microlinux.txz: Added.
+xap/homebank-5.0.9-i586-1_microlinux.txz: Added.
++--------------------------+
+Fri Jul 29 16:46:41 CEST 2016
+xap/filezilla-3.19.0-i586-1_microlinux.txz: Added.
+xap/remmina-20160509-i586-1_microlinux.txz: Added.
++--------------------------+
+Wed Jul 27 19:30:14 CEST 2016
+xap/HandBrake-0.9.9-i686-1_microlinux.txz: Added.
+xap/librecad-2.0.11-i586-1_microlinux.txz: Added.
+xap/easytag-2.1.10-i586-1_microlinux.txz: Added.
+xap/anki-2.0.36-noarch-1_microlinux.txz: Added.
++--------------------------+
+Tue Jul 26 15:42:54 CEST 2016
+xap/virtualbox-5.0.26-i586-1_microlinux.txz: Added.
+xap/virtualbox-kernel-5.0.26_4.4.14_smp-i586-1_microlinux.txz: Added.
+xap/virtualbox-extension-pack-5.0.26-i586-1_microlinux.txz: Added.
++--------------------------+
+Sat Jul 23 10:13:41 CEST 2016
+ap/qemu-2.4.1-i586-1_microlinux.txz: Added.
+xap/virt-manager-1.4.0-i586-1_microlinux.txz: Added.
++--------------------------+
+Thu Jul 21 09:58:14 CEST 2016
+xap/owncloud-client-2.2.2-i586-1_microlinux.txz: Added.
++--------------------------+
+Tue Jul 19 08:53:13 CEST 2016
+xap/gtkcdlabel-1.15-noarch-1_microlinux.txz: Added.
++--------------------------+

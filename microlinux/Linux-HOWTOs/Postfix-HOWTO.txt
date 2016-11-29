@@ -1,0 +1,628 @@
+=============
+Postfix HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=============
+
+Dernière révision : 29 janvier 2016
+
+Ce HOWTO décrit la mise en place d'un serveur mail avec Postfix sous Slackware
+Linux.
+
+
+  * Le MTA Postfix
+  * Prérequis
+  * Installation
+  * Configuration initiale
+  * Gérer les mails en ligne de commande avec Mutt
+  * Créer les comptes Linux pour la messagerie
+  * Les alias
+  * Définir les destinataires autorisés
+  * Faire correspondre les comptes Linux aux adresses de messagerie
+  * Domaines virtuels avec des utilisateurs distincts
+  * Régler les problèmes de permissions
+  * Supprimer Postfix
+  * Documentation
+
+
+Le MTA Postfix
+--------------
+
+Postfix est un serveur mail, et plus exactement un MTA ("Mail Transfer Agent").
+Il gère l'envoi et la réception de mails par Internet en utilisant le protocole
+SMTP.
+
+Le monde de l'Open Source offre toute une panoplie de MTA, parmi lesquels on
+trouve Postfix, Exim, Qmail et Sendmail. La distribution Slackware comprend
+Sendmail comme MTA par défaut. Nous allons lui préférer Postfix, qui est
+beaucoup plus facile à configurer.
+
+
+Prérequis
+---------
+
+Dans le pare-feu, il faudra ouvrir le port 25 en TCP. 
+
+Vérifier si le serveur n'est pas blacklisté quelque part :
+
+  * http://www.mxtoolbox.com/blacklists.aspx
+
+Il faut impérativement disposer d'un ou de plusieurs noms de domaines
+enregistrés et valides, comme par exemple :
+
+  * radionovak.com
+  * slackbox.fr
+  * unixbox.fr
+
+Sur une machine externe, vérifier la configuration DNS des domaines pour
+lesquels on souhaite gérer le courrier, comme ceci :
+
+  $ host -t MX radionovak.com
+  radionovak.com mail is handled by 10 mail.radionovak.com.
+  $ host mail.radionovak.com
+  mail.radionovak.com has address 88.191.137.75
+  $ host radionovak.com
+  radionovak.com has address 88.191.137.75
+  radionovak.com mail is handled by 10 mail.radionovak.com.
+  $ host 88.191.137.75
+  75.137.191.88.in-addr.arpa domain name pointer sd-25854.dedibox.fr.
+
+
+Installation
+------------
+
+Postfix ne fait pas partie d'une installation standard de Slackware. On va
+donc le compiler à partir des sources, en utilisant le script de
+SlackBuilds.org. 
+
+Au préalable, créer quelques utilisateurs et groupes système pour Postfix :
+
+  # groupadd -g 200 postfix
+  # useradd -u 200 -d /dev/null -s /bin/false -g postfix postfix
+  # groupadd -g 201 postdrop
+
+Au final, on doit avoir quelque chose comme ceci :
+
+  # grep post /etc/passwd
+  postfix:x:200:200::/dev/null:/bin/false
+  # grep post /etc/group
+  postfix:x:200:
+  postdrop:x:201:
+
+Lancer la compilation de Postfix et installer le paquet résultant.
+
+  /!\ Si l'on choisit le paquet MLES, la création des utilisateurs et des
+  groupes système est gérée automatiquement par le script de
+  post-installation.
+
+
+Configuration initiale
+----------------------
+
+Les fichiers de configuration utilisés par Postfix se situent dans
+'/etc/postfix'. 
+
+  * Le fichier 'master.cf' gère la configuration du démon 'master' de Postfix.
+    Dans la plupart des configurations de base, on n'aura pas à intervenir sur
+    ce fichier.
+
+  * Le fichier 'main.cf' contient les paramètres de contrôle des démons de
+    Postfix. C'est celui que l'on modifiera le plus souvent.
+
+Le fichier 'main.cf' fourni par défaut fait plus de 650 lignes, la plupart
+étant des commentaires. On peut commencer par aérer ce fichier pour ne garder
+que les directives :
+
+  # cd /etc/postfix
+  # mv main.cf main.cf.orig
+  # grep -h -v '^[[:space:]]*\#' main.cf.orig | \
+      grep -v '^[[:space:]]*$' > main.cf
+
+On obtient quelque chose comme ceci :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+queue_directory = /var/spool/postfix
+command_directory = /usr/sbin
+daemon_directory = /usr/libexec/postfix
+data_directory = /var/lib/postfix
+mail_owner = postfix
+unknown_local_recipient_reject_code = 550
+debug_peer_level = 2
+debugger_command =
+   PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+   ddd $daemon_directory/$process_name $process_id & sleep 5
+sendmail_path = /usr/sbin/sendmail
+newaliases_path = /usr/bin/newaliases
+mailq_path = /usr/bin/mailq
+setgid_group = postdrop
+html_directory = /usr/doc/postfix-2.9.4/html
+manpage_directory = /usr/man
+sample_directory = /etc/postfix
+readme_directory = /usr/doc/postfix-2.9.4/README_FILES
+inet_protocols = ipv4
+--8<--------------------------------------------------------------------------
+
+Si un paramètre n'est pas présent dans 'main.cf', Postfix utilisera sa valeur
+par défaut. Pour la plupart, ces valeurs sont définies "en dur" dans le code
+source de Postfix, tandis que certaines sont initialisées à la compilation et
+quelques-unes au moment du lancement du programme. 
+
+Le programme 'postconf' est très utile pour examiner les valeurs courantes et
+par défaut du fichier 'main.cf'. Pour afficher la valeurs de certains
+paramètres de configuration, il suffit de les fournir en argument. Exemple :
+
+  # postconf inet_protocols
+  inet_protocols = ipv4
+
+L'option '-d' affichera la valeur par défaut des paramètres demandés :
+
+  # postconf -d inet_protocols
+  inet_protocols = all
+
+Nous allons supprimer la plupart des paramètres redondants ou autrement
+inutiles, pour commencer avec quelques directives de base :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+# /etc/postfix/main.cf
+
+# Désactiver l'IPv6
+inet_protocols = ipv4
+
+# Identification 
+smtpd_banner = $myhostname ESMTP $mail_name (Slackware Linux)
+
+# Nom d'hôte pleinement qualifié du serveur
+myhostname = sd-41893.dedibox.fr
+
+# Domaine du serveur
+mydomain = dedibox.fr
+
+# Domaine pour qualifier les adresses sans partie domaine
+myorigin = $myhostname
+
+# Domaines locaux
+mydestination = sd-41893.dedibox.fr, localhost.localdomain, localhost
+
+# Envoi de mails sans authentification
+mynetworks = 127.0.0.0/8
+
+# Relais
+relayhost =
+
+# Format de stockage
+home_mailbox = Maildir/
+
+# Tables de correspondance
+alias_maps = hash:/etc/postfix/aliases
+alias_database = hash:/etc/postfix/aliases
+--8<--------------------------------------------------------------------------
+
+  > Si l'IPv6 est désactivé au niveau du système, il faudra également le faire
+    ici grâce à la directive 'inet_protocols'.
+
+  > 'smtpd_banner' définit la chaîne de caractères avec laquelle Postfix
+    s'identifie auprès d'un autre MTA.
+
+  > 'myhostname' est censé contenir le nom d'hôte pleinement qualifié du
+    serveur, c'est-à-dire le résultat de la commande 'hostname --fqdn'.
+
+  > 'myorigin' définit le domaine auquel sont associés des mails envoyés
+    localement. Par défaut, 'myorigin' a la même valeur que 'myhostname'. 
+
+  > 'mydestination' fournit la liste des domaines pour lesquels les messages
+    reçus doivent être stockés dans une boîte mail locale. Attention : même si
+    Postfix gère plusieurs domaines, 'mydestination' ne doit spécifier que le
+    domaine principal. Les domaines virtuels seront gérés par la directive
+    'virtual_alias_domains', que nous verrons plus loin.
+
+  > 'mynetworks' définit les adresses depuis lesquelles Postfix accepte les
+    mails sans authentification via SMTP. Les plages d'adresses fournies ici
+    désignent donc toutes les machines auxquelles Postfix fait confiance, si
+    l'on peut dire. Sur un serveur dédié public, il est impératif de définir
+    uniquement l'hôte local pour 'mynetworks', sous peine de se retrouver avec
+    une "pompe à merde", le terme communément utilisé pour les serveurs mails
+    mal configurés qui sont utilisés par des tiers malintentionnés pour l'envoi
+    massif de spams sans authentification. Attention : les spammeurs du monde
+    entier adorent ce genre de machines.
+
+  > 'relayhost' définit le MTA auquel on est censé transférer les mails qui ne
+    doivent pas être acheminés localement. Dans notre configuration, cette
+    directive doit rester vide. On l'utilisera sur un serveur de réseau local
+    pour transférer les mails à un MTA public sur Internet.
+
+  > Le format de stockage par défaut de Postfix, c'est mbox. On préférera le
+    format Maildir, bien plus adapté pour une configuration IMAP.
+
+  > 'alias_maps' définit l'emplacement de la table de correspondance, et
+    'alias_database' la base de données correspondante. Certaines informations
+    ne peuvent pas être facilement représentées dans 'main.cf'. Les tables de
+    correspondance permettent de les stocker dans des fichiers externes.
+    Postfix n'utilise pas directement les fichiers texte, ce serait trop lent.
+    Au lieu de cela, les tables de correspondance de type "hash" (ou "tables
+    de hachage) servent pour construire des fichiers indexés, grâce à la
+    bibliothèque Berkeley DB. Le programme 'postmap' est utilisé pour
+    construire les fichiers indexés. Pour mettre à jour les alias, on
+    utilisera la commande 'newaliases'.
+
+Éditer la table de correspondance comme ceci :
+
+--8<---------- /etc/postfix/aliases ------------------------------------------
+postmaster: root
+root      : kikinovak
+kikinovak : kikinovak
+--8<--------------------------------------------------------------------------
+
+Construire le fichier indexé :
+
+  # newaliases 
+
+Activer et démarrer Postfix :
+
+  # chmod +x /etc/rc.rc.postfix
+  # /etc/rc.d/rc.postfix start
+
+Basculer vers un compte utilisateur normal et envoyer un mail vers un compte
+Webmail externe :
+
+  # su - kikinovak
+  $ mail kikinovak@free.fr
+  Subject: Test Postfix
+  Ceci est un test.
+  .
+  EOT
+
+Se connecter au compte Webmail et vérifier si le message a bien été envoyé,
+puis répondre à ce message. Si tout se passe bien, le répertoire utilisateur
+contient un nouveau répertoire ~/Maildir, qui ressemble à ceci :
+
+  $ tree Maildir/
+  Maildir/
+  |-- cur
+  |-- new
+  |   `-- 1360401556.V803I70000bM517366.sd-25854
+  `-- tmp
+
+  3 directories, 1 file
+
+C'est un simple fichier texte, qu'on peut afficher avec 'less' :
+
+  $ less Maildir/new/1360401556.V803I70000bM517366.sd-25854 
+  Return-Path: <kikinovak@free.fr>
+  X-Original-To: kikinovak@sd-25854.dedibox.fr
+  Delivered-To: kikinovak@sd-25854.dedibox.fr
+  Received: from smtp5-g21.free.fr (smtp5-g21.free.fr [212.27.42.5])
+          by sd-25854.dedibox.fr (Postfix) with ESMTP id 426C2780A06
+          for <kikinovak@sd-25854.dedibox.fr>; Sun, 10 Feb 2013 12:30:38 +0100
+  (CET)
+  Received: from zimbra21-e3.priv.proxad.net (unknown [172.20.243.171])
+          by smtp5-g21.free.fr (Postfix) with ESMTP id 93489D4813B
+          for <kikinovak@sd-25854.dedibox.fr>; Sun, 10 Feb 2013 12:30:34 +0100
+  (CET)
+  Date: Sun, 10 Feb 2013 12:30:33 +0100 (CET)
+  From: kikinovak@free.fr
+  To: Niki Kovacs <kikinovak@sd-25854.dedibox.fr>
+  Message-ID:
+  <943841863.56394345.1360495833441.JavaMail.root@zimbra21-e3.priv.proxad.net>
+  In-Reply-To: <20130210112926.2670C780A07@sd-25854.dedibox.fr>
+  Subject: Re: Test Postfix
+  MIME-Version: 1.0
+  Content-Type: text/plain; charset=utf-8
+  Content-Transfer-Encoding: quoted-printable
+  X-Originating-IP: [213.41.141.252]
+  X-Mailer: Zimbra 7.2.0-GA2598 (ZimbraWebClient - FF3.0 (Linux)/7.2.0-GA2598)
+  X-Authenticated-User: kikinovak@free.fr
+
+  Et voici la r=C3=A9ponse.
+
+
+Gérer les mails en ligne de commande avec Mutt
+----------------------------------------------
+
+Mutt est un MUA ("Mail User Agent") en ligne de commande. On peut l'utiliser
+sur des machines dépourvues d'interface graphique.
+
+Avant de lancer Mutt, éditer le fichier de configuration '~/.muttrc' :
+
+--8<---------- ~/.muttrc -----------------------------------------------------
+set mbox_type=Maildir
+set folder="~/Maildir"
+set spoolfile="~/Maildir"
+set mbox="+Mailbox"
+
+my_hdr From: kikinovak@sd-25854.dedibox.fr (Niki Kovacs)
+my_hdr Reply-To: kikinovak@sd-25854.dedibox.fr (Niki Kovacs)
+--8<--------------------------------------------------------------------------
+
+Lancer Mutt :
+
+  $ mutt
+
+La fenêtre principale de Mutt affiche la boite de réception. Les nouveaux
+mails sont marqués par un 'N'. Une barre d'état en haut de l'écran affiche les
+principaux raccourcis. En règle générale, Mutt fonctionne avec les mêmes
+raccourcis que Vim. 
+
+Pour lire un message, il suffit de le sélectionner et d'appuyer sur [Entrée].
+
+
+Créer les comptes Linux pour la messagerie
+------------------------------------------
+
+Bien sûr, c'est plus élégant de créer des comptes virtuels gérés par une base
+de données et tout le bling bling. Le Web regorge d'ailleurs de tutoriaux de ce
+genre, rivalisant de complexité. Pour commencer, nous allons rester fidèles au
+principe KISS et passer par des comptes Linux traditionnels. 
+
+Admettons que nous ayons à gérer le courrier des deux domaines (fictifs)
+'journaldespirou.fr' et 'gaffophone.org', avec les adresses mail suivantes :
+
+  * fantasio@journaldespirou.fr
+  * gaston.lagaffe@journaldespirou.fr
+  * jeanne.dupont@journaldespirou.fr
+  * gaston.lagaffe@gaffophone.org
+  * bertrand.labevue@gaffophone.org
+
+Dans un premier temps, nous allons créer des comptes Linux traditionnels, un
+par compte mail, en respectant - plus ou moins - les conventions de nommage
+classiques. Notons que les utilisateurs n'ont pas de shell de connexion,
+c'est-à-dire qu'ils ne pourront pas se connecter directement au serveur.
+
+  # useradd -m -g users -s /bin/false -c "Fantasio" fantasio
+  # useradd -m -g users -s /bin/false -c "Gaston Lagaffe" glagaffe
+  # useradd -m -g users -s /bin/false -c "Gaston Lagaffe" glagaffe2
+  # useradd -m -g users -s /bin/false -c "Jeanne Dupont" jdupont
+  # useradd -m -g users -s /bin/false -c "Bertrand Labévue" blabevue
+
+Pour ne pas avoir à inventer des mots de passe raisonnablement compliqués pour
+chaque utilisateur, on peut utiliser l'outil 'pwgen', disponible sur
+SlackBuilds.org. Exemple pour créer un mot de passe aléatoire long de huit
+caractères, composé de chiffres et de lettres majuscules et minuscules :
+
+  # pwgen -n -N 1
+
+On va créer notre propre "base de données" sous forme de simple fichier texte
+'touslesmails.txt' :
+
+--8<---------- touslesmails.txt ----------------------------------------------
+Nom              Mail                              Login     Pass
+=====================================================================
+Fantasio         fantasio@journaldespirou.fr       fantasio  LjaLScHa
+Gaston Lagaffe   gaston.lagaffe@journaldespirou.fr glagaffe  4qe0PsXY
+                 gaston.lagaffe@gaffophone.org     glagaffe2 ug8u8Uvf
+Jeanne Dupont    jeanne.dupont@journaldespirou.org jdupont   juRqqXsi
+Bertrand Labévue bertrand.labevue@gaffophone.org   blabevue  01WedFcV
+...
+--8<--------------------------------------------------------------------------
+
+Étant donné qu'il contient des informations sensibles, on va le stocker dans un
+endroit approprié, à l'abri des regards curieux.
+
+  # ls -l /root/touslesmails.txt
+  -rw------- 1 root root 494 19 mars  06:53 /root/touslesmails.txt
+
+
+Les alias
+---------
+
+Un alias est un nom supplémentaire pour recevoir du courrier électronique. En
+réalité, les mails sont acheminés vers un compte qui existe déjà. Les alias
+sont définis dans le fichier '/etc/postfix/aliases'. Exemple :
+
+--8<---------- /etc/postfix/aliases ------------------------------------------
+...
+# Utilisateurs
+gaston.lagaffe  : glagaffe, glagaffe2 
+jeanne.dupont   : jdupont
+bertrand.labevue: blabevue
+...
+--8<--------------------------------------------------------------------------
+
+Utilisons ce fichier pour créer l'alias suivant :
+
+--8<---------- /etc/postfix/aliases ------------------------------------------
+...
+kikinovak: kikinovak
+webmaster: kikinovak
+--8<--------------------------------------------------------------------------
+
+À chaque modification de ce fichier, il faut reconstruire 'aliases.db', la base
+de données des alias :
+
+  # newaliases
+
+À présent, on peut envoyer un mail à webmaster@sd-25854.dedibox.fr, et il
+atterrira chez kikinovak@sd-25854.dedibox.fr.
+
+Notons que pour des raisons de sécurité, Postfix n'achemine pas de mails vers
+root. Dans ce cas, il suffit de définir un alias vers un utilisateur
+judicieusement choisi qui les recevra à la place de root. Au total, on pourra
+avoir quelque chose comme ceci :
+
+--8<---------- /etc/postfix/aliases ------------------------------------------
+root         : kikinovak
+MAILER-DAEMON: postmaster
+postmaster   : root
+bin          : root
+daemon       : root
+named        : root
+nobody       : root
+uucp         : root
+www          : root
+ftp-bugs     : root
+postfix      : root
+manager      : root
+dumper       : root
+operator     : root
+abuse        : postmaster
+decode       : root
+kikinovak    : kikinovak
+webmaster    : kikinovak
+--8<--------------------------------------------------------------------------
+
+Là encore, ne pas oublier de prendre en compte les nouveaux alias :
+
+  # newaliases
+
+
+Définir les destinataires autorisés
+-----------------------------------
+
+Dans la configuration par défaut, tous les comptes Linux peuvent recevoir
+du courrier, y compris les comptes système comme root, named, nobody, etc. Pour
+tester ce comportement, on peut créer un utilisateur 'bidon' avec 'adduser' et
+lui envoyer un mail à l'adresse 'bidon@sd-25854.dedibox.fr'. 
+
+On va donc instaurer quelques restrictions pour éviter de spammer tout ce petit
+monde. Pour ce faire, on va créer un fichier '/etc/postfix/local-recips' avec
+la liste de tous les destinataires autorisés, en suivant la syntaxe suivante :
+
+--8<---------- /etc/postfix/local-recips -------------------------------------
+fantasio   x
+glagaffe   x
+glagaffe2  x
+jdupont    x
+blabevue   x
+--8<--------------------------------------------------------------------------
+
+À partir de ce fichier, on va générer une base de données dans un format
+lisible pour Postfix :
+
+  # cd /etc/postfix
+  # postmap local-recips
+
+Nous pouvons vérifier si le fichier a été généré correctement :
+
+  # postmap -s hash:local-recips
+  blabevue  x
+  jdupont   x
+  fantasio  x
+  glagffe   x
+  glagaffe2 x
+
+  > À chaque modification de 'local-recips', il faudra réinvoquer 'postmap'
+    pour reconstruire le fichier de base de données 'local-recips.db'.
+
+Pour prendre en compte les nouvelles restrictions, éditer
+'/etc/postfix/main.cf' et ajouter le paramètre suivant :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+...
+local_recipient_maps = hash:/etc/postfix/local-recips $alias_maps
+--8<--------------------------------------------------------------------------
+
+Prendre en compte les modifications :
+
+  # /etc/rc.d/rc.postfix reload
+
+À partir de là, seuls les utilisateurs explicitement définis dans
+'local-recips' pourront recevoir du courrier.
+
+
+Faire correspondre les comptes Linux aux adresses de messagerie
+---------------------------------------------------------------
+
+Créer un fichier '/etc/postfix/canonical' comme ceci :
+
+--8<---------- /etc/postfix/canonical ----------------------------------------
+blabevue    bertrand.labevue@gaffophone.org
+fantasio    fantasio@journaldespirou.fr
+glagaffe    gaston.lagaffe@journaldespirou.fr
+glagaffe2   gaston.lagaffe@gaffophone.org
+jdupont     jeanne.dupont@journaldespirou.org
+--8<--------------------------------------------------------------------------
+
+Convertir le tableau en un format lisible pour Postfix :
+
+  # cd /etc/postfix
+  # postmap canonical
+
+Définir le paramètre correspondant dans '/etc/postfix/main.cf' :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+canonical_maps = hash:/etc/postfix/canonical
+--8<--------------------------------------------------------------------------
+
+
+Domaines virtuels avec des utilisateurs distincts
+-------------------------------------------------
+
+Les domaines virtuels ("Hosted Domains") sont tous les domaines qui ne
+correspondent pas au nom d'hôte du serveur.
+
+Créer un fichier '/etc/postfix/virtual' avec un tableau qui fait correspondre
+chaque adresse mail d'un domaine virtuel à un compte Linux, comme ceci :
+
+--8<---------- /etc/postfix/virtual ------------------------------------------
+bertrand.labevue@gaffophone.org    blabevue
+fantasio@journaldespirou.fr        fantasio
+gaston.lagaffe@journaldespirou.fr  glagaffe
+gaston.lagaffe@gaffophone.org      glagaffe2
+jeanne.dupont@journaldespirou.org  jdupont
+--8<--------------------------------------------------------------------------
+
+Là aussi, rendre ce fichier lisible pour Postfix :
+
+  # postmap virtual
+
+Adapter '/etc/postfix/main.cf' pour prendre en compte les domaines virtuels :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+...
+mydestination  = sd-25854.dedibox.fr, localhost.localdomain, localhost
+virtual_alias_domains = journaldespirou.fr,
+                        gaffophone.org
+virtual_alias_maps    = hash:/etc/postfix/virtual                        
+...
+--8<--------------------------------------------------------------------------
+
+Il ne reste qu'à recharger Postfix pour prendre en compte la nouvelle
+configuration.
+
+
+Régler les problèmes de permissions
+-----------------------------------
+
+Après une mise à jour, il se peut que l'on ait des problèmes de permissions.
+Voici ce qu'il faut faire :
+
+  # /etc/rc.d/rc.postfix stop
+  # killall -9 postdrop
+  # cd /var/spool/postfix
+  # chown -R root:postdrop public maildrop
+  # postfix set-permissions
+  # postfix check
+  # /etc/rc.d/rc.postfix start
+
+
+Supprimer Postfix
+-----------------
+
+Arrêter le service :
+
+  # /etc/rc.d/rc.postfix stop
+
+Supprimer le paquet :
+
+  # removepkg postfix 
+
+Supprimer les fichiers de configuration :
+
+  # rm -rf /etc/postfix/ 
+
+Supprimer le script de démarrage :
+
+  # rm -f /etc/rc.d/rc.postfix
+
+Supprimer les utilisateurs et les groupes système correspondants :
+
+  # userdel -r postfix --> supprime également le groupe 'postfix'
+  # groupdel postdrop
+
+
+Documentation
+-------------
+
+  * Linux 2014, M. Kofler, pp. 1231 - 1256
+  * Monter son serveur de mails sous Linux, M. Bäck, pp. 25 - 36
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

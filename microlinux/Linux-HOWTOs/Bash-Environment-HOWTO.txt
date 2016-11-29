@@ -1,0 +1,781 @@
+======================
+Bash Environment HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+======================
+
+Dernière révision : 20 décembre 2015
+
+Ce HOWTO permet aux utilisateurs du shell Bash de paramétrer leur
+environnement de travail.
+
+  
+  * Variables d'environnement
+  * Principales variables
+  * Les options du shell
+  * Les alias
+  * Historique de commandes
+  * Les fichiers d'environnement
+  * Exercices
+  * Corrigés
+
+
+=========================
+Variables d'environnement
+=========================
+
+
+Un certain nombre de variables sont définies dans l'environnement du shell.
+Elles contiennent des informations nécessaires au fonctionnement de
+l'interpréteur et/ou des commandes lancées à partir de celui-ci.
+
+
+Liste des variables
+-------------------
+
+La commande 'set' donne la liste des variables définies dans le shell courant.
+
+  $ set
+  BASH=/usr/bin/bash
+  EDITOR=vim
+  HOME=/home/kikinovak
+  LOGNAME=kikinovak
+  OSTYPE=linux-gnu
+  PS1='$ '
+  PS2='> '
+  TERM=xterm
+  ...
+
+
+Afficher la valeur d'une variable
+---------------------------------
+
+Le caractère spécial '$' du shell permet d'accéder au contenu d'une variable.
+
+  $ echo $HOME
+  /home/kikinovak
+
+
+Modifier la valeur d'une variable
+---------------------------------
+
+Le shell permet d'initialiser ou de modifier des variables.
+
+  $ variable=valeur
+  $ echo $variable
+  valeur
+
+Si la valeur contient des caractères spéciaux du shell ('$', '>', espace), il
+faut empêcher le shell d'interpréter ceux-ci en entourant la valeur avec des
+simples quotes ' '. Utiliser des simples quotes est l'une des trois manières
+de masquer des caractères en shell, comme nous le verrons un peu plus loin.
+
+Dans l'exemple qui suit, nous devons masquer le symbole '>' (redirection)
+ainsi que l'espace (séparateur de mots sur la ligne de commande) :
+
+  $ variable='mot1 mot2 =>'
+  $ echo $variable
+  mot1 mot2 =>
+
+  /!\ Il ne faut pas mettre d'espace autour du signe '='. Le shell ne
+  comprendrait pas qu'il s'agit d'une affectation.
+
+
+=====================
+Principales variables
+=====================
+
+
+Les variables présentées ci-dessous possèdent une valeur au niveau du shell de
+connexion. D'autres variables peuvent être définies ultérieurement.
+
+
+La variable HOME
+----------------
+
+La variable HOME contient la valeur du répertoire d'accueil de l'utilisateur.
+Elle ne doit pas être modifiée.
+
+  $ echo $HOME
+  /home/kikinovak
+
+
+La variable PATH
+----------------
+
+La variable PATH contient une liste de répertoires qui sont explorés par le
+shell lorsqu'il doit lancer une commande externe.
+
+  $ echo $PATH
+  /usr/local/bin:/usr/bin:/bin...
+
+  /!\ En aucun cas, une commande n'est recherchée dans le répertoire courant
+  si celui-ci ne figure pas dans le PATH.
+
+La commande 'date' est trouvée :
+
+  $ date
+  dim. oct. 18 09:36:57 CEST 2015
+
+En effet, elle se situe dans les répertoires '/usr/bin' et '/bin' qui figurent
+tous les deux dans la variable PATH :
+
+  $ find / -name date 2> /dev/null
+  /usr/bin/date
+  /bin/date
+  $ ls -l /usr/bin/date 
+  lrwxrwxrwx 1 root root 14 avril 26 08:07 /usr/bin/date -> ../../bin/date
+
+La commande 'ifconfig' n'est pas trouvée :
+
+  $ ifconfig
+  bash: ifconfig : commande introuvable
+
+Elle est située dans le répertoire '/sbin' qui n'est pas cité dans la variable
+PATH de l'utilisateur :
+
+  $ find / -name ifconfig 2> /dev/null
+  /sbin/ifconfig
+
+Le répertoire courant n'est pas exploré s'il n'est pas cité dans le PATH :
+
+  $ cd /sbin/
+  $ ifconfig
+  bash: ifconfig : commande introuvable
+
+Modifier le contenu de la variable PATH :
+
+  $ PATH=$PATH:/sbin
+  $ echo $PATH
+  /usr/local/bin:/usr/bin:/bin:/sbin
+
+À présent, la commande 'ifconfig' est trouvée :
+
+  $ ifconfig
+  eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+          inet 192.168.2.2  netmask 255.255.255.0  broadcast 192.168.2.255
+          ether 00:1f:d0:ae:ec:fe  txqueuelen 1000  (Ethernet)
+          RX packets 6613  bytes 6444418 (6.1 MiB)
+          RX errors 0  dropped 2  overruns 0  frame 0
+          TX packets 5474  bytes 1212369 (1.1 MiB)
+          TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+  ...
+
+
+Rechercher une commande dans le répertoire courant
+--------------------------------------------------
+
+Pour qu'une commande soit recherchée dans le répertoire courant, il faut
+ajouter en fin de variable PATH la chaîne ':.' ou simplement le caractère ':'.
+
+  $ PATH="$PATH:"
+  $ cd /usr/bin/
+  $ ifconfig
+  bash: ifconfig : commande introuvable
+  $ cd /sbin/
+  $ ifconfig
+  eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+          inet 192.168.2.2  netmask 255.255.255.0  broadcast 192.168.2.255
+          ether 00:1f:d0:ae:ec:fe  txqueuelen 1000  (Ethernet)
+          RX packets 6641  bytes 6449061 (6.1 MiB)
+          RX errors 0  dropped 2  overruns 0  frame 0
+          TX packets 5509  bytes 1218682 (1.1 MiB)
+          TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+  ...
+
+
+La variable PWD
+---------------
+
+La variable PWD contient la valeur du répertoire courant. Elle est mise à jour
+par le shell dès que l'utilisateur change de répertoire.
+
+  $ echo $PWD
+  /home/kikinovak
+  $ cd /sbin/
+  $ echo $PWD
+  /sbin
+
+La variable PS1
+---------------
+
+La variable PS1 contient la chaîne de caractères représentant le prompt
+principal.
+
+  [kikinovak@alphamule:~] $ echo $PS1
+  [\u@\h:\W] $
+  [kikinovak@alphamule:~] $ PS1='Entrez une commande => '
+  Entrez une commande => date
+  dim. oct. 18 10:52:29 CEST 2015
+  Entrez une commande => 
+
+Il existe des séquences d'échappement possédant une signification particulière
+qu'il est pratique d'utiliser pour initialiser PS1. En voici quelques-unes :
+
+  +------------------------+----------------------------------------+
+  | Séquence d'échappement |                 Valeur                 |
+  +------------------------+----------------------------------------+
+  | \u                     | Nom de l'utilisateur                   |
+  | \h                     | Nom de la machine                      |
+  | \w                     | Répertoire courant                     |
+  | \W                     | Partie terminale du répertoire courant |
+  +------------------------+----------------------------------------+
+
+
+La variable PS2
+---------------
+
+La variable PS2 contient la chaîne de caractères représentant le prompt
+secondaire, qui apparaît lorsque les éléments de syntaxe sont incomplets.
+
+  $ echo $PS2
+  >
+  $ echo 'Affichage du caractère *
+  > je
+  > dois 
+  > fermer ma quote'
+  Affichage du caractère *
+  je
+  dois 
+  fermer ma quote
+
+Dans l'exemple qui suit, le shell attend la suite du message tant qu'il ne
+rencontre pas l'étiquette '%' :
+
+  $ mail glagaffe <<%
+  > Salut Gaston,
+  > Comment vas-tu ?
+  > %
+  $ 
+
+
+La variable TMOUT
+-----------------
+
+La variable TMOUT contient un délai exprimé en secondes. Si aucune interaction
+avec le clavier n'a eu lieu pendant ce délai, le shell se termine. Lorsque la
+valeur est 0, le timeout est désactivé.
+
+  $ echo $TMOUT
+  ...
+  $ TMOUT=10
+
+
+La variable TERM
+----------------
+
+La variable TERM contient le type de terminal de l'utilisateur. Les valeurs
+les plus courantes sont 'ansi', 'vt100', 'vt220', 'dtterm' et 'xterm'. Ces
+valeurs renvoient à un fichier de paramétrage du système, la base de données
+'terminfo'.
+
+  $ echo $TERM
+  xterm
+  $ find / -name xterm 2> /dev/null
+  /usr/share/terminfo/x/xterm
+  ...
+
+
+La variable LOGNAME
+-------------------
+
+La variable LOGNAME contient le nom de l'utilisateur connecté.
+
+  $ echo $LOGNAME
+  kikinovak
+
+
+Processus et variables d'environnement
+--------------------------------------
+
+Les variables d'environnement ne sont pas toutes utilisées par les mêmes
+processus. On peut distinguer trois catégories de variables.
+
+  1. celles qui sont utilisées uniquement par le shell : PS1, PS2
+
+  2. celles qui sont utilisées par de nombreuses commandes et éventuellement
+     par le shell : PATH, TERM
+
+  3. celles qui sont utilisées par une commande bien précise : EXINIT pour vim
+
+
+Exportation des variables
+-------------------------
+
+Par défaut, une variable n'est pas transmise aux processus descendants. Pour
+qu'elle le soit, il faut demander au shell de l'exporter. 
+
+La commande interne 'env' affiche les variables exportées du shell courant.
+
+  $ env
+  HOME=/home/kikinovak
+  EDITOR=vim
+  LOGNAME=kikinovak
+  TERM=xterm
+  ...
+
+Dans l'exemple qui suit, les variables PS1 et PS2 ont été redéfinies dans le
+shell courant :
+
+  $ set
+  BASH=/usr/bin/bash
+  EDITOR=vim
+  HOME=/home/kikinovak
+  LOGNAME=kikinovak
+  OSTYPE=linux-gnu
+  PS1='commande> '
+  PS2='suite> '
+  TERM=xterm
+  ...
+
+PS1 et PS2 ne sont pas exportées, elles n'apparaissent donc pas dans le
+résultat de la commande 'env'. Elles reprendront donc leur valeur par défaut
+('[\u@\h:\W] $' et '> ') dans les sous-shells :
+
+  $ env
+  HOME=/home/kikinovak
+  EDITOR=vim
+  LOGNAME=kikinovak
+  TERM=xterm
+  ...
+
+Les variables utilisées par des processus autres que le shell doivent
+obligatoirement être exportées pour être transmises. 
+
+Exporter une variable déjà défini :
+
+  $ export MAVARIABLE
+
+Définir et exporter une variable :
+
+  $ MAVARIABLE=valeur
+  $ export MAVARIABLE
+
+Ou, plus simplement :
+
+  $ export MAVARIABLE=valeur
+
+Dans l'exemple qui suit, on va utiliser la variable EXINIT. Celle-ci est
+consultée par la commande 'vim' et contient la liste des options à positionner
+dans l'éditeur. L'option 'set number' active l'affichage des numéros de ligne. 
+
+  $ EXINIT='set number'
+  $ vim .screenrc 
+
+Visiblement, ça ne fonctionne pas. En effet, la variable EXINIT est
+initialisée mais non exportée. Elle ne sera donc pas transmise aux processus
+descendants du shell, en l'occurrence l'éditeur Vim. Autrement dit, sans
+exportation, la définition de la variable EXINIT est inutile.
+
+Retentons le coup en exportant la variable :
+
+  $ EXINIT='set number'
+  $ export EXINIT
+  $ vim .screenrc 
+
+Cette fois-ci, la variable exportée est bien transmise au processus
+descendant.
+
+
+====================
+Les options du shell
+====================
+
+
+
+Le shell propose des options permettant de paramétrer un certain nombre de
+fonctionnalités.
+
+
+Visualiser la liste des options du shell
+----------------------------------------
+
+La commande 'set' avec l'option '-o' affiche la liste des options du shell en
+indiquant si elles sont actuellement activées ou non.
+
+  $ set -o
+  allexport       off
+  braceexpand     on
+  emacs           on
+  errexit         off
+  errtrace        off
+  ...
+
+
+Activer et désactiver une option du shell
+-----------------------------------------
+
+Les options '-o' et '+o' de la commande interne 'set' permettent
+respectivement d'activer et de désactiver une option du shell. 
+
+Voici un exemple :
+
+  $ set -o | grep noclobber
+  noclobber       off
+  $ set -o noclobber
+  $ set -o | grep noclobber
+  noclobber       on
+  $ set +o noclobber
+  $ set -o | grep noclobber
+  noclobber       off
+
+  /!\ Effectivement, ce n'est pas très intuitif.
+
+
+L'option 'ignoreof'
+-------------------
+
+Si l'option 'ignoreeof' est activée, il devient impossible de quitter le shell
+en appuyant sur [Ctrl]+[D]. L'option est désactivée par défaut.
+
+  $ set -o | grep ignoreeof
+  ignoreeof       off
+  $ set -o ignoreeof
+  $ ^D
+  Utilisez « exit » pour quitter le shell.
+
+
+L'option 'noclobber'
+--------------------
+
+Lorsqu'une redirection est faite vers un fichier déjà existant, celui-ci est
+écrasé sans sommation (sous réserve des permissions). Pour être averti de
+l'existence du fichier, il faut activer l'option 'noclobber'. À partir de là,
+on pourra forcer l'écrasement en utilisant la redirection '>|'. 
+
+    $ set -o | grep noclobber
+    noclobber       off
+    $ echo Bonjour > fichier.txt
+    $ cat fichier.txt 
+    Bonjour
+    $ echo Au revoir > fichier.txt 
+    $ cat fichier.txt 
+    Au revoir
+    $ set -o noclobber
+    $ set -o | grep noclobber
+    noclobber       on
+    $ echo Merci > fichier.txt 
+    bash: fichier.txt : impossible d'écraser le fichier existant
+    $ echo Merci >| fichier.txt 
+    $ cat fichier.txt 
+    Merci
+
+
+L'option 'emacs'
+----------------
+
+L'option 'emacs' permet de paramétrer le rappel des commandes. Elle est
+activée par défaut.
+
+  $ set -o | grep emacs
+  emacs           on
+
+
+L'option 'xtrace'
+-----------------
+
+Enfin, l'option 'xtrace' est utilisée en programmation shell pour déboguer les
+scripts. Elle est désactivée par défaut.
+
+  $ set -o | grep xtrace
+  xtrace          off
+
+
+=========
+Les alias
+=========
+
+
+Le shell propose une commande interne 'alias' qui permet de créer des
+raccourcis sur des commandes. Selon les distributions, un certain nombre
+d'alias existent par défaut.
+
+
+Définir un alias
+----------------
+
+Dans l'exemple qui suit, nous allons créer trois alias 'l', 'c' et 'rm' qui
+seront respectivement les équivalents de 'ls -l', 'clear' et 'rm -i'.
+
+  $ alias l='ls -l'
+  $ l
+  total 0
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 f1
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 f2
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 fic
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 fic1.txt
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 FIC.c
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 Fic.doc
+  -rw-r--r-- 1 kikinovak users 0 oct.  17 09:21 fIc.PDF
+  $ alias c='clear'
+  $ alias rm='rm -i'
+  $ rm fic1.txt 
+  rm : supprimer fichier vide « fic1.txt » ? n
+
+
+Visualiser la liste des alias
+-----------------------------
+
+Visualiser tous les alias :
+
+  $ alias
+  alias ..='cd ..'
+  alias ...='cd ../..'
+  alias cp='cp -i'
+  alias ll='ls -al'
+  alias ls='ls --color=auto'
+  alias mv='mv -i'
+  alias rm='rm -i'
+  alias uman='GROFF_ENCODING=utf8 man'
+  alias vi='vim'
+
+
+Visualiser un alias
+-------------------
+
+Visualiser un alias en particulier :
+
+  $ alias ls
+  alias ls='ls --color=auto'
+
+
+Supprimer un alias
+------------------
+
+Supprimer un alias :
+
+  $ unalias ll
+  $ ll
+  bash: ll : commande introuvable
+
+
+=======================
+Historique de commandes
+=======================
+
+
+Le shell Bash stocke les commandes lancées dans un fichier texte localisé dans
+le répertoire d'accueil de l'utilisateur : '~/.bash_history'. 
+
+Pour rappeler les commandes stockées dans ce fichier, le shell propose deux
+options : 'emacs' et 'vi'. Ces deux options sont mutuellement exclusives.
+L'activation de l'une désactive l'autre. En Bash, l'option 'emacs' est activée
+par défaut.
+
+  $ set -o | grep 'emacs\|vi '
+  emacs           on
+  vi              off
+
+Il est recommandé d'utiliser le mode 'emacs' par défaut, étant donné que les
+flèches du clavier peuvent être utilisées pour parcourir l'historique.
+
+
+============================
+Les fichiers d'environnement
+============================
+
+
+Les fichiers d'environnement servent à stocker de manière permanente les
+définitions liées au paramétrage de l'environnement utilisateur. Ils
+contiennent des commandes Unix et sont toujours interprétés par un shell. Ce
+sont des scripts shell d'environnement.
+
+Certains scripts d'environnement sont exécutés uniquement par le shell de
+connexion. Il est donc important de savoir faire la distinction entre un shell
+de connexion et un shell ordinaire.
+
+En environnement texte, le shell de connexion est lancé immédiatement après
+l'identification de l'utilisateur par son nom de login et son mot de passe. Ce
+processus est l'ancêtre commun de toutes les commandes qui seront lancées
+pendant la session. Tout shell lancé ultérieurement n'aura pas le statut de
+shell de connexion.
+
+En environnement graphique, le shell de connexion est lancé entre la bannière
+de connexion et l'affichage du bureau. Ce n'est donc pas un shell interactif.
+Le bureau et toute application lancée ultérieurement à partir des icônes sont
+des processus descendant du shell de connexion. Dans la majorité des cas, un
+terminal ouvert à partir de l'environnement graphique n'est pas associé à un
+shell de connexion. 
+
+Le shell de connexion lit un script shell système qui se nomme '/etc/profile'.
+Ce fichier est géré par l'administrateur du système et contient des paramètres
+communs à tous les utilisateurs.
+
+Il recherche ensuite dans le répertoire d'accueil de l'utilisateur un des
+trois fichiers d'environnement suivants :
+
+  - $HOME/.bash_profile 
+
+  - $HOME/.bash_login 
+
+  - $HOME/.profile
+
+Ce qu'il faut mettre dans le fichier '$HOME/.bash_profile' :
+
+  - la définition suivie de l'exportation éventuelle d'une ou plusieurs
+    variables : celles-ci seront transmises à tous les processus lancés à
+    partir du shell de connexion. Les variables définies mais non exportées
+    resteront locales à ce dernier.
+
+  - la redéfinition de paramètres système tels que 'umask', caractéristiques
+    du terminal, qui resteront valables pendant toute la durée de la session.
+
+Ce qu'il ne faut pas mettre dans le fichier '$HOME/.bash_profile' :
+
+  - les options du shell ;
+
+  - les alias.
+
+Le fichier '$HOME/.bash_profile' est lu uniquement au moment de la connexion,
+et ce par le shell de connexion lui-même. Si l'utilisateur apporte une
+modification à ce fichier, ce dernier doit être relu par le shell. Pour cela,
+il existe deux méthodes.
+
+  - Se déconnecter et se reconnecter, ce qui a pour effet de relancer un shell
+    de connexion.
+
+  - Demander au shell courant (qui n'est pas forcément le shell de connexion)
+    de relire le script d'environnement. Pour cela, il faut utiliser la
+    commande interne '.'.
+
+Les définitions de variables et paramètres utilisateur doivent être faites
+dans le fichier '$HOME/.bash_profile'. Les options et alias seront stockées
+dans un autre script que l'utilisateur nommera '$HOME/.bashrc'.
+
+  - Le Bash de connexion lit automatiquement le fichier '$HOME/.bash_profile',
+    mais pas le fichier '$HOME/.bashrc'.
+
+  - Un bash ordinaire (non connexion) et interactif lit automatiquement le
+    fichier '$HOME/.bashrc'.
+
+
+=========
+Exercices
+=========
+
+
+1. Afficher la liste de toutes les variables d'environnement.
+
+2. Afficher la liste des variables d'environnement exportées.
+
+3. Afficher la valeur des variables d'environnement PATH et HOME.
+
+4. Créer un répertoire '~/bin'. Dans ce répertoire, éditer le script suivant :
+
+     $ pwd
+     /home/kikinovak/bin
+     $ cat affichedate
+     #!/bin/bash
+     echo Voici la date : $(date)
+     $ chmod +x affichedate
+
+   Revenir dans le répertoire d'accueil. Modifier la variable PATH de telle
+   sorte que cette commande fonctionne.
+
+5. Rendre ce paramétrage permanent.
+
+6. Afficher les alias du shell courant.
+
+7. Créer un alias 'p' qui va correspondre à la commande 'ps -ef | more'.
+
+8. Tester l'alias.
+
+9. Détruire l'alias.
+
+10. Rendre cet alias permanent.
+
+11. En définissant un alias, l'utilisateur a malencontreusement appuyé sur la
+touche [Entrée] sans avoir eu le temps de fermer l'apostrophe. À quoi
+correspond le caractère ">" et comment se sortir de cette situation ?
+
+  $ alias l
+  alias l='ls -l
+  >
+
+
+========
+Corrigés
+========
+
+
+1. Afficher la liste de toutes les variables d'environnement.
+
+     $ set
+
+2. Afficher la liste des variables d'environnement exportées.
+ 
+     $ env
+
+3. Afficher la valeur des variables d'environnement PATH et HOME.
+
+     $ echo $PATH
+     $ echo $HOME
+
+4. Créer un répertoire '~/bin'. Dans ce répertoire, éditer le script suivant :
+
+     $ pwd
+     /home/kikinovak/bin
+     $ cat affichedate
+     #!/bin/bash
+     echo Voici la date : $(date)
+     $ chmod +x affichedate
+
+   Revenir dans le répertoire d'accueil. Modifier la variable PATH de telle
+   sorte que cette commande fonctionne.
+
+     $ PATH=$PATH:$HOME/bin
+     $ affichedate
+     Voici la date : lun. oct. 19 10:42:45 CEST 2015
+
+5. Rendre ce paramétrage permanent.
+
+   Éditer $HOME/.bash_profile comme ceci :
+
+     PATH=$PATH:$HOME/bin
+     export PATH
+   
+   Faire relire le fichier au shell courant :
+
+     $ . $HOME/.bash_profile
+
+6. Afficher les alias du shell courant.
+
+     $ alias
+
+7. Créer un alias 'p' qui va correspondre à la commande 'ps -ef | more'.
+ 
+     $ alias p='ps -ef | more'
+
+8. Tester l'alias.
+
+     $ p
+
+9. Détruire l'alias.
+ 
+     $ unalias p
+
+10. Rendre cet alias permanent.
+
+    Éditer '$HOME/.bashrc' comme ceci :
+
+      alias p='ps -ef | grep more'
+
+    Ensuite :
+
+      $ . $HOME/.bashrc
+
+11. En définissant un alias, l'utilisateur a malencontreusement appuyé sur la
+touche [Entrée] sans avoir eu le temps de fermer l'apostrophe. À quoi
+correspond le caractère ">" et comment se sortir de cette situation ?
+
+    $ alias l
+    alias l='ls -l
+    >
+
+  Il s'agit du prompt PS2 du shell qui s'affiche lorsque l'interpréteur
+  détecte une erreur de syntaxe shell. Ce prompt permet de poursuivre
+  l'écriture de la commande. 
+
+  Pour abandonner la commande, il suffit d'appuyer sur [Ctrl]+[C].
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

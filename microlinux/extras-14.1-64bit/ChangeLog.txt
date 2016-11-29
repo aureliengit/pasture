@@ -1,0 +1,225 @@
+Sun Oct  2 16:14:24 CEST 2016
+xap/owncloud-client-2.2.4-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Mon Sep 19 08:37:07 CEST 2016
+xap/owncloud-client-2.2.3-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sun Sep 18 15:15:26 CEST 2016
+xap/virtualbox-5.0.26-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-kernel-5.0.26_3.10.103-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-extension-pack-5.0.26-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Sep  3 09:56:01 CEST 2016
+xap/CherryTree-0.37.4-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Thu Jul 21 09:43:46 CEST 2016
+xap/owncloud-client-2.2.2-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Wed Jul 20 09:23:00 CEST 2016
+xap/virtualbox-5.0.24-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-kernel-5.0.24_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-extension-pack-5.0.24-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat May 21 17:31:44 CEST 2016
+xap/pdfchain-0.4.4-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat May 21 09:13:09 CEST 2016
+xap/cinelerra-2.3-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri May 20 11:46:18 CEST 2016
+xap/HandBrake-0.9.9-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue May 17 09:46:43 CEST 2016
+xap/owncloud-client-2.2.0-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Apr 30 10:44:20 CEST 2016
+xap/virtualbox-5.0.20-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-kernel-5.0.20_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-extension-pack-5.0.20-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Wed Apr  6 10:33:54 CEST 2016
+xap/virtualbox-5.0.16-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-kernel-5.0.16_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+xap/virtualbox-extension-pack-5.0.16-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Apr  2 16:08:57 CEST 2016
+	Brace yourselves, spring is coming. After weighing the pros and the cons,
+	we're introducing package categories for clarity's sake.  These are mostly
+	inspired by upstream, so Slackware users will feel "at home". We've also
+	added an automatic build infrastructure with a master build script in the
+	source directory to ease maintenance. 
+	MLED 14.1 64-bit now defaults to pure 64-bit and doesn't use Multilib.
+ap/cdlabelgen-4.3.0-noarch-2_microlinux.txz: Rebuilt.
+ap/qemu-2.4.1-x86_64-2_microlinux.txz: Rebuilt.
+d/fpc-2.6.4-x86_64-2_microlinux.txz: Rebuilt.
+d/fpc-source-2.6.4-noarch-2_microlinux.txz: Rebuilt.
+d/lazarus-1.2.6-x86_64-2_microlinux.txz: Rebuilt.
+x/scholae-fonts-1.0-noarch-3_microlinux.txz: Rebuilt.
+xap/aMule-2.3.1-x86_64-2_microlinux.txz: Rebuilt.
+xap/anki-2.0.32-noarch-2_microlinux.txz: Rebuilt.
+xap/blender-2.76b-x86_64-2_microlinux.txz: Rebuilt.
+xap/dropbox-3.10.7-x86_64-2_microlinux.txz: Rebuilt.
+xap/easytag-2.1.10-x86_64-2_microlinux.txz: Rebuilt.
+xap/filezilla-3.8.1-x86_64-2_microlinux.txz: Rebuilt.
+xap/gcompris-15.02-x86_64-2_microlinux.txz: Rebuilt.
+xap/geogebra-5.0.214.0-x86_64-2_microlinux.txz: Rebuilt.
+xap/gtkcdlabel-1.15-noarch-2_microlinux.txz: Rebuilt.
+xap/homebank-5.0.3-x86_64-2_microlinux.txz: Rebuilt.
+xap/librecad-2.0.7-x86_64-2_microlinux.txz: Rebuilt.
+xap/owncloud-client-2.1.1-x86_64-2_microlinux.txz: Rebuilt.
+xap/povray-3.7.0.0-x86_64-2_microlinux.txz: Rebuilt.
+xap/remmina-1.2.0_rcgit.1-x86_64-2_microlinux.txz: Rebuilt.
+xap/simple-scan-2.32.0.2-x86_64-2_microlinux.txz: Rebuilt.
+xap/virt-manager-1.2.1-x86_64-2_microlinux.txz: Rebuilt.
+xap/virtualbox-5.0.14-x86_64-2_microlinux.txz: Rebuilt.
+xap/virtualbox-kernel-5.0.14_3.10.17-x86_64-2_microlinux.txz: Rebuilt.
+xap/virtualbox-extension-pack-5.0.14-x86_64-1_microlinux.txz: Rebuilt.
+xap/winff-20150729-x86_64-2_microlinux.txz: Rebuilt.
+xap/xpe-0.9.5b-x86_64-2_microlinux.txz: Rebuilt.
+y/aisleriot-3.6.2-x86_64-3_microlinux.txz: Rebuilt.
+y/lbreakout2-2.6.3-x86_64-2_microlinux.txz: Rebuilt.
+steam-1.0.0.50-x86_64-1_microlinux.txz: Removed.
+spotify64-0.9.11.27.g2b1a638.81-x86_64-1_microlinux.txz: Removed.
+wine-1.6.2-x86_64-1_microlinux.txz: Removed.
++--------------------------+
+Wed Mar 16 08:12:43 CET 2016
+geogebra-5.0.214.0-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sun Mar 13 08:41:12 CET 2016
+scholae-fonts-1.0-noarch-2_microlinux.txz: Rebuilt.
++--------------------------+
+Sat Mar 12 10:12:00 CET 2016
+scholae-fonts-1.0-noarch-1_microlinux.txz: Added.
+  A collection of fonts for a project at our local school.
++--------------------------+
+Thu Mar  3 14:34:13 CET 2016
+owncloud-client-2.1.1-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Tue Feb 23 11:25:12 CET 2016
+qemu-2.4.1-x86_64-1_microlinux.txz: Added.
+virt-manager-1.2.1-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Wed Jan 20 15:03:57 CET 2016
+virtualbox-5.0.14-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-kernel-5.0.14_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-extension-pack-5.0.14-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Mon Jan 18 20:52:31 CET 2016
+skype-4.3.0.37-i486-1_microlinux.txz: Removed.
+  Skype is 32-bit only, so we just keep it in the 32-bit repository.
++--------------------------+
+Sat Jan 16 21:42:57 CET 2016
+steam-1.0.0.50-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue Jan 12 11:15:43 CET 2016
+blender-2.76b-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat Jan  9 16:33:52 CET 2016
+skype-4.3.0.37-i486-1_microlinux.txz: Added.
++--------------------------+
+Sun Jan  3 17:55:36 CET 2016
+vlc-2.1.6-x86_64-1_microlinux.txz: Removed.
+  Moved to the main repository.
++--------------------------+
+Sat Jan  2 17:46:36 CET 2016
+owncloud-client-2.1.0-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue Dec 29 10:30:06 CET 2015
+virtualbox-4.3.34-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-kernel-4.3.34_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-extension-pack-4.3.34-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Tue Dec  8 16:06:46 CET 2015
+freerdp-1.2.0_beta1_android9-x86_64-1_microlinux.txz: Removed.
+  Moved to the main repository.
+vlc-2.1.6-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat Nov 28 07:45:22 CET 2015
+dropbox-3.10.7-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Thu Nov 26 14:46:07 CET 2015
+plank-0.10.1-x86_64-1_microlinux.txz: Removed.
+  Moved to the main repository.
++--------------------------+
+Thu Oct 22 16:50:28 CEST 2015
+plank-0.10.1-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri Sep 18 09:46:14 CEST 2015
+anki-2.0.32-noarch-1_microlinux.txz: Added.
++--------------------------+
+Sat Sep  5 09:04:26 CEST 2015
+homebank-5.0.3-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri Aug 21 11:14:32 CEST 2015
+simple-scan-2.32.0.2-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sun Aug  2 08:09:01 CEST 2015
+dropbox-3.8.5-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Fri Jul 31 10:15:09 CEST 2015
+virtualbox-4.3.30-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-kernel-4.3.30_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-extension-pack-4.3.30-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Thu Jul 30 08:51:42 CEST 2015
+freerdp-1.2.0_beta1_android9-x86_64-1_microlinux.txz: Upgraded.
+remmina-1.2.0_rcgit.1-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Wed Jul 29 10:45:58 CEST 2015
+freerdp-20131115_ea18d2b-x86_64-2_microlinux.txz: Rebuilt.
+  Rebuilt against new ffmpeg.
+winff-20150729-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Sat Jun 13 10:05:24 CEST 2015
+xpe-0.9.5b-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri Jun  5 10:23:00 CEST 2015
+librecad-2.0.7-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Wed Jun  3 08:44:21 CEST 2015
+povray-3.7.0.0-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Sat May 30 11:01:24 CEST 2015
+fpc-2.6.4-x86_64-1_microlinux.txz: Added.
+fpc-source-2.6.4-noarch-1_microlinux.txz: Added.
+lazarus-1.2.6-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Tue May 19 18:55:10 CEST 2015
+virtualbox-4.3.28-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-kernel-4.3.28_3.10.17-x86_64-1_microlinux.txz: Upgraded.
+virtualbox-extension-pack-4.3.28-x86_64-1_microlinux.txz: Upgraded.
++--------------------------+
+Tue May  5 07:16:59 CEST 2015
+aisleriot-3.6.2-x86_64-2_microlinux.txz: Added.
++--------------------------+
+Thu Apr 23 18:22:54 CEST 2015
+gcompris-15.02-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Mon Apr 20 17:08:59 CEST 2015
+lbreakout2-2.6.3-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Thu Apr 16 12:46:31 CEST 2015
+dropbox-2.10.41-x86_64-1_microlinux.txz: Added.
+filezilla-3.8.1-x86_64-1_microlinux.txz: Added.
+freerdp-20131115_ea18d2b-x86_64-1_microlinux.txz: Added.
+remmina-20131008_26b814a-x86_64-1_microlinux.txz: Added.
+easytag-2.1.10-x86_64-1_microlinux.txz: Added.
+gtkcdlabel-1.15-noarch-1_microlinux.txz: Added.
+aMule-2.3.1-x86_64-1_microlinux.txz: Added.
+spotify64-0.9.11.27.g2b1a638.81-x86_64-1_microlinux.txz: Added.
+winff-1.5.3-x86_64-1_microlinux.txz: Added.
+	WinFF doesn't have any particular runtime dependencies except ffmpeg, but
+	it's written in Free Pascal, so you'll need a Free Pascal Compiler on your
+	machine. Make sure to install packages fpc, fpc-source and lazarus before
+	launching the build. They're all available on SlackBuilds.org.
+wine-1.6.2-x86_64-1_microlinux.txz: Added.
+  Build dependency fontforge (available on SlackBuilds.org) is not included.
++--------------------------+
+Sun Apr 12 13:43:27 CEST 2015
+virtualbox-4.3.26-x86_64-1_microlinux.txz: Added.
+virtualbox-kernel-4.3.26_3.10.17-x86_64-1_microlinux.txz: Added.
+virtualbox-extension-pack-4.3.26-x86_64-1_microlinux.txz: Added.
++--------------------------+
+Fri Apr 10 06:33:11 CEST 2015
+cdlabelgen-4.3.0-noarch-1_microlinux.txz: Added.
++--------------------------+

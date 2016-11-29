@@ -1,0 +1,178 @@
+================
+Apache SSL HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 8 janvier 2016
+
+Ce HOWTO décrit la mise en place d'un site web sécurisé sur un serveur Apache
+tournant sous Slackware.
+
+
+  * Le protocole HTTPS
+  * Configurer Apache et SSL
+  * La politique HSTS
+  * Plusieurs hébergements SSL sur un même serveur
+
+
+Le protocole HTTPS
+------------------
+
+Le protocole HTTP ("Hypertext Transfer Protocol") transmet les données entre le
+serveur et le navigateur "en clair". Les données personnelles, mots de passe et
+autres numéros de Carte Bleue sont donc interceptables.
+
+Pour résoudre ce problème, on utilisera le protocole HTTPS, qui ajoute une
+couche de cryptage SSL ("Secure Sockets Layer") au protocole HTTP.
+
+Le transfert crypté des données ne constitue qu'un aspect dans l'établissement
+d'une connexion sécurisé. L'autre aspect tout aussi important, c'est que
+l'utilisateur doit être sûr de communiquer avec la bonne personne. Autrement
+dit, votre numéro de Carte Bleue a beau être transmis de façon sécurisée,
+encore faut-il que la plateforme de paiement ne soit pas située sur un serveur
+géré par la mafia albanaise. 
+
+Pour savoir si l'on a bien affaire au bon interlocuteur, on utilisera un
+certificat. Cette véritable carte d'identité électronique contient non
+seulement la clé publique du serveur pour crypter les transmissions, mais
+également des renseignements sur le site ainsi que la signature de l'autorité
+de certification. La génération d'un certificat électronique fait l'objet d'un
+HOWTO à part :
+
+  * SSL-TLS-Certificate-HOWTO
+
+Pour nos essais, nous utiliserons un certificat SSL/TLS fourni par le client
+Let's Encrypt. Si l'on décide de partir sur un certificat auto-signé, la
+configuration devra être adaptée en conséquence. 
+
+Le protocole HTTPS utilise le port 443. Il faut donc songer avant toute chose
+à ouvrir ce port dans le pare-feu.
+
+Dans l'exemple ci-dessous, nous allons configurer un hébergement HTTPS public :
+
+  * https://www.slackbox.fr
+
+
+Configurer Apache et SSL
+------------------------
+
+Notre premier hébergement HTTPS sera rangé à l'emplacement défini par la
+configuration par défaut de Slackware, en-dessous de '/srv/httpd/htdocs'.
+
+Éditer le fichier '/etc/httpd/extra/httpd-ssl.conf'. La version par défaut de
+ce fichier est amplement commentée. Je ne reproduis ici que les directives
+sans les commentaires :
+
+--8<---------- /etc/httpd/extra/httpd-ssl.conf -------------------------------
+Listen 443
+SSLCipherSuite HIGH:MEDIUM:!MD5:!RC4
+SSLProxyCipherSuite HIGH:MEDIUM:!MD5:!RC4
+SSLHonorCipherOrder on
+SSLProtocol all -SSLv3
+SSLProxyProtocol all -SSLv3
+SSLPassPhraseDialog  builtin
+SSLSessionCache        "shmcb:/var/run/ssl_scache(512000)"
+SSLSessionCacheTimeout  300
+<VirtualHost _default_:443>
+DocumentRoot "/srv/httpd/htdocs"
+ServerName www.slackbox.fr:443
+ServerAdmin info@microlinux.fr
+ErrorLog "/var/log/httpd/www.slackbox.fr-error_log"
+TransferLog "/var/log/httpd/www.slackbox.fr-access_log"
+SSLEngine on
+SSLCertificateFile "/etc/letsencrypt/live/slackbox.fr/cert.pem"
+SSLCertificateKeyFile "/etc/letsencrypt/live/slackbox.fr/privkey.pem"
+SSLCertificateChainFile "/etc/letsencrypt/live/slackbox.fr/chain.pem"
+<FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+</FilesMatch>
+<Directory "/srv/httpd/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog "/var/log/httpd/www.slackbox.fr-ssl_request_log" \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>
+--8<--------------------------------------------------------------------------
+
+Activer SSL dans la configuration d'Apache :
+
+--8<---------- /etc/httpd/httpd.conf -----------------------------------------
+...
+LoadModule socache_shmcb_module lib64/httpd/modules/mod_socache_shmcb.so
+...
+LoadModule ssl_module lib64/httpd/modules/mod_ssl.so
+...
+# Secure (SSL/TLS) connections
+Include /etc/httpd/extra/httpd-ssl.conf
+...
+--8<--------------------------------------------------------------------------
+
+L'astuce consiste ici à faire une recherche sur la chaîne de caractères "ssl"
+pour éditer le fichier.
+
+Redémarrer Apache :
+
+  # /etc/rc.d/rc.httpd restart
+
+Ouvrir notre site sécurisé :
+
+  * https://www.slackbox.fr
+
+Effectuer un audit de la sécurité de notre hébergement :
+
+  * https://www.ssllabs.com/ssltest/
+
+
+La politique HSTS
+-----------------
+
+HSTS ("HTTP Strict Transport Security") est un mécanisme de politique de
+sécurité proposé pour HTTP, permettant à un serveur web de déclarer à un agent
+utilisateur (navigateur web) compatible qu'il doit interagir avec
+lui en utilisant une connexion sécurisée (comme HTTPS). La politique est donc
+communiquée à l'agent utilisateur par le serveur via la réponse HTTP, dans le
+champ d'en-tête nommé "Strict-Transport-Security". La politique spécifie une
+période de temps durant laquelle l'agent utilisateur doit accéder au serveur
+uniquement de façon sécurisée.
+
+Pour activer cette politique dans la configuration d'Apache, il suffit
+d'ajouter la ligne suivante dans la définition de l'hôte virtuel :
+
+--8<---------- /etc/httpd/extra/httpd-ssl.conf -------------------------------
+<VirtualHost _default_:443>
+...
+# HSTS
+Header always set Strict-Transport-Security \
+  "max-age=63072000; includeSubDomains"
+...
+</VirtualHost>
+--8<--------------------------------------------------------------------------
+
+
+Plusieurs hébergements SSL sur un même serveur
+----------------------------------------------
+
+Les versions récentes d'Apache supportent plusieurs hébergements sécurisés
+grâce aux hôtes virtuels. Le fonctionnement est le même que pour les hôtes
+virtuels classiques, au détail près que les hôtes virtuels sécurisés seront
+définis dans '/etc/httpd/extra/httpd-ssl.conf'. 
+
+Bien évidemment, chaque hôte virtuel devra disposer de son propre certificat.
+
+Sur les anciennes versions d'Apache, il fallait ajouter une option générale
+pour la configuration des hôtes virtuels sécurisés :
+
+--8<---------- /etc/httpd/extra/httpd-ssl.conf -------------------------------
+...
+Listen 443
+SSLStrictSNIVHostCheck off --> ajouter
+...
+--8<--------------------------------------------------------------------------
+
+
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt
