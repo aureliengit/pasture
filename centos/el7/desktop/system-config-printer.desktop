@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Print Settings
+Name[de]=Druckeinstellungen
+Name[fr]=Configuration de l'impression
+Comment=system-config-printer
+Exec=system-config-printer
+Terminal=false
+Type=Application
+Icon=printer
+StartupNotify=true
+X-Desktop-File-Install-Version=0.21
+Categories=System;

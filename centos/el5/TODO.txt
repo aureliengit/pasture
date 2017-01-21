@@ -1,0 +1,31 @@
+=============
+CentOS 5 TODO 
+=============
+
+  - Groupe de paquets pour les outils de base
+
+  - Groupe de paquets pour le serveur graphique
+
+  - Groupe de paquets pour le poste de travail
+
+  - Signer les paquets avec la clé GPG
+
+  - Peaufiner la désactivation des services inutiles
+
+  - Peaufiner l'ajout des utilisateurs
+
+  - NTP HOWTO client + serveur
+
+  - Peaufinage de GNOME + GNOME HOWTO
+
+  - Profil par défaut des utilisateurs
+
+Applis et composants :
+
+  - Polices MS
+
+  - Peaufiner XMMS
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

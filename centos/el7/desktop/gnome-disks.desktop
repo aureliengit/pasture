@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Disks
+Name[de]=Laufwerke
+Name[fr]=Disques
+Comment=GNOME Disks
+Exec=gnome-disks
+Icon=gnome-disks
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=System;

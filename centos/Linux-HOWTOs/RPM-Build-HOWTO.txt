@@ -1,0 +1,115 @@
+===============
+RPM Build HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+===============
+
+Dernière révision : 30 mai 2016
+
+Ce HOWTO décrit de façon succincte la mise en place d'un environnement de
+construction et la compilation de paquets RPM sous CentOS. 
+
+
+  * Introduction
+  * Mettre en place l'environnement de construction
+  * Construction d'un paquet RPM
+  * Création d'une archive Yum
+
+
+Introduction
+------------
+
+La construction de paquets RPM est un vaste chapitre. Ce HOWTO me sert
+uniquement de pense-bête pour les spécificités de la construction d'un paquet
+sous RHEL/CentOS. Il ne pourra pas remplacer un tutorial détaillé.
+
+On prendra soin de construire les paquets en tant que simple utilisateur. Les
+droits root seront uniquement nécessaires pour l'installation des paquets.
+
+
+Mettre en place l'environnement de construction
+-----------------------------------------------
+
+Installer l'outil de construction 'rpmbuild' :
+
+  # yum install rpm-build
+
+Créer l'arborescence de construction des paquets :
+
+  $ mkdir -pv ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+  mkdir: création du répertoire « /home/microlinux/rpmbuild »
+  mkdir: création du répertoire « /home/microlinux/rpmbuild/BUILD »
+  mkdir: création du répertoire « /home/microlinux/rpmbuild/RPMS »
+  mkdir: création du répertoire « /home/microlinux/rpmbuild/SOURCES »
+  mkdir: création du répertoire « /home/microlinux/rpmbuild/SPECS »
+  mkdir: création du répertoire « /home/microlinux/rpmbuild/SRPMS »
+
+Ensuite, éditer un fichier '~/.rpmmacros' comme ceci :
+
+--8<---------- ~/.rpmmacros --------------------------------------------------
+%_topdir /home/microlinux/rpmbuild
+%packager Niki Kovacs <info@microlinux.fr>
+%dist .el7.microlinux
+--8<--------------------------------------------------------------------------
+
+
+Construction d'un paquet RPM
+----------------------------
+
+Si l'on part d'un paquet source SRPM, on peut utiliser RPM en tant que simple
+utilisateur, et la commande 'rpm -ivh' installera le RPM source au bon
+endroit.
+
+Alternativement, on peut récupérer le fichier '.spec', on le place dans le
+répertoire '~/rpmbuild/SPECS/', puis on récupère les sources correspondantes,
+et on les place dans le répertoire '~/rpmbuild/SOURCES/'.
+
+Pour construire un RPM à partir de là :
+
+  $ cd ~/rpmbuild/SPECS
+  $ rpmbuild -bb --clean exemple.spec
+
+Alternativement, on peut décider de reconstruire le SRPM, ce qui peut être
+utile si l'on a apporté des modifications au fichier '.spec' :
+
+  $ rpmbuild -ba --clean exemple.spec
+
+
+Création d'une archive Yum
+--------------------------
+
+Récupérer l'utilitaire de création d'archive :
+
+  # yum install createrepo
+
+Créer une arborescence d'archive vide :
+
+  $ cd
+  $ mkdir -pv repos/centos/5/os/i386/RPMS
+
+Ranger les paquetages RPM dans le répertoire RPMS, puis :
+
+  $ cd repos/centos/5/os/i386/
+  $ createrepo .
+
+On obtient quelque chose de ce genre :
+
+  $ tree repos/
+  repos/
+  `-- centos
+      `-- 5
+          `-- os
+              `-- i386
+                  |-- RPMS
+                  |   `-- tango-icon-theme-0.7.2-6.el5.microlinux.noarch.rpm
+                  `-- repodata
+                      |-- filelists.xml.gz
+                      |-- other.xml.gz
+                      |-- primary.xml.gz
+                      `-- repomd.xml
+
+
+En partant du répertoire 'centos/', copier l'arborescence récursivement vers le
+serveur distant.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

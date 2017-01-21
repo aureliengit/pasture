@@ -1,0 +1,144 @@
+==================
+CentOS 7 X11 HOWTO (c) Niki Kovacs <info@microlinux.fr>
+==================
+
+Dernière révision : 26 mai 2016
+
+Ce HOWTO décrit l'installation d'un poste de travail CentOS 7.
+
+
+  * Installer le serveur graphique X.org
+  * Lancer le gestionnaire de fenêtres WindowMaker
+  * Configurer une carte graphique NVidia
+  * KVM et la résolution écran
+
+
+Installer le serveur graphique X.org
+------------------------------------
+
+Le script '04-installer-xorg.sh' se charge d'installer les paquets nécessaires
+pour le serveur graphique X.org. Il récupère également le gestionnaire de
+fenêtres WindowMaker. L'intérêt de cette démarche est de configurer
+l'environnement graphique avant de récupérer le bureau GNOME.
+
+  # cd ~/centos/7.x/scripts
+  # ./04-installer-xorg.sh
+
+Notez que la liste des paquets nécessaires pour le serveur graphique est
+fournie par la commande suivante :
+
+  # yum groupinfo "Système X Window"
+
+Alternativement :
+
+  # LANG=C
+  # yum groupinfo "X Window System"
+
+Pour des raisons mystérieuses, la commande 'yum grouplist' n’affiche plus
+certains groupes, et il faut explicitement aller piocher dans les groupes
+cachés. Les voies de Red Hat sont parfois insondables :
+
+  # yum grouplist hidden | grep -i window
+   Compatibilité héritée du système X Window
+   Système X Window
+
+
+Lancer le gestionnaire de fenêtres WindowMaker
+----------------------------------------------
+
+En dehors du serveur graphique X.org à proprement parler, le script installe
+également le gestionnaire de fenêtres WindowMaker, l’émulateur de terminal
+XTerm et une panoplie de polices 'xorg-x11-fonts-*' supplémentaires. Certains
+drivers vidéo utilisent le KMS (Kernel Mode Setting), ce qui nécessite un
+redémarrage de la machine.
+
+Avant de lancer WindowMaker, il faut se connecter en tant qu'utilisateur
+simple et s'assurer de disposer des fichiers '~/.xinitrc' et '~/.Xresources'.
+
+Voici à quoi peut ressembler '~/.xinitrc' :
+
+--8<---------- ~/.xinitrc ----------------------------------------------------
+/usr/bin/xrdb -merge $HOME/.Xresources
+/usr/bin/wmaker --no-dock --no-clip
+--8<--------------------------------------------------------------------------
+
+Et voici un exemple pour '~/.Xresources' :
+
+--8<---------- ~/.Xresources -------------------------------------------------
+XTerm*background: #000000
+XTerm*foreground: LightGrey
+XTerm*font: 9x15
+XTerm*VT100.geometry: 105x35
+--8<--------------------------------------------------------------------------
+
+Lancer WindowMaker :
+
+  $ startx
+
+Au démarrage de WindowMaker, on peut éventuellement se débarrasser de
+l'horrible fond d'écran par défaut de CentOS. Cliquer droit sur le fond
+d'écran, puis :
+
+  Apparence > Thèmes > Default
+
+
+Configurer une carte graphique NVidia
+-------------------------------------
+
+Les drivers propriétaires se trouvent dans le dépôt communautaire ELRepo, que
+nous devons activer explicitement à chaque opération.
+
+Installer l'outil de détection des cartes NVidia :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+Rechercher et installer le driver approprié :
+
+  # nvidia-detect
+  kmod-nvidia
+  # yum --enablerepo=elrepo install kmod-nvidia
+
+Éventuellement, Yum affiche un avertissement quant à l'incompatibilité du
+driver NVidia avec un ou plusieurs drivers présents sur la machine. Dans ce
+cas, il suffit de désinstaller le driver en question, par exemple :
+
+  # yum remove xorg-x11-glamor
+
+Pour utiliser le driver, il suffit de redémarrer la machine.
+
+
+KVM et la résolution écran
+--------------------------
+
+Si l'on a installé CentOS comme système virtuel dans KVM, la résolution
+d'écran peut être définie manuellement.
+
+En mode console, générer un fichier 'xorg.conf' par défaut :
+
+  # X -configure
+  # mv /root/xorg.conf.new /etc/X11/xorg.conf
+
+Éditer ce fichier en spécifiant la résolution de l'écran :
+
+--8<---------- /etc/X11/xorg.conf --------------------------------------------
+...
+Section "Screen"
+        Identifier "Screen0"
+        Device     "Card0"
+        Monitor    "Monitor0"
+        SubSection "Display"
+                Viewport   0 0
+                Depth     1
+        EndSubSection
+        ...
+        SubSection "Display"
+                Viewport   0 0
+                Depth     24
+                Modes "1280x1024"   --> définir la résolution ici
+        EndSubSection
+EndSection
+--8<--------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

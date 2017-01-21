@@ -1,0 +1,197 @@
+================
+GNOME 2.16 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 5 juin 2016
+
+Ce HOWTO décrit la configuration du bureau GNOME 2.16 sous CentOS 5.
+
+
+  * Thème de l’interface
+  * Thème du pointeur
+  * Nautilus
+  * Périphériques
+  * Économiseur d’écran
+  * Applications préférées
+  * Terminal
+  * GEdit
+  * Réglages de GConf
+  * Création du profil
+  * Lecteur audio XMMS
+  * Extracteur audio Grip
+
+
+Thème de l’interface
+--------------------
+
+	Système > Préférences > Thème : Bluecurve
+
+		Détails du thème ->
+     
+      Contrôles : MurrinaGilouche
+
+			Icônes    : Tango
+
+
+Thème du pointeur
+-----------------
+
+Système > Préférences > Souris > Pointeurs > Bluecurve inverse (petit)
+
+
+Nautilus
+--------
+
+	Système > Préférences > Gestionnaire de fichiers :
+
+		Onglet Comportement :
+
+			[*] Toujours ouvrir dans des fenêtres de navigation.
+
+			[*] Inclure une commande Supprimer qui ignore la Corbeille.
+
+		Onglet Aperçu :
+
+			Fichiers texte : Afficher le texte dans les icônes [*] Jamais
+
+			Afficher les vignettes [*] Toujours
+
+
+Périphériques
+-------------
+
+Système > Préférences > Périphériques et média amovibles
+
+	Onglet Stockage :
+
+		[ ] Monter les périphériques amovibles lors d'un branchement à chaud
+
+		[ ] Monter les médias amovibles lors de l'insertion
+
+		[ ] Parcourir les médias amovibles lors de l'insertion
+
+	Onglet Multimédia :
+
+		[ ] Lecture des CD audio lors de l'insertion
+
+		[ ] Play video DVD discs when inserted
+
+
+Économiseur d’écran
+-------------------
+
+	Système > Préférences > Economiseur d’écran :
+
+		Thème : Cosmos.
+
+		Considérer l’écran inactif après : 2 heures.
+
+		[ ] Verrouiller l’écran quand l’écran de veille est actif.
+
+
+Applications préférées
+----------------------
+
+	Système > Préférences > Préférences supplémentaires > Applications préférées
+
+		Navigateur web      : Firefox
+
+		Lecteur de courrier : Thunderbird Mail
+
+
+Terminal
+--------
+
+	Edition > Profil courant
+
+		Onglet Général :
+
+			[ ] Utiliser la police système du terminal
+
+			Police : MiscFixed 12
+
+			[ ] Activer le texte en gras
+
+		Onglet Couleurs :
+
+			[ ] Utiliser les couleurs du thème système
+
+			Palettes prédéfinies : gris sur noir / Xterm
+
+		Onglet Défilement :
+
+			La barre de défilement est (*) désactivée.
+
+
+GEdit
+-----
+
+	Edition > Préférences :
+
+		Onglet Editeur :
+
+      [ ] Créer une copie de sauvegarde des fichiers avant l’enregistrement.
+
+
+Réglages de GConf
+-----------------
+
+  $ gconf-editor
+
+  apps >
+    gnome-power-manager >
+        [ ] can_suspend
+        [ ] can_hibernate
+
+    gnome-session >
+      options >
+        [*] show_splash_screen
+
+    nautilus >
+      desktop >
+        [ ] computer_icon_visible
+        [ ] home_icon_visible
+        [ ] trash_icon_visible
+
+
+Création du profil
+------------------
+
+La configuration du bureau se situe dans '~/.gnome2' et '~/.gconf'. Copier ces
+deux répertoires et leur contenu récursivement vers '/etc/skel'. 
+
+
+Lecteur audio XMMS
+------------------
+
+Options > Navigateur de revêtements > aucun
+
+
+Extracteur audio Grip
+---------------------
+
+Agrandir la fenêtre de GRip pour que toutes les commandes soient lisibles.
+
+Onglet CD ->
+	Périphérique CDROM : /dev/hdX
+	[ ] Démarrer avec la première piste
+	[ ] Mélanger avant chaque lecture
+
+Onglet Extraction -->
+	Extracteur -->
+		Format du fichier extrait : ~/Musique/%A/%t-%n.wav
+
+Onglet Codage -->
+		Codeur -->
+			Codeur : oggenc
+			Format du fichier codé : ~/Musique/%A/%d/%t-%n.%x
+         o Options -->
+			[*] Effacer les fichiers WAV après le codage
+			[*] Créer des fichiers M3U
+			[*] Utiliser un chemin relatif dans les fichiers M3U
+			Format des fichiers M3U : ~/Musique/%A/%d.m3u
+			Débit binaire du codage : 192 kbps.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Web Browser
+Name[de]=Webbrowser
+Name[fr]=Navigateur Web
+Comment=Mozilla Firefox
+Exec=firefox %u
+Icon=/usr/share/icons/Tango/48x48/apps/internet-web-browser.png
+Terminal=false
+Type=Application
+StartupWMClass=Firefox-bin
+MimeType=text/html;text/xml;application/xhtml+xml;application/vnd.mozilla.xul+xml;text/mml;
+Categories=Network;WebBrowser;

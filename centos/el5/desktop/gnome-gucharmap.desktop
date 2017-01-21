@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Character Map
+Name[de]=Zeichentabelle
+Name[fr]=Table de caractères
+Comment=Gucharmap
+Exec=gucharmap
+Icon=gucharmap.png
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Utility;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gucharmap
+X-GNOME-Bugzilla-Component=general
+StartupNotify=true
+X-Desktop-File-Install-Version=0.10
+OnlyShowIn=GNOME;

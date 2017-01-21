@@ -1,0 +1,754 @@
+======================
+CentOS 7 Desktop HOWTO (c) Niki Kovacs <info@microlinux.fr>
+======================
+
+Dernière révision : 11 novembre 2016
+
+Ce HOWTO décrit l'installation d'un poste de travail CentOS 7 basé sur
+l'environnement de bureau KDE.
+
+
+  * Introduction
+  * Support d'installation
+  * Démarrage
+  * Langue et clavier
+  * Interfaces réseau
+  * Date et heure
+  * Désactivation de Kdump
+  * Partitionnement manuel
+  * Partition EFI
+  * Partition /boot
+  * Partition swap
+  * Partition principale
+  * Choix des paquets
+  * Utilisateur initial
+  * Accord de licence
+  * Système invité VirtualBox
+  * Démarrer le service RNGD
+  * Synchronisation de la grappe RAID
+  * Chargeur de démarrage
+  * Mise à jour initiale
+  * Configurer le réseau
+  * Faire le ménage dans les kernels
+  * Récupérer les scripts d'installation
+  * Configurer les dépôts de paquets officiels
+  * Configurer le dépôt tiers EPEL
+  * Activer les priorités
+  * Configurer le dépôt tiers Nux-Dextop
+  * Configurer le dépôt tiers Adobe
+  * Configurer le dépôt tiers ELRepo
+  * Installer les outils de base
+  * Agrémenter la console
+  * Désactiver SELinux
+  * Désactiver l'IPv6
+  * Désactiver le pare-feu
+  * Installer les applications
+  * Créer un utilisateur
+
+
+Introduction
+------------
+
+CentOS 7 est officiellement supporté jusqu'au 30 juin 2024. On choisira cette
+branche sur du matériel raisonnablement récent qui supporte un OS 64-bits.
+
+L'installateur de CentOS 7 requiert au moins 1 Go de RAM. Sur une machine
+disposant de moins de mémoire vive ou dotée d'un processeur 32-bits, on pourra
+opter pour CentOS 6.
+
+
+Support d'installation
+----------------------
+
+Pour l'installation d'un poste de travail, on choisira le DVD :
+
+  * CentOS-7-x86_64-DVD-1511.iso
+
+Graver le DVD à partir de l'ISO téléchargé.
+
+Sur les machines dépourvues de lecteur optique, il faudra confectionner une
+clé USB d’installation. L’image ISO est hybride et peut s’écrire directement
+sur une clé :
+
+  # dd if=CentOS-7-x86_64-DVD-1511.iso of=/dev/sdX
+
+
+Démarrage
+---------
+
+Débrancher clés USB, disques externes et autres périphériques amovibles.
+Autrement l'installateur les proposera au formatage.
+
+
+Langue et clavier
+-----------------
+
+Dans l'écran de bienvenue, sélectionner la langue (Français) et la
+localisation (Français - France). La disposition du clavier sera définie par
+le biais de l'écran principal de l'installateur.
+
+
+Interfaces réseau
+-----------------
+
+Le réseau n'est pas activé par défaut, il faut donc songer à l'activer
+explicitement. 
+
+Les noms des interfaces réseau ont changé avec cette nouvelle version.
+Désormais, on n'a plus affaire à 'eth0', 'eth1', 'eth2', 'wlan0', etc. Le
+nouveau schéma de nommage est moins arbitraire et offre davantage de
+consistance en se basant sur l'emplacement physique de la carte dans la
+machine. On se retrouve avec des noms d'interface du genre :
+
+  * enp2s0
+  * enp3s0
+  * enp3s1
+  * etc.
+
+
+Date et heure
+-------------
+
+Vérifier si le fuseau horaire (Europe/Paris) est correctement configuré.
+Éventuellement, activer "Heure du réseau" et vérifier les serveurs NTP.
+
+
+Désactivation de Kdump
+----------------------
+
+Kdump est un mécanisme de capture lors du plantage d'un noyau. Il peut être
+désactivé.
+
+
+Partitionnement manuel
+----------------------
+
+L'outil de partitionnement graphique de CentOS n'est pas très intuitif. Voici
+un exemple de schéma de partitionnement courant :
+
+  * une partition '/boot' de 200 MiB, formatée en ext2
+  * une partition swap, équivalent à la RAM disponible
+  * une partition principale, formatée en ext4
+
+Sur une station de travail munie de deux disques durs, on choisira le RAID 1. 
+
+Cliquer sur "Destination de l'installation".
+
+Vérifier si le ou les disques durs sont bien sélectionnés.
+
+Cocher "Je vais configurer le partitionnement" et cliquer sur "Terminé".
+
+Dans le menu déroulant, sélectionner "Partition standard" au lieu de "LVM".
+
+
+Partition EFI
+-------------
+
+Sur les systèmes UEFI, il faut d'abord créer un point de montage '/boot/efi'
+pour une partition de type EFI, au début du disque. 
+
+Cliquer sur "+" pour créer un point de montage. 
+
+Créer le point de montage '/boot/efi' et spécifier une taille de 100 MiB.
+
+Définir le type de périphérique standard.
+
+Choisir le système de fichiers 'EFI System Partition' et l'étiquette 'efi'.
+
+Confirmer "Mise à jour des paramètres".
+
+
+Partition /boot
+---------------
+
+Cliquer sur "+" pour créer un nouveau point de montage.
+
+Créer le point de montage '/boot' avec une capacité de 200 MiB ou plus.
+
+Définir le type de périphérique standard ou RAID 1.
+
+Choisir le système de fichiers 'ext2' et l'étiquette 'boot'.
+
+Confirmer "Mise à jour des paramètres".
+
+
+Partition swap
+--------------
+
+Cliquer sur "+" pour créer un autre point de montage. 
+
+Créer le point de montage 'swap' en spécifiant sa capacité en "GiB".
+
+Définir le type de périphérique standard ou RAID 1.
+
+Choisir l'étiquette 'swap'.
+
+Confirmer "Mise à jour des paramètres".
+
+  /!\ Dans certains cas, la partition 'swap' pourra être reléguée à la fin du
+  disque par l'installateur pour une utilisation optimale.
+
+
+Partition principale
+--------------------
+
+Cliquer sur "+" pour créer un dernier point de montage. 
+
+Créer le point de montage '/' sans spécifier la capacité souhaitée.
+
+Définir le type de périphérique standard ou RAID 1.
+
+Choisir le système de fichiers 'ext4' et l'étiquette 'root'.
+
+Confirmer "Mise à jour des paramètres", puis "Terminé".
+
+
+Choix des paquets
+-----------------
+
+Dans l’écran de sélection des logiciels du DVD, on optera pour le groupe de
+paquets "KDE Plasma Workspaces", mais sans cocher les options supplémentaires
+comme "Applications KDE", "Applications Internet", etc.
+
+
+Utilisateur initial
+-------------------
+
+Créer un utilisateur non privilégié 'microlinux'. Cocher l'option "Faire de
+cet utilisateur un administrateur" pour l'ajouter au groupe 'wheel' et lui
+permettre d'utiliser 'sudo' ou de devenir root. 
+
+
+Accord de licence
+-----------------
+
+CentOS affiche un dialogue d'acceptation de licence au démarrage initial du
+système depuis la version 7. La logique de l'affichage s'avère quelque peu
+déroutante.  Voici ce qu'il faut faire, dans l'ordre :
+
+  1. Appuyer sur [1] pour afficher la licence.
+
+  2. Appuyer sur [2] pour accepter la licence.
+
+  3. Appuyer sur [C] pour continuer le démarrage initial.
+
+  4. Appuyer sur [C] une deuxième fois pour confirmer le tout.
+
+
+Système invité VirtualBox
+-------------------------
+
+Si l'on a installé CentOS comme système invité VirtualBox, la résolution
+du bureau est trop réduite pour pouvoir travailler correctement. Le mieux est
+de passer en mode console avant de faire quoi que ce soit :
+
+  # systemctl set-default multi-user.target
+  # systemctl isolate multi-user.target
+
+Installer les paquets prérequis pour la compilation des drivers. Le paquet
+DKMS est fourni par le dépôt EPEL :
+
+  # yum install gcc kernel-devel dkms
+
+  /!\ Avant de lancer la construction des Additions Invité, vérifier que les
+  paquets du kernel correspondent tous. 
+
+Insérer l'image CD des Additions Invité et lancer la compilation :
+
+  # mount /dev/cdrom /mnt
+  # cd /mnt
+  # ./VBoxLinuxAdditions.run
+
+Une fois que la construction des drivers s'est déroulée correctement, on peut
+redémarrer en mode graphique :
+
+  # systemctl set-default graphical.target
+  # systemctl reboot
+
+  /!\ SELinux peut causer des problèmes avec l'affichage 3D. Il vaut donc
+      mieux le désactiver.
+
+
+Démarrer le service RNGD
+------------------------
+
+Il se peut que tous les services du système n'aient pas démarré comme prévu :
+
+  # systemctl status
+  ● amandine
+    State: degraded
+     Jobs: 0 queued
+   Failed: 1 units
+   ...
+
+Afficher le service fautif :
+
+  # systemctl --failed
+    UNIT         LOAD   ACTIVE SUB    DESCRIPTION
+  ● rngd.service loaded failed failed Hardware RNG Entropy Gatherer Daemon
+
+RNGD, c'est le générateur d'entropie du système. Dans sa configuration par
+défaut, il se base sur un périphérique '/dev/hwrandom' qui n'existe pas sur
+notre machine. Pour corriger ce comportement, il faut éditer le fichier de
+configuration du service :
+
+--8<---------- /usr/lib/systemd/system/rngd.service --------------------------
+[Unit]
+Description=Hardware RNG Entropy Gatherer Daemon
+
+[Service]
+ExecStart=/sbin/rngd -f -r /dev/urandom           ==> ajouter
+
+[Install]
+WantedBy=multi-user.target
+--8<--------------------------------------------------------------------------
+
+Recharger la configuration :
+
+  # systemctl daemon-reload
+
+Démarrer le service et vérifier son statut :
+
+  # systemctl start rngd.service
+  # systemctl status rngd.service
+  ● rngd.service - Hardware RNG Entropy Gatherer Daemon
+     Loaded: loaded (/usr/lib/systemd/system/rngd.service; ...
+
+
+Synchronisation de la grappe RAID
+---------------------------------
+
+Sur une station de travail installée en RAID 1, la synchronisation initiale
+d'une grappe RAID peut être assez longue. L'astuce suivante permet d'accélérer
+le processus de façon significative :
+
+  # echo 50000 > /proc/sys/dev/raid/speed_limit_min
+
+
+Chargeur de démarrage
+---------------------
+
+Sur une station de travail munie de deux disques durs configurés en RAID 1, il
+faudra installer le chargeur de démarrage manuellement sur le MBR de chaque
+disque. En cas de défaillance d'un disque, on pourra toujours démarrer sur
+l'autre disque :
+
+  # grub2-install /dev/sda
+  # grub2-install /dev/sdb
+
+
+Mise à jour initiale
+--------------------
+
+Afficher les mises à jour :
+
+  # yum check-update
+
+Installer les mises à jour :
+
+  # yum update
+
+Redémarrer.
+
+
+Configurer le réseau
+--------------------
+
+Dans la configuration par défaut, le réseau est géré par NetworkManager, qui
+est pratique sur un portable, mais ne sert pas à grand-chose sur un poste de
+travail ou une station de travail. Notons au passage que contrairement à ce
+qui se dit dans des blogs un peu partout sur le Web, NetworkManager n’est pas
+nécessaire pour la gestion du réseau. C’est juste une couche d’abstraction et
+de complexité supplémentaire, et dont on peut aisément se passer. 
+
+  # systemctl stop NetworkManager.service
+  # yum remove NetworkManager
+
+Voici un exemple de configuration simple :
+
+--8<---------- /etc/sysconfig/network-scripts/ifcfg-enp2s0 -------------------
+DEVICE=enp2s0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=dhcp
+--8<--------------------------------------------------------------------------
+
+Si l'on gère les noms d'hôtes de manière centralisée avec Dnsmasq, il faut
+supprimer les occurrences correspondantes dans '/etc/hosts' :
+
+--8<---------- /etc/hosts ----------------------------------------------------
+127.0.0.1   localhost.localdomain localhost 
+--8<--------------------------------------------------------------------------
+
+Le fichier '/etc/hostname' devra juste contenir ceci :
+
+--8<---------- /etc/hostname -------------------------------------------------
+localhost
+--8<--------------------------------------------------------------------------
+
+
+Faire le ménage dans les kernels
+--------------------------------
+
+Afficher les kernels installés :
+
+  # rpm -q kernel
+  kernel-3.10.0-327.el7.x86_64
+  kernel-3.10.0-327.13.1.el7.x86_64
+
+Supprimer l'ancien kernel :
+
+  # package-cleanup --oldkernels --count=1
+
+L'option '--count=x' spécifie le nombre de kernels que l'on souhaite garder.
+
+Éditer '/etc/yum.conf' et définir le nombre de kernels à préserver :
+
+--8<---------- /etc/yum.conf -------------------------------------------------
+...
+installonly_limit=2
+...
+--8<--------------------------------------------------------------------------
+
+
+Récupérer les scripts d'installation
+------------------------------------
+
+Installer Git :
+
+  # yum install git
+
+Récupérer mes scripts et mes fichiers de configuration :
+
+  # cd
+  # git clone https://github.com/kikinovak/centos
+
+Le répertoire 'centos/el7/scripts' contient une série de scripts numérotés qui
+facilitent la configuration post-installation.
+
+
+Configurer les dépôts de paquets officiels
+------------------------------------------
+
+Éditer '/etc/yum.repos.d/CentOS-Base.repo' et activer les dépôts [base],
+[updates] et [extras] avec une priorité maximale :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+[base]
+enabled=1
+priority=1
+name=CentOS-$releasever - Base
+...
+
+#released updates
+[updates]
+enabled=1
+priority=1
+name=CentOS-$releasever - Updates
+...
+
+#additional packages that may be useful
+[extras]
+enabled=1
+priority=1
+name=CentOS-$releasever - Extras
+...
+--8<--------------------------------------------------------------------------
+
+Désactiver le dépôt [centosplus] :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+...
+
+[centosplus]
+enabled=0
+name=CentOS-$releasever - Plus
+...
+--8<--------------------------------------------------------------------------
+
+
+Configurer le dépôt tiers EPEL
+------------------------------
+
+Le dépôt tiers EPEL ("Extra Packages for Enterprise Linux") fournit des
+paquets qui ne sont pas inclus dans la distribution CentOS. Une fois que le
+dépôt officiel [extras] est configuré, le dépôt EPEL peut se configurer très
+simplement à l'aide du paquet correspondant :
+
+  # yum install epel-release
+
+Définir les priorités du dépôt EPEL :
+
+--8<---------- /etc/yum.repos.d/epel.repo ------------------------------------
+[epel]
+enabled=1
+priority=10
+name=Extra Packages for Enterprise Linux 7 - $basearch
+...
+
+[epel-debuginfo]
+enabled=0
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+...
+
+[epel-source]
+enabled=0
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+...
+--8<--------------------------------------------------------------------------
+
+
+Activer les priorités
+---------------------
+
+Installer le plug-in 'yum-plugin-priorities' :
+
+  # yum install yum-plugin-priorities
+
+Vérifier s'il fonctionne correctement :
+
+  # yum check-update
+  Loaded plugins: fastestmirror, priorities
+  Loading mirror speeds from cached hostfile
+   * base: mirror.plusserver.com
+   * epel: mirrors.neterra.net
+   * extras: centos.mirror.ate.info
+   * updates: mirrors.ircam.fr
+  125 packages excluded due to repository priority protections --> vérifier
+
+
+Configurer le dépôt tiers Nux-Dextop
+------------------------------------
+
+Le dépôt tiers Nux-Dextop fournit des paquets orientés poste de travail et
+multimédia. Il a besoin du dépôt EPEL pour fonctionner correctement.
+
+Installer un navigateur en ligne de commande et aller sur le site du projet :
+
+  # yum install links
+  # links http://li.nux.ro/download
+
+Naviguer vers le répertoire 'nux/dextop/el7/x86_64' et télécharger le paquet
+'nux-dextop-release'. Quitter Links et installer le paquet :
+
+  # yum localinstall nux-dextop-release-*.rpm
+
+Activer le dépôt [nux-dextop] avec une priorité de 10. Laisser le dépôt
+[nux-dextop-testing] désactivé, en lui attribuant une priorité de 10. 
+
+
+Configurer le dépôt tiers Adobe
+-------------------------------
+
+Ce dépôt nous servira uniquement pour le plugin Macromedia Flash.
+
+Aller sur le site d'Adobe : http://www.adobe.com
+
+Tout en bas de la page d'accueil, suivre le lien 'Flash Player'. Sur la page
+de sélection, choisir le système d'exploitation (Linux 64-bit) et la version
+(Flash Player YUM). Télécharger le paquet 'adobe-release' et installer ce
+paquet :
+
+  # yum localinstall adobe-release-*.rpm
+
+Configurer le dépôt [adobe-linux-i386] avec une priorité de 10.
+
+
+Configurer le dépôt tiers ELRepo
+--------------------------------
+
+Le dépôt ELRepo est un autre dépôt tiers pour CentOS, qui se concentre sur les
+drivers : systèmes de fichiers, cartes graphiques, cartes réseau, cartes son,
+webcams, etc.
+
+Installer un navigateur Web en ligne de commande :
+
+  # yum install links
+
+Aller sur le site :
+
+  # cd
+  # links http://elrepo.org
+
+Télécharger et installer le paquet 'elrepo-release' pour les versions 7.x.
+
+  # yum localinstall elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+
+Désactiver l'ensemble des dépôts [elrepo] :
+
+--8<---------- /etc/yum.repos.d/elrepo.org -----------------------------------
+[elrepo]
+enabled=0
+...
+[elrepo-testing]
+enabled=0
+...
+[elrepo-kernel]
+enabled=0
+...
+[elrepo-extras]
+enabled=0
+...
+
+--8<--------------------------------------------------------------------------
+
+On activera ce dépôt ponctuellement en cas de besoin. Voici un exemple :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+
+Installer les outils de base
+----------------------------
+
+Le script '01-installer-outils.sh' installe une poignée d'outils en ligne de
+commande qui ne sont pas fournis par l'installation par défaut.
+
+  # ./01-installer-outils.sh
+
+
+Agrémenter la console
+---------------------
+
+Le script '02-configurer-base.sh' agrémente la console pour root et les futurs
+utilisateurs :
+
+  # ./02-configurer-base.sh
+
+Outre la personnalisation du shell, le script se charge également de peaufiner
+la configuration de l'éditeur Vim.
+
+Prendre en compte la personnalisation du shell pour root :
+
+  # source ~/.bashrc
+
+Récupérer la personnalisation du shell pour l'utilisateur initial :
+
+  # su - microlinux
+  $ cp /etc/skel/.bash* .
+  $ source ~/.bashrc
+  $ exit
+
+
+Désactiver SELinux
+------------------
+
+Éditer le fichier '/etc/sysconfig/selinux' :
+
+--8<---------- /etc/sysconfig/selinux ----------------------------------------
+# /etc/sysconfig/selinux
+SELINUX=disabled
+#SELINUXTYPE=targeted
+--8<--------------------------------------------------------------------------
+
+La modification sera prise en compte au prochain redémarrage.
+
+
+Désactiver l'IPv6
+-----------------
+
+Créer un fichier '/etc/sysctl.d/disable-ipv6.conf' et l'éditer comme ceci :
+
+--8<---------- /etc/sysctl.d/disable-ipv6.conf -------------------------------
+# Disable IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+--8<--------------------------------------------------------------------------
+
+La désactivation de l'IPv6 peut entraîner des problèmes avec le service SSH.
+Il faut donc adapter sa configuration en conséquence.
+
+Éditer '/etc/ssh/sshd_config' et spécifier les directives suivantes :
+
+--8<---------- /etc/ssh/sshd_config ------------------------------------------
+...
+AddressFamily inet
+ListenAddress 0.0.0.0
+...
+--8<--------------------------------------------------------------------------
+
+  > 'inet' désigne l'IPv4 et 'inet6' l'IPv6'.
+
+Les modifications seront prises en compte au prochain redémarrage.
+
+
+Désactiver le pare-feu
+----------------------
+
+Sur un poste de travail, un pare-feu n'a pas beaucoup de sens à partir du
+moment où l'on pense à désactiver les services inutiles. 
+
+Arrêter le pare-feu :
+
+  # systemctl stop firewalld.service
+
+Supprimer le démon correspondant :
+
+  # yum remove firewalld
+
+À partir de là, on a toujours la possibilité de configurer un pare-feu
+traditionnel avec 'iptables'.
+
+
+Installer les applications
+--------------------------
+
+Le script '03-installer-bureau.sh' récupère une panoplie cohérente
+d'applications, de codecs et de plugins. Il supprime une poignée de paquets
+inutiles et installe également une poignée de polices TrueType.
+
+  # ./03-installer-bureau.sh
+
+Le script '04-nettoyer-menus.sh' remplace les entrées de menu du bureau KDE
+par des entrées personnalisées plus cohérentes :
+
+  # ./04-nettoyer-menus.sh
+
+Enfin, le script '05-installer-profil.sh' installe une configuration
+personnalisée du bureau KDE pour les futurs utilisateurs :
+
+  # ./05-installer-profil.sh
+
+
+Créer un utilisateur
+--------------------
+
+Maintenant que le profil par défaut est installé, on peut créer un ou plusieurs
+utilisateurs. On l'ajoutera éventuellement au groupe 'wheel' :
+
+  # adduser -c "Niki Kovacs" kikinovak
+  # passwd kikinovak
+  # usermod -a -G wheel kikinovak
+
+Se connecter en tant que ce nouvel utilisateur. Éventuellement, on pourra
+supprimer l'utilisateur initial :
+
+  # userdel -r microlinux
+
+
+Openshot
+--------
+
+L'éditeur Openshot devra être installé manuellement. Aller sur le site du
+projet et télécharger le fichier AppImage :
+
+  * http://www.openshotvideo.com/
+
+Ranger ce fichier dans '/usr/bin' en réglant les permissions et en créant un
+lien symbolique :
+
+  # cd /usr/bin
+  # chown root:root OpenShot-v2.1.0.AppImage 
+  # chmod +x OpenShot-v2.1.0.AppImage
+  # ln -s OpenShot-v2.1.0.AppImage openshot
+
+L'entrée de menu globale '/usr/share/applications/openshot.desktop' devra être
+créée manuellement. Au démarrage, Openshot propose systématiquement de créer
+une entrée de menu dans '~/.local/share/applications'. Pour éviter de se
+retrouver avec un doublon, on peut faire ceci pour chaque utilisateur :
+
+  $ cd ~/.local/share/applications
+  $ echo "NoDisplay=true" > appimagekit-openshot-qt.desktop
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

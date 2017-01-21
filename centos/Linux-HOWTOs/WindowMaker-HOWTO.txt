@@ -1,0 +1,88 @@
+=================
+WindowMaker HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=================
+
+Dernière révision : 17 juin 2016
+
+Ce HOWTO décrit l'installation et la configuration du gestionnaire de fenêtres
+WindowMaker sous CentOS.
+
+
+Introduction
+------------
+
+Si l'on a besoin d'un environnement graphique basique sur un serveur et que
+l'on souhaite quand-même un peu plus de confort, on peut installer
+WindowMaker, un clone de l'interface légendaire du système NeXTSTEP.
+
+
+Installation
+------------
+
+WindowMaker est fourni par le dépôt de paquets tiers EPEL :
+
+  # yum install WindowMaker
+
+Installer un terminal graphique et les polices qui vont bien avec :
+
+  # yum install xterm xorg-x11-fonts-misc
+
+
+Configuration
+-------------
+
+Avant de lancer WindowMaker, il faut s'assurer de disposer des fichiers
+'~/.xinitrc' et '~/.Xresources'. 
+
+Voici à quoi peut ressembler '~/.xinitrc' :
+
+--8<---------- ~/.xinitrc ----------------------------------------------------
+/usr/bin/xrdb -merge $HOME/.Xresources
+/usr/bin/wmaker --no-dock --no-clip
+--8<--------------------------------------------------------------------------
+
+Et voici un exemple pour '~/.Xresources' :
+
+--8<---------- ~/.Xresources -------------------------------------------------
+XTerm*background: #000000
+XTerm*foreground: LightGrey
+XTerm*font: 9x15
+XTerm*VT100.geometry: 125x48
+--8<--------------------------------------------------------------------------
+
+  > Pour connaître les tailles de polices disponibles pour XTerm, il faut
+    regarder dans '/usr/share/X11/app-defaults/XTerm'. Si 9x15 est trop petit,
+    essayer 10x20.
+
+  > Si la fenêtre dépasse l'écran, essayer une géométrie de 105x35.
+
+
+Le gestionnaire de connexion XDM
+--------------------------------
+
+Si l'on décide de passer par un gestionnaire de connexion, XDM sera plus
+adapté que GDM :
+
+  # yum remove gdm
+  # yum install xorg-x11-xdm
+
+XDM lit le fichier '~/.xsession' au démarrage. On va donc créer un lien
+symbolique correspondant :
+
+  $ ln -s .xinitrc .xsession
+
+Basculer manuellement vers le niveau d'exécution 5 pour lancer XDM :
+
+  # init 5
+
+Si ce premier test est concluant, on pourra rendre cette configuration
+persistante :
+
+--8<---------- /etc/inittab --------------------------------------------------
+id:5:initdefault:
+...
+--8<--------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

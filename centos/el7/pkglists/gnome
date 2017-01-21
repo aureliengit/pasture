@@ -1,0 +1,116 @@
+# GDM
+gdm 
+
+# GNOME
+control-center
+gnome-classic-session
+gnome-terminal
+gnome-tweak-tool
+nautilus-open-terminal
+xdg-user-dirs
+xdg-user-dirs-gtk
+
+# Client SMB
+samba-client
+samba-common
+gvfs-smb
+
+# Polices TrueType
+abattis-cantarell-fonts
+dejavu-sans-fonts
+dejavu-sans-mono-fonts
+dejavu-serif-fonts
+gnu-free-mono-fonts
+gnu-free-sans-fonts
+gnu-free-serif-fonts
+google-crosextra-caladea-fonts
+google-crosextra-carlito-fonts
+google-droid-sans-fonts
+google-droid-sans-mono-fonts
+google-droid-serif-fonts
+liberation-mono-fonts
+liberation-sans-fonts
+liberation-serif-fonts
+ucs-miscfixed-fonts
+urw-fonts
+webcore-fonts
+webcore-fonts-vista
+
+# Internet
+filezilla
+firefox
+mozilla-adblockplus
+pidgin
+pidgin-otr
+thunderbird
+thunderbird-lightning
+transmission-gtk
+
+# Bureautique
+evince
+evince-nautilus
+libreoffice
+libreoffice-langpack-de
+libreoffice-langpack-fr
+
+# Graphisme
+gimp
+gimp-help
+gimp-help-de
+gimp-help-fr
+gnome-screenshot
+gthumb
+inkscape
+inkscape-docs
+inkscape-view
+scribus
+simple-scan
+ufraw-gimp
+
+# Son & Vidéo
+audacious
+audacious-plugins
+audacious-plugins-freeworld
+audacious-plugins-freeworld-aac
+audacious-plugins-freeworld-ffaudio
+audacious-plugins-freeworld-mms
+audacious-plugins-freeworld-mp3
+audacity-freeworld
+ffmpegthumbnailer
+flash-plugin
+gnome-mplayer
+gstreamer
+gstreamer-ffmpeg
+gstreamer-plugins-base
+gstreamer-plugins-good
+gstreamer-plugins-bad
+gstreamer-plugins-bad-free
+gstreamer-plugins-bad-nonfree
+gstreamer-plugins-ugly
+gstreamer1
+gstreamer1-libav
+gstreamer1-plugins-base
+gstreamer1-plugins-good
+gstreamer1-plugins-bad-free
+gstreamer1-plugins-bad-freeworld
+gstreamer1-plugins-ugly
+libdvdcss
+openshot
+
+# Accessoires & Utilitaires
+# brasero
+# brasero-nautilus
+baobab
+conky
+file-roller
+file-roller-nautilus
+gedit
+gnome-calculator
+gnome-disk-utility
+gnome-font-viewer
+gucharmap
+seahorse
+
+# HPLIP
+# hplip-gui
+

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Tweak Tool
+Name[de]=Optimierungswerkzeug
+Name[fr]=Outil de personnalisation
+Comment=GNOME Tweak Tool
+Icon=gnome-tweak-tool
+Exec=gnome-tweak-tool
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=System;
+OnlyShowIn=GNOME;Unity;Pantheon;

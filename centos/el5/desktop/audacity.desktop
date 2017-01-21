@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Sound Editor
+Name[de]=Audio-Editor
+Name[fr]=Éditeur audio
+Comment=Audacity
+Icon=/usr/share/pixmaps/audacity.png
+Type=Application
+Categories=Application;AudioVideo;
+Exec=audacity
+StartupNotify=false
+Terminal=false
+MimeType=application/ogg;audio/basic;audio/mpeg;audio/x-aiff;audio/x-mp3;audio/x-wav;application/x-audacity-project;

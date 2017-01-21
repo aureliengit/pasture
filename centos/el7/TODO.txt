@@ -1,0 +1,71 @@
+=============
+TODO CentOS 7
+=============
+
+Niki Kovacs <info@microlinux.fr>
+
+
+Général
+-------
+
+  * Partitionnement et formatage manuel
+  * Assemblage manuel d'une grappe RAID
+
+
+Serveur de réseau local
+-----------------------
+
+  * Serveur FTP local
+  * Serveur Apache sécurisé HTTPS
+  * Gestion des quotas
+  * Authentification centralisée avec NIS/NFS
+  * Authentification centralisée sécurisée avec LDAP
+  * Alerte et simulation de panne RAID
+  * GRUB redondant sur une grappe RAID
+  * Système de sauvegardes incrémentales
+  * OpenVPN
+
+
+Serveur dédié
+-------------
+
+  * Installation de base sur une Dedibox
+  * Module kernel problématique Dedibox
+  * DNS avec BIND
+  * Serveur Web Apache/PHP/MariaDB
+  * Serveur mail Postfix
+  * Serveur IMAP Dovecot
+  * Greylisting Postgrey
+  * Listes de diffusion Mailman
+  * Antispam Spamassassin
+  * Antivirus ClamAV
+  * Webmail Roundcube
+  * Cloud privé Owncloud
+  * Mail et DKIM
+  * Streaming audio MPD/Icecast/NCMPC
+  * Certificats non auto-signés
+
+
+Poste de travail
+----------------
+
+  * GtkCDLabel
+  * AMule
+  * WinFF
+  * Remmina
+  * Easytag
+  * Spotify
+  * VirtualBox
+  * Wine
+  * Gestion des playlists audio
+  * Formats d'archivage
+  * Extracteur audio
+  * Skype ou équivalent
+  * Gestion des appareils photo PTP
+  * Gthumb vs. Shotwell
+  * Formatage clés USB
+  * Solitaire
+  * Webcam
+  * Bootsplash couleur GRUB
+  * Thème Aero pour la souris
+

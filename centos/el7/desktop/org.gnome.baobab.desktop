@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=Disk Usage
+Name[de]=Festplattenbelegung
+Name[fr]=Utilisation des disques
+Comment=Baobab
+TryExec=baobab
+Exec=baobab
+Icon=baobab
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=inode/directory;
+Categories=System;
+NotShowIn=KDE;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gnome-utils
+X-GNOME-Bugzilla-Component=baobab
+X-GNOME-Bugzilla-Version=3.14.1
+DBusActivatable=true

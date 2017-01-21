@@ -1,0 +1,105 @@
+================
+GNOME 2.28 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 22 juin 2016
+
+Ce HOWTO décrit la configuration du bureau GNOME 2.28 sous CentOS 6.
+
+
+GNOME Terminal
+--------------
+
+Édition > Préférences du profil
+
+Onglet "Général" :
+
+    Décocher "Utiliser la police à chasse fixe du système".
+
+    Police : Fixed 12.
+
+    Cocher "Utiliser une taille de terminal personnalisée par défaut".
+
+    Définir la taille adaptée du terminal
+
+Onglet Couleurs :
+
+    Décocher "Utiliser les couleurs du thème système".
+
+    Palettes prédéfinies du premier plan et de l’arrière plan : Gris sur noir.
+
+    Palette de couleurs : Tango.
+
+Onglet Arrière-plan :
+
+    Arrière-plan transparent 80 %.
+
+Onglet Défilement :
+
+    Désactiver la barre de défilement.
+
+
+Bureau GNOME
+------------
+
+Système > Préférences > Apparence :
+
+    Thème : Clearlooks > Personnaliser
+
+    Contrôles : MurrinaGilouche
+
+    Bordures de fenêtres : Bluecurve
+
+    Icônes : Elementary Xfce
+
+    Pointeur : dmz
+
+    Arrière-plan : par défaut.
+
+Système > Préférences > Applications préférées :
+
+    Navigateur Web : Firefox
+
+    Logiciel de messagerie : Thunderbird
+
+Système > Préférences > Économiseur d’écran :
+
+    Thème Cosmos.
+
+    Considérer l’ordinateur inactif après : 30 minutes.
+
+Système > Préférences > Gestion des fichiers :
+
+    Comportement : Toujours ouvrir dans des fenêtres de navigation.
+
+    Inclure une commande Supprimer qui ignore la corbeille.
+
+Tableau de bord supérieur :
+
+    Lanceurs rapides : Firefox, Thunderbird, LibreOffice, Nautilus
+
+    Verrouiller les lanceurs rapides au tableau de bord.
+
+Supprimer les icônes Poste de Travail, Dossier personnel et Corbeille du bureau :
+
+  $ gconf-editor
+
+Ouvrir apps > nautilus > desktop et décocher :
+
+    computer_icon_visible
+
+    home_icon_visible
+
+    trash_icon_visible
+
+
+GNOME enregistre tous les réglages individuel dans '~/.gconf'. Il suffit de
+copier cette arborescence vers '/etc/skel' avant de créer un nouvel
+utilisateur.
+
+Au final, on obtient un environnement de travail fonctionnel, esthétique et
+stable, qui rivalise aisément avec Windows 7 ou Mac OS X.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

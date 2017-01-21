@@ -1,0 +1,33 @@
+Notes sur CentOS
+----------------
+
+TODO
+----
+
+Openshot
+
+Recherche de fichiers : Recoll
+
+Gtkcdlabel
+
+Client OwnCloud
+
+Virtualisation KVM
+
+Nettoyer les scripts du dépôt Github
+
+
+Notes
+-----
+
+Lorsqu'on ajoute un utilisateur au groupe 'wheel', quelle différence ça fait
+exactement ?
+
+
+Bugs
+----
+
+DimDisplay au démarrage.
+
+Clavier US pour un nouvel utilisateur dans KDE.
+

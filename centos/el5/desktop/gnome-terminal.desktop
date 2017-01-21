@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Terminal
+Name[de]=Terminal
+Name[fr]=Terminal
+Comment=GNOME Terminal
+Exec=gnome-terminal
+Icon=gnome-terminal
+Type=Application
+Categories=Application;Utility;
+StartupNotify=true
+OnlyShowIn=GNOME;

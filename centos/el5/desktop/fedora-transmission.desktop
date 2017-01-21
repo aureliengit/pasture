@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=BitTorrent Downloader
+Name[de]=BitTorrent-Programm
+Name[fr]=Téléchargement BitTorrent
+Type=Application
+Comment=Transmission
+Exec=transmission %F
+TryExec=transmission
+Icon=transmission
+MimeType=application/x-bittorrent;
+Categories=Network;FileTransfer;P2P;GTK;
+X-Desktop-File-Install-Version=0.10

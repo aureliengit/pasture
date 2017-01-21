@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+#Name=XSane
+Name=Scanner Tool
+Name[de]=Scannersoftware
+Name[fr]=Acquisition d'images
+Comment=XSane
+Exec=xsane
+TryExec=xsane
+Icon=/usr/share/icons/Tango/48x48/mimetypes/image-x-generic.png
+Terminal=false
+Categories=Application;Graphics;2DGraphics;RasterGraphics;GTK;X-Fedora;X-Red-Hat-Base;
+StartupNotify=true
+X-Desktop-File-Install-Version=0.10

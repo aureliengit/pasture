@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Electronic Mail
+Name[de]=Elektronische Post
+Name[fr]=Courrier électronique
+Comment=Mozilla Thunderbird
+Exec=thunderbird
+Icon=/usr/share/icons/Tango/48x48/apps/internet-mail.png
+Terminal=false
+Type=Application
+StartupWMClass=Thunderbird-bin
+X-Desktop-File-Install-Version=0.10
+Categories=Network;Application;X-Fedora;

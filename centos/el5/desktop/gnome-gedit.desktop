@@ -1,0 +1,20 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Text Editor
+Name[de]=Texteditor
+Name[fr]=Éditeur de texte
+Comment=Gedit
+Exec=gedit %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=text-editor
+Categories=GNOME;GTK;Application;Utility;TextEditor;X-Red-Hat-Base;
+X-GNOME-DocPath=gedit/gedit.xml
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gedit
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=2.16.0
+X-Desktop-File-Install-Version=0.10
+OnlyShowIn=GNOME;

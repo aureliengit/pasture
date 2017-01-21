@@ -1,0 +1,229 @@
+====================
+Yum Repository HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+====================
+
+Dernière révision : 3 juin 2016
+
+Ce HOWTO offre une vue d'ensemble sur les dépôts de paquets logiciels sous
+CentOS.
+
+
+  * Les dépôts de paquets officiels
+  * Configurer les dépôts officiels
+  * Le dépôt EPEL
+  * Activer les priorités
+  * Le dépôt RPMForge
+  * Le dépôt Adobe
+  * Le dépôt ELRepo
+
+
+Les dépôts de paquets officiels
+-------------------------------
+
+Le dépôt [base] fournit les paquets de base de CentOS, tels qu'on les trouve
+sur les ISOs. 
+
+Le dépôt [updates] contient les mises à jour de [base] publiées après les ISOs
+de CentOS. Il s’agit de mises à jour de sécurité, de corrections de bogues ou
+d’améliorations des paquetages de [base].
+
+Le dépôt [extras] fournit des paquetages compilés et gérés par les
+développeurs de CentOS, qui ajoutent certaines fonctionnalités à la
+distribution de base. Il s'agit de paquetages dûment testés, et qui
+n’interfèrent pas avec la distribution de base.
+
+Les paquets contenus dans le dépôt [addons] sont requis pour la compilation
+des paquetages de [base], même s’ils ne font pas partie de ce groupe. On peut
+considérer qu’il s’agit d’une extension de [base]. 
+
+Le dépôt [centosplus] contient des paquets contribués par les développeurs et
+les utilisateurs de CentOS, mais susceptibles de remplacer des paquetages de
+[base].
+
+Le dépôt [contrib] contient des applications et paquets fournis par des
+utilisateurs tiers. 
+
+Enfin, le dépôt [testing] comporte des paquets en cours de développement, et
+qui se retrouveront éventuellement dans les dépôts [extras] ou [centosplus].
+
+
+Configurer les dépôts officiels
+-------------------------------
+
+Éditer '/etc/yum.repos.d/CentOS-Base.repo' et activer les dépôts [base],
+[updates] et [extras] avec une priorité maximale :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+[base]
+enabled=1
+priority=1
+name=CentOS-$releasever - Base
+...
+
+#released updates
+[updates]
+enabled=1
+priority=1
+name=CentOS-$releasever - Updates
+...
+
+#additional packages that may be useful
+[extras]
+enabled=1
+priority=1
+name=CentOS-$releasever - Extras
+...
+--8<--------------------------------------------------------------------------
+
+Désactiver les dépôts [centosplus] et [contrib] :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+...
+
+[centosplus]
+enabled=0
+name=CentOS-$releasever - Plus
+
+#contrib - packages by Centos Users
+[contrib]
+enabled=0
+name=CentOS-$releasever - Contrib
+...
+--8<--------------------------------------------------------------------------
+
+
+Le dépôt EPEL
+-------------
+
+Le dépôt tiers EPEL ("Extra Packages for Enterprise Linux") fournit des
+paquets qui ne sont pas inclus dans la distribution CentOS. 
+
+Une fois que le dépôt officiel [extras] est configuré, le dépôt EPEL peut se
+configurer très simplement à l'aide du paquet correspondant :
+
+  # yum install epel-release
+
+Définir les priorités du dépôt EPEL :
+
+--8<---------- /etc/yum.repos.d/epel.repo ------------------------------------
+[epel]
+enabled=1
+priority=10
+gpgcheck=1
+name=Extra Packages for Enterprise Linux 5 - $basearch
+...
+
+[epel-debuginfo]
+enabled=0
+gpgcheck=1
+name=Extra Packages for Enterprise Linux 5 - $basearch - Debug
+...
+
+[epel-source]
+enabled=0
+gpgcheck=1
+name=Extra Packages for Enterprise Linux 5 - $basearch - Source
+...
+--8<--------------------------------------------------------------------------
+
+
+Activer les priorités
+---------------------
+
+Installer le plug-in 'yum-priorities' :
+
+  --> yum-priorities
+
+Vérifier s'il fonctionne correctement :
+
+  # yum check-update
+  Loaded plugins: fastestmirror, priorities
+  Loading mirror speeds from cached hostfile
+   * base: mirrors.atosworldline.com
+   * epel: mirror.ibcp.fr
+   * extras: mirror-fr2.bbln.org
+   * updates: ftp.ciril.fr
+  166 packages excluded due to repository priority protections --> vérifier
+
+
+Le dépôt RPMForge
+-----------------
+
+Le dépôt RPMForge n'est plus officiellement maintenu. Il n'empêche que sur les
+très vieilles machines sous CentOS 5, c'est celui qui nous permettra le mieux
+d'obtenir une panoplie cohérente de paquets tiers pour le multimédia et le
+graphisme. 
+
+Attention : ce dépôt n'est pas compatible avec le dépôt EPEL, et il est
+fortement déconseillé de mélanger les deux.
+
+Avec un navigateur en ligne de commande, aller sur le site du projet :
+
+  # links http://apt.sw.be
+
+Naviguer vers le répertoire 'redhat/el5/en/i386/rpmforge/RPMS' et télécharger
+le paquet 'rpmforge-release'. Quitter Links et installer le paquet :
+
+  # rpm -ivh rpmforge-release-*.rpm
+
+Activer le dépôt [rpmforge] avec une priorité de 10. Désactiver les dépôts
+[rpmforge-extras] et [rpmforge-testing].
+
+
+Le dépôt Adobe
+--------------
+
+Ce dépôt nous servira uniquement pour le plugin Macromedia Flash.
+
+Aller sur le site d'Adobe : http://www.adobe.com
+
+Tout en bas de la page d'accueil, suivre le lien 'Flash Player'. Sur la page
+de sélection, choisir le système d'exploitation (Linux 32-bit ou 64-bit) et la
+version (Flash Player YUM). Télécharger le paquet 'adobe-release' et installer
+ce paquet :
+
+  # rpm -ivh adobe-release-*.rpm
+
+Configurer le dépôt [adobe-linux-$ARCH] avec une priorité de 5. Sur les
+vieilles machines sous CentOS 5, le paquet fourni par le dépôt Adobe sera
+prioritaire par rapport au paquet obsolète fourni par RPMForge. 
+
+
+Le dépôt ELRepo
+---------------
+
+Le dépôt ELRepo est un autre dépôt tiers pour CentOS, qui se concentre sur les
+drivers : systèmes de fichiers, cartes graphiques, cartes réseau, cartes son,
+webcams, etc.
+
+Aller sur le site du projet :
+
+  # links http://elrepo.org
+
+Télécharger et installer le paquet 'elrepo-release' pour la version que l'on
+utilise.
+
+Désactiver l'ensemble des dépôts [elrepo] :
+
+--8<---------- /etc/yum.repos.d/elrepo.org -----------------------------------
+[elrepo]
+enabled=0
+...
+[elrepo-testing]
+enabled=0
+...
+[elrepo-kernel]
+enabled=0
+...
+[elrepo-extras]
+enabled=0
+...
+--8<--------------------------------------------------------------------------
+
+On activera ce dépôt ponctuellement en cas de besoin. Voici un exemple :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

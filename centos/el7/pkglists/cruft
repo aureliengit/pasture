@@ -1,0 +1,66 @@
+# Cruft
+
+# PackageKit
+PackageKit
+
+# GNOME applications
+empathy
+gnome-abrt
+gnome-boxes
+gnome-contacts
+gnome-disk-utility
+gnome-documents
+gnome-system-log
+gnome-system-monitor
+orca
+totem
+vinagre
+
+# Automatic Bug Reporting Tool
+abrt
+
+# Chrony
+chrony
+
+# Firewall
+firewall-config
+firewalld
+
+# Postfix
+postfix
+
+# SELinux
+setroubleshoot
+
+# Printer configuration GUI
+system-config-printer
+
+# Exotic Fonts
+cjkuni-uming-fonts
+jomolhari-fonts
+khmeros-base-fonts
+khmeros-fonts-common
+lklug-fonts
+lohit-assamese-fonts
+lohit-bengali-fonts
+lohit-devanagari-fonts
+lohit-gujarati-fonts
+lohit-kannada-fonts
+lohit-malayalam-fonts
+lohit-marathi-fonts
+lohit-nepali-fonts
+lohit-oriya-fonts
+lohit-punjabi-fonts
+lohit-tamil-fonts
+lohit-telugu-fonts
+madan-fonts
+nhn-nanum-fonts-common
+nhn-nanum-gothic-fonts
+paktype-naskh-basic-fonts
+sil-padauk-fonts
+smc-fonts-common
+smc-meera-fonts
+thai-scalable-fonts-common
+thai-scalable-waree-fonts
+wqy-microhei-fonts
+wqy-zenhei-fonts

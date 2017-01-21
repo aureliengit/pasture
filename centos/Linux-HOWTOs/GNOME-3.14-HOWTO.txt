@@ -1,0 +1,92 @@
+================
+GNOME 3.14 HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+================
+
+Dernière révision : 13 août 2016
+
+Ce HOWTO décrit la configuration du bureau GNOME 3.14 sous CentOS 7.
+
+
+  * Configurer le bureau GNOME
+  * Configurer GNOME Terminal
+  * Création du profil
+
+
+Configurer le bureau GNOME
+--------------------------
+
+L'aspect du bureau se configure principalement par le biais de l'utilitaire
+Tweak Tool : Applications > Utilitaires > Outil de personnalisation.
+
+Onglet Apparence :
+
+  Thème sombre global : au choix
+
+  Fenêtre : Adwaita
+
+  GTK+ : Adwaita
+
+  Icônes : Elementary-xfce
+
+  Curseur : Bluecurve-inverse
+
+Onglet Bureau :
+
+  Activer la configuration des icônes sur le bureau.
+
+  [ ] Dossier personnel
+
+  [ ] Serveurs réseau
+
+  [ ] Corbeille
+
+  [*] Volumes montés
+
+  Arrière plan : Mode "Stretched"
+
+  Écran de verrouillage : Mode "Stretched"
+
+Onglet Polices :
+
+  Titres des fenêtres : Cantarell Bold 11
+
+  Interface : Cantarell Regular 11
+
+  Non proportionnelle : Monaco Regular 11
+
+Applications > Outils système > Paramètres > Énergie > Écran noir : augmenter
+l’intervalle de mise en veille de 5 à 15 minutes.
+
+
+Configurer GNOME Terminal
+-------------------------
+
+Édition > Préférences du profil.
+
+Onglet Général :
+
+  Taille de terminal initiale : 105 x 38
+
+Onglet Couleurs :
+
+  [ ] Utiliser les couleurs du système.  
+  
+  Couleur du texte et de l’arrière-plan : Gris sur noir.  
+  
+  Palette : Tango.
+
+Onglet Défilement :
+
+  [ ] Afficher la barre de défilement.
+
+
+Création du profil
+------------------
+
+GNOME enregistre tous les réglages individuel dans '~/.config/dconf/user'. Il
+suffit de copier cette arborescence vers '/etc/skel' avant de créer un nouvel
+utilisateur.
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=File Browser
+Name[de]=Dateimanager
+Name[fr]=Gestionnaire de fichiers
+Comment=Nautilus
+Exec=nautilus --no-desktop --browser %U
+Icon=/usr/share/icons/Tango/48x48/places/folder.png
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Application;Utility;
+OnlyShowIn=GNOME;

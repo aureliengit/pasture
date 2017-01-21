@@ -1,0 +1,541 @@
+======================
+CentOS 6 Desktop HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+======================
+
+Dernière révision : 3 août 2016
+
+Ce HOWTO décrit l'installation d'un poste de travail CentOS 6.
+
+
+  * Introduction
+  * Support d'installation
+  * Démarrage
+  * Partitionnement
+  * Choix des paquets
+  * Redémarrage initial
+  * Configurer le réseau
+  * Mise à jour initiale
+  * Faire le ménage dans les kernels
+  * Récupérer les scripts d'installation
+  * Configurer les dépôts de paquets officiels
+  * Configurer le dépôt tiers EPEL
+  * Activer les priorités
+  * Configurer le dépôt tiers Nux-Dextop
+  * Configurer le dépôt tiers Adobe
+  * Configurer le dépôt tiers ELRepo
+  * Installer les outils de base
+  * Agrémenter la console
+  * Désactiver SELinux
+  * Désactiver l'IPv6
+  * Installer les applications
+  * Configurer une carte graphique NVidia
+  * Désactiver les services inutiles
+  * Compiz
+
+ 
+Introduction
+------------
+
+CentOS 6 est officiellement supporté jusqu'au 30 novembre 2020. On choisira
+cette branche sur du matériel qui ne supporte pas un OS 64-bits, comme par
+exemple les machines dotées de processeurs Intel Atom 32-bits ou Pentium-IV.
+
+L'installateur de CentOS requiert au moins 632 Mo de RAM. Sur une machine
+disposant de moins de mémoire vive, on pourra opter pour CentOS 5.
+
+
+Support d'installation
+----------------------
+
+Pour l'installation d'un poste de travail, on choisira le DVD :
+
+  * CentOS-6.8-i386-bin-DVD1.iso
+
+Graver le CD à partir de l'ISO téléchargé.
+
+Sur les machines dépourvues de lecteur optique, il faudra confectionner une
+clé USB d’installation. Depuis CentOS 6.5, l’image ISO est hybride et peut
+s’écrire directement sur une clé :
+
+  # dd if=CentOS-6.8-i386-DVD1.iso of=/dev/sdX
+
+
+Démarrage
+---------
+
+Débrancher clés USB, disques externes et autres périphériques amovibles.
+Autrement l'installateur les proposera au formatage.
+
+Depuis la version 6.0, l'installateur en mode texte est tronqué de quelques
+fonctionnalités essentielles comme le partitionnement personnalisé. Il faut
+donc utiliser l'installateur graphique proposé par défaut.
+
+
+Partitionnement
+---------------
+
+Choisir l'option "Créer un partitionnement personnalisé" :
+
+  - une partition '/boot' de 100 Mo, formatée en ext2
+
+  - une partition d'échange égale à la quantité de RAM 
+
+  - une partition principale formatée en ext4
+
+
+Choix des paquets
+-----------------
+
+Opter pour la sélection "Minimal Desktop".
+
+
+Redémarrage initial
+-------------------
+
+Accepter le contrat de licence, créer l'utilisateur initial et désactiver
+Kdump.
+
+
+Configurer le réseau
+--------------------
+
+Dans la configuration par défaut, aucune interface réseau à part 'lo' n'est
+activée, et le réseau est géré par NetworkManager, dont on n'a pas forcément
+besoin sur un poste de travail :
+
+  # service NetworkManager stop
+  # chkconfig NetworkManager off
+
+Voici un exemple de configuration simple :
+
+--8<---------- /etc/sysconfig/network-scripts/ifcfg-eth0 ---------------------
+DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=dhcp
+--8<--------------------------------------------------------------------------
+
+Si l'on gère les noms d'hôtes de manière centralisée avec Dnsmasq, il faut
+supprimer les occurrences correspondantes dans '/etc/hosts' :
+
+--8<---------- /etc/hosts ----------------------------------------------------
+127.0.0.1   localhost.localdomain localhost 
+--8<--------------------------------------------------------------------------
+
+Le fichier '/etc/sysconfig/network' devra contenir ceci :
+
+--8<---------- /etc/sysconfig/network ----------------------------------------
+NETWORKING=yes
+HOSTNAME=localhost.localdomain
+--8<--------------------------------------------------------------------------
+
+Prendre en compte les modifications :
+
+  # service network restart
+
+
+Mise à jour initiale
+--------------------
+
+Afficher les mises à jour disponibles :
+
+  # yum check-update
+
+Effectuer la mise à jour initiale :
+
+  # yum update
+
+Redémarrer.
+
+
+Faire le ménage dans les kernels
+--------------------------------
+
+Le paquet 'yum-utils' nous facilitera la tâche. Il est déjà installé sur un
+poste de travail minimal :
+
+  # rpm -q yum-utils
+  yum-utils-1.1.30-37.el6.noarch
+
+Afficher les kernels installés :
+
+  # rpm -q kernel
+  kernel-2.6.32-642.el6.i686
+  kernel-2.6.32-642.1.1.el6.i686
+
+Supprimer l'ancien kernel :
+
+  # package-cleanup --oldkernels --count=1
+
+L'option '--count=x' spécifie le nombre de kernels que l'on souhaite garder.
+
+Éditer '/etc/yum.conf' et définir le nombre de kernels à préserver :
+
+--8<---------- /etc/yum.conf -------------------------------------------------
+...
+installonly_limit=2
+...
+--8<--------------------------------------------------------------------------
+
+
+Récupérer les scripts d'installation
+------------------------------------
+
+Installer Git :
+
+  # yum install git
+
+Récupérer mes scripts et mes fichiers de configuration :
+
+  # cd
+  # git clone https://github.com/kikinovak/centos
+
+Si l'on souhaite récupérer le dépôt en lecture/écriture, il faudra invoquer la
+commande comme ceci :
+
+  # git clone https://kikinovak@github.com/kikinovak/centos
+
+Il se peut qu'on se retrouve confronté au message d'erreur suivant :
+
+  (gnome-ssh-askpass:2340): Gtk-WARNING **: cannot open display
+
+Dans ce cas, il suffit de supprimer la variable d'environnement SSH_ASKPASS :
+
+  # unset SSH_ASKPASS
+
+Le répertoire 'centos/el6/scripts' contient une série de scripts numérotés qui
+facilitent la configuration post-installation. 
+
+
+Configurer les dépôts de paquets officiels
+------------------------------------------
+
+Éditer '/etc/yum.repos.d/CentOS-Base.repo' et activer les dépôts [base],
+[updates] et [extras] avec une priorité maximale :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+[base]
+enabled=1
+priority=1
+name=CentOS-$releasever - Base
+...
+
+#released updates
+[updates]
+enabled=1
+priority=1
+name=CentOS-$releasever - Updates
+...
+
+#additional packages that may be useful
+[extras]
+enabled=1
+priority=1
+name=CentOS-$releasever - Extras
+...
+--8<--------------------------------------------------------------------------
+
+Désactiver les dépôts [centosplus] et [contrib] :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+...
+
+[centosplus]
+enabled=0
+name=CentOS-$releasever - Plus
+
+#contrib - packages by Centos Users
+[contrib]
+enabled=0
+name=CentOS-$releasever - Contrib
+...
+--8<--------------------------------------------------------------------------
+
+
+Configurer le dépôt tiers EPEL
+------------------------------
+
+Le dépôt tiers EPEL ("Extra Packages for Enterprise Linux") fournit des
+paquets qui ne sont pas inclus dans la distribution CentOS. On privilégiera ce
+dépôt pour une installation serveur. Il n'est pas compatible avec le dépôt
+RPMForge.
+
+Une fois que le dépôt officiel [extras] est configuré, le dépôt EPEL peut se
+configurer très simplement à l'aide du paquet correspondant :
+
+  # yum install epel-release
+
+Définir les priorités du dépôt EPEL :
+
+--8<---------- /etc/yum.repos.d/epel.repo ------------------------------------
+[epel]
+enabled=1
+priority=10
+name=Extra Packages for Enterprise Linux 6 - $basearch
+...
+
+[epel-debuginfo]
+enabled=0
+name=Extra Packages for Enterprise Linux 6 - $basearch - Debug
+...
+
+[epel-source]
+enabled=0
+name=Extra Packages for Enterprise Linux 6 - $basearch - Source
+...
+--8<--------------------------------------------------------------------------
+
+
+Activer les priorités
+---------------------
+
+Installer le plug-in 'yum-priorities' :
+
+  --> yum-priorities
+
+Vérifier s'il fonctionne correctement :
+
+  # yum check-update
+  Modules complémentaires chargés : fastestmirror, priorities
+  Loading mirror speeds from cached hostfile
+   * base: mir01.syntis.net
+   * epel: ftp.ps.pl
+   * extras: centos.mirror.ate.info
+   * updates: mir01.syntis.net
+  84 packages excluded due to repository priority protections --> vérifier
+
+
+Configurer le dépôt tiers Nux-Dextop
+------------------------------------
+
+Le dépôt tiers Nux-Dextop fournit des paquets orientés poste de travail et
+multimédia à partir de RHEL 6. Il a besoin du dépôt EPEL pour fonctionner
+correctement.
+
+Installer un navigateur en ligne de commande et aller sur le site du projet :
+
+  # yum install links
+  # links http://li.nux.ro/download
+
+Naviguer vers le répertoire 'nux/dextop/el6' et télécharger le paquet
+'nux-dextop-release' dans le sous-répertoire correspondant à l'architecture du
+processeur. Quitter Links et installer le paquet :
+
+  # yum localinstall nux-dextop-release-*.rpm
+
+Activer le dépôt [nux-dextop] avec une priorité de 10. Laisser le dépôt
+[nux-dextop-testing] désactivé.
+
+Exclure tous les paquets relatifs à GIMP en provenance de ce dépôt. GIMP 2.8
+est fourni, mais le thème GTK et les localisations ne sont pas gérés.
+
+--8<---------- /etc/yum.repos.d/nux-dextop.repo ------------------------------
+[nux-dextop]
+...
+enabled=1
+priority=10
+...
+exclude=*gimp*
+--8<--------------------------------------------------------------------------
+
+
+Configurer le dépôt tiers Adobe
+-------------------------------
+
+Ce dépôt nous servira uniquement pour le plugin Macromedia Flash.
+
+Aller sur le site d'Adobe : http://www.adobe.com
+
+Tout en bas de la page d'accueil, suivre le lien 'Flash Player'. Sur la page
+de sélection, choisir le système d'exploitation (Linux 32-bit) et la version
+(Flash Player YUM). Télécharger le paquet 'adobe-release' et installer ce
+paquet :
+
+  # yum localinstall adobe-release-*.rpm
+
+Configurer le dépôt [adobe-linux-i386] avec une priorité de 10.
+
+
+Configurer le dépôt tiers ELRepo
+--------------------------------
+
+Le dépôt ELRepo est un autre dépôt tiers pour CentOS, qui se concentre sur les
+drivers : systèmes de fichiers, cartes graphiques, cartes réseau, cartes son,
+webcams, etc.
+
+Installer un navigateur Web en ligne de commande :
+
+  # yum install links
+
+Aller sur le site :
+
+  # links http://elrepo.org
+
+Télécharger et installer le paquet 'elrepo-release' pour les versions 6.x.
+
+Désactiver l'ensemble des dépôts [elrepo] :
+
+--8<---------- /etc/yum.repos.d/elrepo.org -----------------------------------
+[elrepo]
+enabled=0
+...
+[elrepo-testing]
+enabled=0
+...
+[elrepo-kernel]
+enabled=0
+...
+[elrepo-extras]
+enabled=0
+...
+
+--8<--------------------------------------------------------------------------
+
+On activera ce dépôt ponctuellement en cas de besoin. Voici un exemple :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+
+Installer les outils de base
+----------------------------
+
+Le script '01-installer-outils.sh' installe une poignée d'outils en ligne de
+commande qui n'ont pas tous été fournis par l'installation par défaut.
+
+  # ./01-installer-outils.sh
+
+
+Agrémenter la console
+---------------------
+
+Le script '02-configurer-base.sh' agrémente la console pour root et les futurs
+utilisateurs :
+
+  # ./02-configurer-base.sh
+
+Outre la personnalisation du shell, le script se charge également de peaufiner
+la configuration de l'éditeur Vim.
+
+Prendre en compte la personnalisation du shell pour root :
+
+  # source ~/.bashrc
+
+
+Désactiver SELinux
+------------------
+
+Éditer le fichier '/etc/sysconfig/selinux' :
+
+--8<---------- /etc/sysconfig/selinux ----------------------------------------
+# /etc/sysconfig/selinux
+SELINUX=disabled
+#SELINUXTYPE=targeted
+--8<--------------------------------------------------------------------------
+
+La modification sera prise en compte au prochain redémarrage.
+
+
+Désactiver l'IPv6
+-----------------
+
+Éditer '/etc/sysctl.conf' et ajouter ceci :
+
+--8<---------- /etc/sysctl.conf ----------------------------------------------
+...
+# Désactiver l'IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+--8<--------------------------------------------------------------------------
+
+La désactivation de l'IPv6 peut entraîner des problèmes avec les services SSH
+et Postfix. Il faut donc adapter leur configuration en conséquence.
+
+Éditer '/etc/ssh/sshd_config' et spécifier les directives suivantes :
+
+--8<---------- /etc/ssh/sshd_config ------------------------------------------
+...
+AddressFamily inet
+ListenAddress 0.0.0.0
+...
+--8<--------------------------------------------------------------------------
+
+  > 'inet' désigne l'IPv4 et 'inet6' l'IPv6'.
+
+Ensuite, éditer '/etc/postfix/main.cf' et spécifier la boucle locale en IPv4 :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+...
+inet_interfaces = 127.0.0.1
+...
+--8<--------------------------------------------------------------------------
+
+Si l'on ne veut pas attendre le prochain redémarrage pour prendre en compte
+les modifications, on peut faire ceci :
+
+  # service sshd restart
+  # service postfix restart
+  # sysctl -p
+
+
+Installer les applications
+--------------------------
+
+Le script '03-installer-bureau.sh' récupère une panoplie cohérente
+d'applications, de codecs et de plugins. Il supprime une poignée de paquets
+inutiles et installe également le profil par défaut des utilisateurs.
+
+  # ./03-installer-bureau.sh
+
+Nettoyer les entrées de menu :
+
+  # ./04-nettoyer-menus.sh
+
+ 
+Configurer une carte graphique NVidia
+-------------------------------------
+
+Les drivers propriétaires se trouvent dans le dépôt communautaire ELRepo, que
+nous devons activer explicitement à chaque opération.
+
+Installer l’outil de détection des cartes NVidia :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+Rechercher et installer le driver approprié :
+
+  # nvidia-detect
+  kmod-nvidia
+  # yum --enablerepo=elrepo install kmod-nvidia
+
+Pour utiliser le driver, il suffit de redémarrer la machine.
+
+
+Désactiver les services inutiles
+--------------------------------
+
+Lancer l'interface de configuration des services au démarrage :
+
+  # ntsysv --level 2345
+
+Désactiver quelques services inutiles selon la configuration :
+
+  * ip6tables
+  * lvm2-monitor (si l'on n'utilise pas le LVM)
+  * mdmonitor    (si l'on n'utilise pas le RAID)
+  * postfix
+  * restorecond
+
+
+Compiz
+------
+
+Sur les machines équipées d'une carte graphique raisonnablement performante,
+on peut activer les effets 3D.
+
+  # yum install compiz-gnome
+
+Système > Préférences > Effets du bureau > Compiz
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

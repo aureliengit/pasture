@@ -1,0 +1,13 @@
+[Desktop Entry]
+Comment=XMMS
+Exec=xmms -e %F
+Icon=/usr/share/icons/Tango/48x48/mimetypes/audio-x-generic.png
+MimeType=audio/x-mp3;audio/x-mod;audio/x-wav;audio/x-mpegurl;audio/mpegurl;audio/x-scpls;application/x-ogg;application/ogg
+Name=Audio Player
+Name[de]=Audio-Player
+Name[fr]=Lecteur audio 
+Terminal=0
+Type=Application
+MapNotify=false
+Categories=Application;AudioVideo;
+Encoding=UTF-8

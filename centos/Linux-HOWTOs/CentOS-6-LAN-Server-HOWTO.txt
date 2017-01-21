@@ -1,0 +1,564 @@
+=========================
+CentOS 6 LAN Server HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=========================
+
+Dernière révision : 19 juin 2016
+
+Ce HOWTO décrit l'installation d'un serveur LAN CentOS 6.
+
+  LAN = Local Area Network (réseau d'entreprise)
+
+
+  * Introduction
+  * Support d'installation
+  * Démarrage
+  * Partitionnement
+  * Choix des paquets
+  * Connexion provisoire
+  * Mise à jour initiale
+  * Installer l'éditeur Vim
+  * Faire le ménage dans les kernels
+  * Chargeur de démarrage
+  * Récupérer les scripts d'installation
+  * Élaguer le système
+  * Configurer les dépôts de paquets officiels
+  * Configurer le dépôt tiers EPEL
+  * Activer les priorités
+  * Configurer le dépôt tiers ELRepo
+  * Installer les outils de base
+  * Agrémenter la console
+  * Désactiver SELinux
+  * Désactiver l'IPv6
+  * Configurer le réseau
+  * Désactiver les services inutiles
+  * Créer un utilisateur
+  * Configurer le pare-feu
+
+ 
+Introduction
+------------
+
+CentOS 6 est officiellement supporté jusqu'au 30 novembre 2020. On choisira
+cette branche sur du matériel qui ne supporte pas un OS 64-bits
+
+L'installateur de CentOS requiert au moins 632 Mo de RAM. Sur une machine
+disposant de moins de mémoire vive, on pourra opter pour CentOS 5.
+
+
+Support d'installation
+----------------------
+
+Pour l'installation d'un serveur, on pourra choisir le CD minimal :
+
+  * CentOS-6.8-i386-minimal.iso
+
+Sur les machines dépourvues de lecteur optique, il faudra confectionner une
+clé USB d’installation. Depuis CentOS 6.5, l’image ISO est hybride et peut
+s’écrire directement sur une clé :
+
+  # dd if=CentOS-6.8-i386-minimal.iso of=/dev/sdX
+
+
+Démarrage
+---------
+
+Débrancher clés USB, disques externes et autres périphériques amovibles.
+Autrement l'installateur les proposera au formatage.
+
+Depuis la version 6.0, l'installateur en mode texte est tronqué de quelques
+fonctionnalités essentielles comme le partitionnement personnalisé. Il faut
+donc utiliser l'installateur graphique proposé par défaut.
+
+
+Partitionnement
+---------------
+
+Schéma de partitionnement :
+
+  - un disque RAID pour '/boot', de 100 Mo, formaté en ext2
+
+  - un disque RAID pour la partition swap, équivalent à la RAM disponible
+
+  - un disque RAID pour '/', formaté en ext4
+
+
+Choix des paquets
+-----------------
+
+Si l'on installe à partir du DVD, opter pour la sélection "Minimal".
+
+
+Connexion provisoire
+--------------------
+
+Dans la configuration par défaut, aucune interface réseau à part 'lo' n'est
+activée. Dans un premier temps, on va configurer une connexion provisoire à
+Internet :
+
+--8<---------- /etc/sysconfig/network-scripts/ifcfg-eth0 ---------------------
+DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=dhcp
+--8<--------------------------------------------------------------------------
+
+ /!\ Étant donné que l'installation minimale ne fournit pas l'éditeur Vim, il
+     faudra se contenter de l'éditeur basique Vi.
+
+Activer le réseau :
+
+  # service network restart
+
+Si l'on n'a pas accès à Internet, il faudra tenter de permuter l'affectation
+des interfaces réseau 'eth0' et 'eth1', en éditant le fichier
+'/etc/udev/rules.d/70-persistent-net.rules'. 
+
+
+Mise à jour initiale
+--------------------
+
+Afficher les mises à jour disponibles :
+
+  # yum check-update
+
+Effectuer la mise à jour initiale :
+
+  # yum update
+
+Redémarrer :
+
+  # reboot
+
+
+Installer l'éditeur Vim
+-----------------------
+
+Pour faciliter l'édition des fichiers de configuration, on peut déjà installer
+l'éditeur de texte Vim :
+
+  # yum install vim-enhanced
+
+
+Faire le ménage dans les kernels
+--------------------------------
+
+Le paquet 'yum-utils' nous facilitera la tâche :
+
+  # yum install yum-utils
+
+Afficher les kernels installés :
+
+  # rpm -q kernel
+  kernel-2.6.32-642.el6.i686
+  kernel-2.6.32-642.1.1.el6.i686
+
+Supprimer l'ancien kernel :
+
+  # package-cleanup --oldkernels --count=1
+
+L'option '--count=x' spécifie le nombre de kernels que l'on souhaite garder.
+
+Éditer '/etc/yum.conf' et définir le nombre de kernels à préserver :
+
+--8<---------- /etc/yum.conf -------------------------------------------------
+...
+installonly_limit=2
+...
+--8<--------------------------------------------------------------------------
+
+
+Chargeur de démarrage
+---------------------
+
+Éditer '/boot/grub/grub.conf' pour peaufiner la configuration de GRUB.
+
+  - Commenter la ligne 'hiddenmenu' pour afficher le menu de démarrage.
+
+  - Supprimer l'option 'rhgb' pour afficher les messages au démarrage.
+
+  - Définir la résolution de la console avec l'option 'video=1024x768'.
+
+  - Sur un écran 16/9, on pourra tenter une résolution de 1366x768.
+
+  - Sur un ultra-portable, essayer 800x480.
+
+  - Sur un serveur, on préférera quelque chose comme 'nomodeset vga=791'.
+
+
+Récupérer les scripts d'installation
+------------------------------------
+
+Installer Git :
+
+  # yum install git
+
+Récupérer mes scripts et mes fichiers de configuration :
+
+  # cd
+  # git clone https://github.com/kikinovak/centos
+
+Si l'on souhaite récupérer le dépôt en lecture/écriture, il faudra invoquer la
+commande comme ceci :
+
+  # git clone https://kikinovak@github.com/kikinovak/centos
+
+Le répertoire 'centos/el6/scripts' contient une série de scripts numérotés qui
+facilitent la configuration post-installation. 
+
+
+Élaguer le système
+------------------
+
+Dans certains cas, il est souhaitable d'élaguer une installation existante
+pour revenir à un système de base plus épuré. Pour ce faire, je fournis le
+script '00-elaguer-paquets.sh' dans le répertoire 'centos/el6/scripts'. Ce
+script se charge de supprimer tous les paquets qui ne font pas partie du
+système de base à proprement parler, c'est-à-dire l'équivalent de ce que l'on
+obtient lorsqu'on effectue une installation minimale. Avant de lancer le
+script, il vaut mieux s'assurer de démarrer en mode console.
+
+  # init 3
+  # cd centos/el6/scripts
+  # ./00-elaguer-paquets.sh
+  
+Le script se sert de la liste de paquets 'centos/el6/pkglists/minimal' qui a
+été établie auparavant moyennant la commande suivante :
+
+  # rpm -qa --queryformat '%{NAME}\n' | sort > minimal
+
+Afficher la vue d'ensemble sur les groupes de paquets :
+
+  # yum grouplist | less
+
+
+Configurer les dépôts de paquets officiels
+------------------------------------------
+
+Éditer '/etc/yum.repos.d/CentOS-Base.repo' et activer les dépôts [base],
+[updates] et [extras] avec une priorité maximale :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+[base]
+enabled=1
+priority=1
+name=CentOS-$releasever - Base
+...
+
+#released updates
+[updates]
+enabled=1
+priority=1
+name=CentOS-$releasever - Updates
+...
+
+#additional packages that may be useful
+[extras]
+enabled=1
+priority=1
+name=CentOS-$releasever - Extras
+...
+--8<--------------------------------------------------------------------------
+
+Désactiver les dépôts [centosplus] et [contrib] :
+
+--8<---------- /etc/yum.repos.d/CentOS-Base.repo -----------------------------
+...
+
+[centosplus]
+enabled=0
+name=CentOS-$releasever - Plus
+
+#contrib - packages by Centos Users
+[contrib]
+enabled=0
+name=CentOS-$releasever - Contrib
+...
+--8<--------------------------------------------------------------------------
+
+
+Configurer le dépôt tiers EPEL
+------------------------------
+
+Le dépôt tiers EPEL ("Extra Packages for Enterprise Linux") fournit des
+paquets qui ne sont pas inclus dans la distribution CentOS. Une fois que le
+dépôt officiel [extras] est configuré, le dépôt EPEL peut se configurer très
+simplement à l'aide du paquet correspondant :
+
+  # yum install epel-release
+
+Définir les priorités du dépôt EPEL :
+
+--8<---------- /etc/yum.repos.d/epel.repo ------------------------------------
+[epel]
+enabled=1
+priority=10
+name=Extra Packages for Enterprise Linux 6 - $basearch
+...
+
+[epel-debuginfo]
+enabled=0
+name=Extra Packages for Enterprise Linux 6 - $basearch - Debug
+...
+
+[epel-source]
+enabled=0
+name=Extra Packages for Enterprise Linux 6 - $basearch - Source
+...
+--8<--------------------------------------------------------------------------
+
+
+Activer les priorités
+---------------------
+
+Installer le plug-in 'yum-priorities' :
+
+  --> yum-priorities
+
+Vérifier s'il fonctionne correctement :
+
+  # yum check-update
+  Modules complémentaires chargés : fastestmirror, priorities
+  Loading mirror speeds from cached hostfile
+   * base: mir01.syntis.net
+   * epel: ftp.ps.pl
+   * extras: centos.mirror.ate.info
+   * updates: mir01.syntis.net
+  84 packages excluded due to repository priority protections --> vérifier
+
+
+Configurer le dépôt tiers ELRepo
+--------------------------------
+
+Le dépôt ELRepo est un autre dépôt tiers pour CentOS, qui se concentre sur les
+drivers : systèmes de fichiers, cartes graphiques, cartes réseau, cartes son,
+webcams, etc.
+
+Installer un navigateur Web en ligne de commande :
+
+  # yum install links
+
+Aller sur le site :
+
+  # links http://elrepo.org
+
+Télécharger et installer le paquet 'elrepo-release' pour les versions 6.x.
+
+Désactiver l'ensemble des dépôts [elrepo] :
+
+--8<---------- /etc/yum.repos.d/elrepo.org -----------------------------------
+[elrepo]
+enabled=0
+...
+[elrepo-testing]
+enabled=0
+...
+[elrepo-kernel]
+enabled=0
+...
+[elrepo-extras]
+enabled=0
+...
+
+--8<--------------------------------------------------------------------------
+
+On activera ce dépôt ponctuellement en cas de besoin. Voici un exemple :
+
+  # yum --enablerepo=elrepo install nvidia-detect
+
+
+Installer les outils de base
+----------------------------
+
+Le script '01-installer-outils.sh' installe une poignée d'outils en ligne de
+commande qui ne sont pas fournis par l'installation minimale.
+
+  # ./01-installer-outils.sh
+
+
+Agrémenter la console
+---------------------
+
+Le script '02-configurer-base.sh' agrémente la console pour root et les futurs
+utilisateurs :
+
+  # ./02-configurer-base.sh
+
+Outre la personnalisation du shell, le script se charge également de peaufiner
+la configuration de l'éditeur Vim.
+
+Prendre en compte la personnalisation du shell pour root :
+
+  # source ~/.bashrc
+
+
+Désactiver SELinux
+------------------
+
+Éditer le fichier '/etc/sysconfig/selinux' :
+
+--8<---------- /etc/sysconfig/selinux ----------------------------------------
+# /etc/sysconfig/selinux
+SELINUX=disabled
+#SELINUXTYPE=targeted
+--8<--------------------------------------------------------------------------
+
+La modification sera prise en compte au prochain redémarrage.
+
+
+Désactiver l'IPv6
+-----------------
+
+Éditer '/etc/sysctl.conf' et ajouter ceci :
+
+--8<---------- /etc/sysctl.conf ----------------------------------------------
+...
+# Désactiver l'IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+--8<--------------------------------------------------------------------------
+
+La désactivation de l'IPv6 peut entraîner des problèmes avec les services SSH
+et Postfix. Il faut donc adapter leur configuration en conséquence.
+
+Éditer '/etc/ssh/sshd_config' et spécifier les directives suivantes :
+
+--8<---------- /etc/ssh/sshd_config ------------------------------------------
+...
+AddressFamily inet
+ListenAddress 0.0.0.0
+...
+--8<--------------------------------------------------------------------------
+
+  > 'inet' désigne l'IPv4 et 'inet6' l'IPv6'.
+
+Ensuite, éditer '/etc/postfix/main.cf' et spécifier la boucle locale en IPv4 :
+
+--8<---------- /etc/postfix/main.cf ------------------------------------------
+...
+inet_interfaces = 127.0.0.1
+...
+--8<--------------------------------------------------------------------------
+
+Si l'on ne veut pas attendre le prochain redémarrage pour prendre en compte
+les modifications, on peut faire ceci :
+
+  # service sshd restart
+  # service postfix restart
+  # sysctl -p
+
+
+Configurer le réseau
+--------------------
+
+Dans l'exemple, l'interface 'eth0' se situe côté Internet :
+
+--8<---------- /etc/sysconfig/network-scripts/ifcfg-eth0 ---------------------
+DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=static
+IPADDR=192.168.2.5
+NETMASK=255.255.255.0
+--8<--------------------------------------------------------------------------
+
+Côté réseau local, c'est l'interface 'eth1' :
+
+--8<---------- /etc/sysconfig/network-scripts/ifcfg-eth1 ---------------------
+DEVICE=eth1
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO=static
+IPADDR=192.168.3.1
+NETMASK=255.255.255.0
+--8<--------------------------------------------------------------------------
+
+L'adresse IP de la passerelle ainsi que le nom d'hôte seront notés dans
+'/etc/sysconfig/network' :
+
+--8<---------- /etc/sysconfig/network ----------------------------------------
+NETWORKING=yes
+HOSTNAME=amandine.sandbox.lan
+GATEWAY=192.168.2.1
+--8<--------------------------------------------------------------------------
+
+Renseigner le ou les serveurs DNS :
+
+--8<---------- /etc/resolv.conf ----------------------------------------------
+nameserver 192.168.2.1
+--8<--------------------------------------------------------------------------
+
+Corriger la configuration du nom d'hôte :
+
+--8<---------- /etc/hosts ----------------------------------------------------
+127.0.0.1   localhost.localdomain localhost 
+192.168.3.1 amandine.sandbox.lan amandine
+--8<--------------------------------------------------------------------------
+
+
+Désactiver les services inutiles
+--------------------------------
+
+Lancer l'interface de configuration des services au démarrage :
+
+  # ntsysv --level 2345
+
+Désactiver quelques services inutiles selon la configuration :
+
+  * ip6tables
+  * iscsi
+  * iscsid
+  * lvm2-monitor (si l'on n'utilise pas le LVM)
+  * mdmonitor    (si l'on n'utilise pas le RAID)
+  * postfix
+  * restorecond
+
+
+Créer un utilisateur
+--------------------
+
+Pour éviter les connexions en root depuis l'extérieur sur un serveur, on peut
+éventuellement créer un utilisateur non privilégié si cela n'a pas été fait
+durant l'installation :
+
+  # useradd -c "Microlinux" microlinux
+  # passwd microlinux
+
+
+Configurer le pare-feu
+----------------------
+
+Dans la configuration par défaut, Iptables est installé et le service
+correspondant est activé :
+
+  # rpm -q iptables
+  iptables-1.4.7-16.el6.i686
+  # service iptables status
+  ...
+
+Sous CentOS, la meilleure solution consiste à éditer un simple script Bash
+pour Iptables, en enregistrant la configuration à la fin du script :
+
+  # /sbin/service iptables save
+
+Copier le script 'el6/firewall/firewall-lan.sh' dans un endroit approprié, par
+exemple '/usr/local/sbin'. Adapter le script à la configuration réseau de la
+machine et aux services que l'on compte héberger dessus, puis :
+
+  # firewall-lan.sh
+
+Afficher la configuration du pare-feu :
+
+  # iptables -L -v -n
+
+Au redémarrage du serveur, les règles Iptables sont bien restaurées, mais le
+relais des paquets est désactivé. Pour l'activer par défaut, on peut éditer
+'/etc/sysctl.conf' comme ceci :
+
+--8<---------- /etc/sysctl.conf ----------------------------------------------
+# Controls IP packet forwarding
+net.ipv4.ip_forward = 1
+--8<--------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

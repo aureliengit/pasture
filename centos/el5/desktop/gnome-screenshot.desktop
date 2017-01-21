@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Screenshot
+Name[de]=Bildschirmfoto
+Name[fr]=Capture d'écran
+Comment=GNOME Screenshot
+Exec=gnome-screenshot
+Terminal=false
+Type=Application
+Icon=applets-screenshooter
+StartupNotify=true
+Categories=GTK;GNOME;Application;Graphics;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gnome-utils
+X-GNOME-Bugzilla-Component=screenshot
+X-Desktop-File-Install-Version=0.10
+OnlyShowIn=GNOME;

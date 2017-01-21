@@ -1,0 +1,153 @@
+======================
+CentOS 7 Install HOWTO (c) Niki Kovacs <info@microlinux.fr>
+======================
+
+Dernière révision : 24 mai 2016
+
+Ce HOWTO décrit l'installation d'un système de base CentOS 7.
+
+
+  * Support d'installation
+  * Langue et clavier
+  * Interfaces réseau
+  * Date et heure
+  * Désactivation de Kdump
+  * Partitionnement
+  * Choix des paquets
+  * Utilisateur initial
+
+
+Support d'installation
+----------------------
+
+On optera pour le CD minimal, mais rien n'empêche d'utiliser le DVD :
+
+  * CentOS-7-x86_64-Minimal-1511.iso
+  * CentOS-7-x86_64-DVD-1511.iso
+
+Graver le CD ou le DVD à partir de l'ISO téléchargé.
+
+Sur les machines dépourvues de lecteur optique comme par exemple les serveurs
+HP de la gamme Proliant Microserver, il faudra confectionner une clé USB
+d'installation. L'image ISO est hybride et peut s'écrire directement sur une
+clé USB :
+
+  # dd if=CentOS-7-x86_64-Minimal-1511.iso of=/dev/sdX
+
+
+Langue et clavier
+-----------------
+
+Dans l'écran de bienvenue, sélectionner la langue (Français) et la
+localisation (Français - France). La disposition du clavier sera définie par
+le biais de l'écran principal de l'installateur.
+
+
+Interfaces réseau
+-----------------
+
+Le réseau n'est pas activé par défaut, il faut donc songer à l'activer
+explicitement. 
+
+Les noms des interfaces réseau ont changé avec cette nouvelle version.
+Désormais, on n'a plus affaire à 'eth0', 'eth1', 'eth2', 'wlan0', etc. Le
+nouveau schéma de nommage est moins arbitraire et offre davantage de
+consistance en se basant sur l'emplacement physique de la carte dans la
+machine.  On se retrouve avec des noms d'interface du genre :
+
+  * enp2s0
+  * enp3s0
+  * enp3s1
+  * etc.
+
+
+Date et heure
+-------------
+
+Vérifier si le fuseau horaire (Europe/Paris) est correctement configuré.
+Éventuellement, activer "Heure du réseau" et vérifier les serveurs NTP.
+
+
+Désactivation de Kdump
+----------------------
+
+Kdump est un mécanisme de capture lors du plantage d'un noyau. Il peut être
+désactivé.
+
+
+Partitionnement
+---------------
+
+L'outil de partitionnement graphique de CentOS n'est pas très intuitif.
+
+  - Cliquer sur "Destination de l'installation".
+
+  - Vérifier si le ou les disques durs sont bien sélectionnés.
+
+  - Cocher "Je vais configurer le partitionnement" et cliquer sur "Terminé".
+
+  - Dans le menu déroulant, sélectionner "Partition standard" au lieu de
+    "LVM".
+
+  - Cliquer sur "+" pour créer un nouveau point de montage.
+
+  - Créer le point de montage '/boot' avec une capacité de 200 MiB ou plus.
+
+  - Éventuellement, définir le type de périphérique RAID avec un niveau 1.
+
+  - Choisir le système de fichiers 'ext2' et l'étiquette 'boot'.
+
+  - Confirmer "Mise à jour des paramètres".
+
+  - Si l'on utilise l'UEFI, il faudra créer un point de montage '/boot/efi'
+    pour une partition de type EFI, d'une taille de 100 Mo, au début du disque.
+
+  - Cliquer sur "+" pour créer un deuxième point de montage. 
+
+  - Créer le point de montage 'swap' en spécifiant sa capacité en "GiB".
+
+  - Éventuellement, définir le type de périphérique RAID avec un niveau 1.
+
+  - Choisir l'étiquette 'swap'.
+
+  - Confirmer "Mise à jour des paramètres".
+
+  - Cliquer sur "+" pour créer un troisième point de montage. 
+
+  - Créer le point de montage '/' sans spécifier la capacité souhaitée.
+
+  - Éventuellement, définir le type de périphérique RAID et le niveau de RAID.
+
+  - Si l'on utilise le RAID 5, il faudra revoir la capacité souhaitée à la
+    hausse.  Pour ce faire, on peut se servir de la valeur "Espace total" en
+    bas à gauche de l'écran et spécifier cette valeur dans le champ "Capacité
+    souhaitée".  L'installateur se chargera de recalculer l'espace disponible
+    en fonction de la capacité des disques et du niveau de RAID utilisé.
+
+  - Choisir le système de fichiers 'ext4' et l'étiquette 'root'.
+
+  - Confirmer "Mise à jour des paramètres", puis "Terminé".
+
+  - Dans certains cas, la partition 'swap' pourra être reléguée à la fin du
+    disque pour l'installateur pour une utilisation optimale.
+
+
+Choix des paquets
+-----------------
+
+Dans l’écran de sélection des logiciels du DVD, on optera pour le groupe de
+paquets "Installation minimale" proposé par défaut. Le CD Minimal ne laisse
+pas le choix de toute façon.
+
+
+Utilisateur initial
+-------------------
+
+Lors de l'installation, on peut éventuellement créer un utilisateur non
+privilégié 'microlinux' ou 'administrateur'. Cocher l'option "Faire de cet
+utilisateur un administrateur" pour l'ajouter au groupe 'wheel' et lui
+permettre d'utiliser 'sudo' ou de devenir root. 
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

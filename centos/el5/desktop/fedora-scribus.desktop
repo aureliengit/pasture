@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Scribus
+Name=Desktop Publishing Application
+Name[de]=Desktop-Publishing-Programm
+Name[fr]=Logiciel de PAO
+Comment=Scribus
+FilePattern=scribus
+TryExec=scribus
+Exec=scribus %f
+MimeType=application/x-scribus
+Terminal=false
+Icon=scribusicon
+Type=Application
+X-StandardInstall=false
+Categories=Application;Graphics;
+StartupWMClass=scribus
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+DocPath=scribus
+X-Desktop-File-Install-Version=0.10

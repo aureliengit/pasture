@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Solitaire
+Comment=AisleRiot
+Exec=sol
+#Icon=gnome-aisleriot
+Icon=applications-cardgames
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Game;CardGame;
+StartupNotify=true

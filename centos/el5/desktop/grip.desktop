@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Audio CD Player & Ripper
+Name[de]=Audio-CD-Player & Ripper
+Name[fr]=Lecteur/extracteur de CD audio
+Comment=GRip
+Exec=grip
+Icon=gripicon.png
+Type=Application
+Categories=Application;AudioVideo;

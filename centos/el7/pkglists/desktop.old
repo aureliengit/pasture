@@ -1,0 +1,52 @@
+# KDE
+bluecurve-cursor-theme
+kdeartwork-wallpapers
+
+# Polices TrueType
+freetype-infinality
+fontconfig-infinality
+webcore-fonts
+webcore-fonts-vista
+
+# Internet
+filezilla
+firefox
+mozilla-adblockplus
+pidgin
+pidgin-otr
+thunderbird
+thunderbird-enigmail
+transmission
+
+# Bureautique
+libreoffice
+libreoffice-langpack-de
+libreoffice-langpack-fr
+
+# Graphisme
+digikam
+gimp
+gimp-data-extras
+gimp-help-fr
+gimp-layer-via-copy-cut
+gimp-save-for-web
+inkscape
+inkscape-docs
+inkscape-view
+librecad
+scribus
+simple-scan
+
+# Son et vidéo
+asunder
+audacity-freeworld
+lame
+libdvdcss
+mplayer
+vlc
+HandBrake-gui
+# openshot -> AppImage
+
+# Accessoires
+k3b
+k3b-extras-freeworld

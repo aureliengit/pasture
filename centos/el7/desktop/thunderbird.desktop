@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Electronic Mail
+Name[de]=Elektronische Post
+Name[fr]=Courrier électronique
+Comment=Mozilla Thunderbird ESR
+Version=1.0
+Exec=thunderbird %u
+TryExec=thunderbird
+#Icon=thunderbird
+Icon=applications-mail
+Terminal=false
+Type=Application
+MimeType=message/rfc822;x-scheme-handler/mailto;
+StartupNotify=true
+Categories=Network;Email;
+X-Desktop-File-Install-Version=0.22

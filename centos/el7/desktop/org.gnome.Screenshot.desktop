@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Screenshot
+Name[de]=Bildschirmfoto
+Name[fr]=Capture d'écran
+Comment=GNOME Screenshot
+Exec=gnome-screenshot --interactive
+Terminal=false
+Type=Application
+Icon=applets-screenshooter
+StartupNotify=true
+Categories=Graphics;
+NotShowIn=KDE;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gnome-utils
+X-GNOME-Bugzilla-Component=screenshot
+Actions=Screen;Window;
+DBusActivatable=true
+

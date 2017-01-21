@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Passwords and Keys
+Name[de]=Passwörter und Verschlüsselung
+Name[fr]=Mots de passe et clés
+Comment=Seahorse
+Exec=/usr/bin/seahorse
+Terminal=false
+Type=Application
+Icon=seahorse
+Categories=System;
+StartupNotify=true
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=seahorse
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=3.14.1
+X-GNOME-DocPath=seahorse/seahorse.xml
+X-Desktop-File-Install-Version=0.22

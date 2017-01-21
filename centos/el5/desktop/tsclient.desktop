@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Remote Desktop
+Name[de]=Fernverbindung
+Name[fr]=Bureau distant
+Comment=Terminal Server Client
+TryExec=tsclient
+Exec=tsclient
+Icon=tsclient.png
+Terminal=false
+Type=Application
+Version=1.0
+Actions=Full;
+Categories=Application;Network;
+Encoding=UTF-8
+
+X-Desktop-File-Install-Version=0.10
+[Desktop Action Full]
+Exec=tsclient -f

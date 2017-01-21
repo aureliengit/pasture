@@ -1,0 +1,49 @@
+# GNOME
+bluecurve-cursor-theme
+elementary-xfce-icon-theme
+
+# Polices TrueType
+webcore-fonts
+webcore-fonts-vista
+
+# Internet
+mozilla-adblockplus
+thunderbird
+thunderbird-enigmail
+transmission
+
+# Bureautique
+libreoffice-langpack-de
+libreoffice-math
+
+# Graphisme
+gimp
+gimp-data-extras
+gimp-help-fr
+gimp-layer-via-copy-cut
+gimp-save-for-web
+inkscape
+inkscape-docs
+inkscape-view
+librecad
+scribus
+
+# Son et vidéo
+audacious
+audacious-plugins-freeworld
+audacity-freeworld
+libdvdcss
+mplayer
+vlc
+HandBrake-gui
+# openshot -> AppImage
+
+# Accessoires
+brasero
+brasero-nautilus
+# gnote
+
+# Jeux
+aisleriot
+
+

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Categories=Application;Office;
+Name=Database Development
+Name[de]=Datenbanken
+Name[fr]=Bases de données
+Comment=OpenOffice Base
+Icon=/usr/share/icons/Bluecurve/48x48/apps/icon-filemanager.png
+Exec=openoffice.org -base %U
+StartupNotify=true
+MimeType=application/vnd.oasis.opendocument.database;application/vnd.sun.xml.base

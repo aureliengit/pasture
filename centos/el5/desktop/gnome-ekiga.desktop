@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+TryExec=ekiga
+Name=H.323/SIP Video Conferencing
+Name[de]=H.323/SIP-Videokonferenz
+Name[fr]=Vidéoconférence H.323/SIP
+Comment=Ekiga
+StartupNotify=true
+Exec=ekiga
+Icon=/usr/share/icons/Tango/48x48/apps/system-users.png
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Network;Telephony;

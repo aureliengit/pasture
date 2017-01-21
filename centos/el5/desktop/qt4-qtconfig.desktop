@@ -1,0 +1,11 @@
+[Desktop Entry]
+NoDisplay=true
+Name=Qt4 Config 
+Comment=Configure Qt4 behavior, styles, fonts
+Exec=qtconfig4
+Icon=qtconfig4
+Terminal=false
+Encoding=UTF-8
+Type=Application
+Categories=Qt;Application;Development;X-Fedora;
+X-Desktop-File-Install-Version=0.10
