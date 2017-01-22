@@ -1,0 +1,438 @@
+=============
+Dedibox HOWTO (c) Nicolas Kovacs <info@microlinux.fr>
+=============
+
+Dernière révision : 20 décembre 2016
+
+Ce HOWTO décrit l'installation et la configuration de Slackware Linux 14.2
+64-bits sur un serveur dédié Dedibox SC de chez Online. Slackware ne figure
+pas parmi les distributions proposées par Online, mais on peut quand-même
+l'installer à l'aide de la console de secours, avec un peu de patience.
+
+  * Installation initiale
+  * Démarrer une session de secours
+  * Préparer le disque
+  * Installer un système Slackware réduit
+  * Configuration post-installation
+  * Redémarrage initial
+  * Pare-feu
+
+
+Installation initiale
+---------------------
+
+Ouvrir la console Online : 
+
+  * http://console.online.net.
+  
+Serveur > Liste de vos serveurs > Serveur Dedibox SC (sd-XXXXX) > Installer
+
+Choix du type d'utilisation du système d'exploitation : Serveur
+
+Choix du système d'exploitation : Debian, Ubuntu, peu importe...
+
+Partitionnement : peu importe, vu qu'on le refera à la main
+
+Noter l'adresse IP du serveur, l'IP de la passerelle et les DNS
+
+
+Démarrer une session de secours
+-------------------------------
+
+Une fois que le système est installé, passer en 'Mode secours' et choisir
+'Ubuntu 16.04 amd64' comme système de secours. 
+
+  /!\ Il se peut qu'avec certains abonnements comme la Dedibox SC, on ne
+  dispose que de 'Ubuntu 12.04 amd64'. Ce n'est pas grave, étant donné que le
+  kernel de cette dernière a été actualisé et ne nous empêchera donc pas de
+  chrooter dans l'environnement Slackware nouvellement installé.
+
+La console affiche un identifiant et un mot de passe qui permettent de se
+connecter en SSH au système de secours. Attendre une ou deux minutes, puis
+lancer la connexion. 
+
+  /!\ Parfois, le mot de passe temporaire pour la session de secours ne
+  fonctionne pas tout de suite. Dans ce cas, il suffit d'insister un peu.
+
+  $ ssh kikinovak@163.172.81.8
+  kikinovak@163.172.81.8's password: 
+
+  Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-47-generic x86_64)
+
+   * Documentation:  https://help.ubuntu.com
+   * Management:     https://landscape.canonical.com
+   * Support:        https://ubuntu.com/advantage
+
+  The programs included with the Ubuntu system are free software;
+  the exact distribution terms for each program are described in the
+  individual files in /usr/share/doc/*/copyright.
+
+  Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+  applicable law.
+
+     _     _                ____
+    | |   (_)__   __ ___   |  _ \  ___  ____ ___  _  _  ___
+    | |   | |\ \ / // _ \  | |_| |/ _ \/ ___/ __\| || |/ _ \
+    | |__ | | \ V /|  __/  |  _ /   __/\__ \ (__ | || |  __/
+    |____||_|  \_/  \___|  |_| \_\\___|____/\___/`.__.'\___|
+
+  Aide et documentation : http://documentation.dedibox.fr
+  Console de gestion    : http://console.dedibox.fr
+
+  Serveur : 163-172-81-8
+  Adr IP  : 163.172.81.8
+  Adr MAC : 00:07:CB:0B:55:78
+  Système : Ubuntu 16.04.1 LTS (xenial) x86_64
+  Démarré : mardi 20 décembre 2016, 15:36:23 (UTC+0100)
+
+  To run a command as administrator (user "root"), use "sudo <command>".
+  See "man sudo_root" for details.
+
+  kikinovak@163-172-81-8:~$ 
+
+
+Préparer le disque
+------------------
+
+Remettre à zéro la table de partitions :
+
+  $ sudo dd if=/dev/zero of=/dev/sda bs=512 count=64
+
+Le changement de la table de partitions n'est pas pris en compte par la console
+de secours. Il faut donc la quitter et en relancer une autre. Dans la console
+Online, passer successivement par 'Repasser en mode normal' et 'Secours', puis
+se reconnecter en SSH avec un nouveau mot de passe. 
+
+Activer le compte root :
+
+  $ sudo passwd root
+
+Devenir root :
+
+  $ su -
+
+Définir la variable d'environnement LANG :
+
+  # LANG=C
+  # export LANG
+
+Partitionner le disque :
+
+  # fdisk /dev/sda
+
+  /!\ Si l'on utilise 'fdisk' pour le partitionnement, on peut éventuellement
+  se retrouver avec des erreurs du style 'Partition 1 does not start on
+  physical sector boundary.' Dans ce cas, il vaut mieux utiliser 'gdisk'. 
+
+Schéma de partitionnement :
+
+  # fdisk -l /dev/sda
+  Disk /dev/sda: 931.5 GiB, 1000204886016 bytes, 1953525168 sectors
+  Units: sectors of 1 * 512 = 512 bytes
+  Sector size (logical/physical): 512 bytes / 4096 bytes
+  I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+  Disklabel type: dos
+  Disk identifier: 0x826fa19f
+
+  Device     Boot   Start        End    Sectors   Size Id Type
+  /dev/sda1  *       2048     206847     204800   100M 83 Linux
+  /dev/sda2        206848    8595455    8388608     4G 82 Linux swap / Solaris
+  /dev/sda3       8595456 1953525167 1944929712 927.4G 83 Linux
+
+
+Étant donné que nous n'avons pas accès à l'installateur Slackware, nous allons
+tout simplement formater le disque à la main :
+
+  # mkfs.ext2 -v /dev/sda1
+  # mkswap /dev/sda2
+  # swapon /dev/sda2
+  # mkfs.ext4 -v /dev/sda3
+
+Monter la partition principale :
+
+  # mount /dev/sda3 /mnt
+
+Créer et monter la partition '/boot' :
+
+  # mkdir /mnt/boot
+  # mount /dev/sda1 /mnt/boot
+
+
+Installer un système Slackware réduit
+-------------------------------------
+
+Récupérer une poignée d'outils nécessaires pour l'installation :
+
+  # apt-get update
+  # apt-get install ncftp xz-utils dialog
+
+On va récupérer un système Slackware réduit sur un miroir FTP. Ce système sera
+composé des groupes de paquets A, AP, D, L et N.
+
+Créer un répertoire 'slackware64-14.2' et télécharger une première fournée de
+paquets dans ce répertoire. Étant donné que l'espace est limité dans notre
+console de secours, nous allons nous y prendre à plusieurs reprises :
+
+  # mkdir slackware64-14.2
+  # cd slackware64-14.2
+  # ncftp mirror.switch.ch
+  ncftp > cd mirror/slackware/slackware64-14.2/slackware64/
+  ncftp > get -R a ap d l n
+  ncftp > bye
+
+  /!\ Le téléchargement produit quelques avertissements sans conséquence, que
+  l'on peut ignorer :
+
+    tar: This does not look like a tar archive
+    tar: Exiting with failure status due to previous errors
+
+Installer 'a/pkgtools' dans l'environnement de secours :
+
+  # cp a/pkgtools-14.2-noarch-10.txz /
+  # cd /
+  # tar xvf pkgtools-14.2-noarch-10.txz 
+  ./
+  var/
+  var/log/
+  var/log/setup/
+  var/log/setup/setup.htmlview
+  var/log/setup/setup.80.make-bootdisk
+  var/log/setup/setup.70.install-kernel
+  var/log/setup/tmp/
+  var/log/setup/setup.services
+  install/
+  install/slack-desc
+  install/doinst.sh
+  sbin/
+  sbin/removepkg
+  sbin/explodepkg
+  sbin/pkgtool
+  sbin/upgradepkg
+  sbin/makepkg
+  sbin/installpkg
+  usr/
+  usr/man/
+  ...
+
+Créer un lien symbolique vers 'du' pour que 'pkgtools' fonctionne correctement
+sous Ubuntu :
+
+  # ln -s /usr/bin/du /bin/du
+
+Installer les paquets téléchargés vers l'environnement chrooté :
+
+  # cd /root/slackware64-14.2
+  # installpkg --root /mnt */*.t?z
+
+  /!\ Là encore, on pourra sereinement ignorer l'avertissement concernant la
+  version de 'tar' :
+
+    WARNING: pkgtools are unstable with tar > 1.13.
+             You should provide a "tar-1.13" in your $PATH.
+
+
+Configuration post-installation
+-------------------------------
+
+Lier les systèmes '/proc', '/dev' et '/sys' à ceux de la console de secours :
+
+  # mount --bind /proc /mnt/proc
+  # mount --bind /dev /mnt/dev
+  # mount --bind /sys /mnt/sys
+
+Changer dans l'environnement chrooté en spécifiant l'interpréteur de commandes
+Bash :
+
+  # chroot /mnt /bin/bash
+
+Maintenant qu'on est dans l'environnement Slackware, lancer l'utilitaire de
+configuration :
+
+  # pkgtool
+
+  > Setup - Choose Slackware installation scripts to run again
+
+Configurer le réseau :
+
+  [*] netconfig
+
+  * Nom d'hôte : sd-25854
+  * Nom de domaine : dedibox.fr
+  * Renseigner l'adresse IP, la passerelle et le DNS primaire.
+
+Notre système fraîchement installé comporte quelques vulnérabilités notoires.
+On va donc songer à appliquer tous les correctifs de sécurité. Éditer
+'/etc/slackpkg/mirrors' et sélectionner un miroir Slackware en fonction du
+pays, par exemple :
+
+--8<---------- /etc/slackpkg/mirrors -----------------------------------------
+...
+# FRANCE (FR)
+ftp://nephtys.lip6.fr/pub/linux/distributions/slackware/slackware64-14.2/
+...
+--8<--------------------------------------------------------------------------
+
+  /!\ Assurez-vous de ne choisir qu'un seul miroir pour Slackware stable.
+  Notez que le miroir OVH est inutilisable comme à peu près tout ce qui vient
+  de chez OVH.
+
+  # slackpkg update
+  # slackpkg upgrade-all
+
+Au terme de la mise à jour, ce n'est pas la peine d'invoquer LILO, vu qu'on ne
+l'a pas encore configuré. Pour le traitement des fichiers de configuration
+nouvellement installés, on peut sereinement choisir l'option (O)verwrite.
+
+  /!\ Depuis le 15 janvier 2016, la configuration par défaut d'OpenSSH ne
+  permet plus à root de se connecter. Il faut donc éditer le fichier de
+  configuration '/etc/ssh/sshd_config' et définir 'PermitRootLogin=yes' si
+  l'on souhaite se connecter en tant que root.
+
+Revenir dans 'pkgtool' et configurer le chargeur de démarrage LILO :
+
+  [*] liloconfig
+
+OPTIONAL LILO append    : 'ipv6.disable=1'
+
+USE UTF-8 TEXT CONSOLE  : Yes
+
+SELECT LILO DESTINATION : MBR - Install to Master Boot Record
+
+Ignorer les avertissements et éditer '/etc/lilo.conf' manuellement pour
+corriger quelques entrées, notamment la partition principale qui n'est pas
+détectée automatiquement :
+
+--8<---------- /etc/lilo.conf ------------------------------------------------
+...
+lba32
+append="ipv6.disable=1 vt.default_utf8=1"
+boot=/dev/sda
+compact
+...
+timeout = 10
+...
+image = /boot/vmlinuz
+  root = /dev/sda3
+  label = MLES-14.2-64bit
+  read-only
+--8<--------------------------------------------------------------------------
+
+Prendre en compte les modifications en ignorant encore une fois les
+avertissements sans conséquence :
+
+  # lilo
+  Warning: Unable to determine video adapter in use in the present system.
+  Warning: Video adapter does not support VESA BIOS extensions needed for
+    display of 256 colors.  Boot loader will fall back to TEXT only operation.
+  Added MLES-14.1-64bit  *
+  2 warnings were issued.
+
+Configurer les services au démarrage :
+
+  [ ] rc.fuse -> désélectionner
+  [ ] rc.inetd -> désélectionner
+  [ ] rc.messagebus -> désélectionner
+  [*] rc.syslog
+  [*] rc.sshd
+
+Générer les certificats SSL :
+
+  [*] cacerts - Rebuilt SSL certificate database
+
+Configurer le fuseau horaire :
+
+  [*] timeconfig - Select your timezone
+
+Horloge système : UTC
+
+Fuseau horaire  : Europe/Paris
+
+Le fichier '/etc/fstab' devra être créé manuellement comme ceci :
+
+--8<---------- /etc/fstab ----------------------------------------------------
+/dev/sda1        /boot            ext2        defaults         1   2
+/dev/sda2        swap             swap        defaults         0   0
+/dev/sda3        /                ext4        defaults         1   1
+devpts           /dev/pts         devpts      gid=5,mode=620   0   0
+proc             /proc            proc        defaults         0   0
+tmpfs            /dev/shm         tmpfs       defaults         0   0
+--8<--------------------------------------------------------------------------
+
+Définir un mot de passe pour root :
+
+  # passwd root
+
+Quitter l'environnement chrooté :
+
+  # exit
+
+Démonter les partitions :
+
+  # umount /mnt/sys
+  # umount /mnt/dev
+  # umount /mnt/proc
+  # umount /mnt/boot
+  # umount /mnt
+
+Revenir dans l'interface web de la console Online, repasser en mode normal et
+croiser les doigts. 
+
+
+Redémarrage initial
+-------------------
+
+Installer les groupes de paquets manquants :
+
+  # slackpkg install f k t tcl x y
+
+On peut se demander à quoi servent les groupes T et X. À titre d'exemple, T est
+nécessaire pour compiler 'ffmpeg', un composant central pour le streaming
+audio. Et certains paquets comme 'php' ont des dépendances dans le groupe X.
+
+Certains modèles de Dedibox équipées d'un processeur VIA sont incompatibles
+avec le module de kernel 'acpi_cpufreq', qui a une méchante tendance à les
+faire geler. 
+
+Vérifier le modèle de processeur :
+
+  # cat /proc/cpuinfo | grep model
+  model   : 15
+  model name  : VIA Nano processor U2250 (1.6GHz Capable)
+
+Blacklister le module qui pose problème :
+
+--8<---------- /etc/modprobe.d/blacklist.conf --------------------------------
+blacklist acpi_cpufreq
+--8<--------------------------------------------------------------------------
+
+Basculer vers le noyau GENERIC. Pour la construction de l'initrd, voir le
+Generic-Kernel-HOWTO.
+
+Peaufiner la configuration du réseau. Éditer '/etc/hosts' comme ceci : 
+
+--8<----------- /etc/hosts ---------------------------------------------------
+127.0.0.1          localhost.localdomain localhost
+163.172.81.8       sd-107066.dedibox.fr sd-107066
+--8<--------------------------------------------------------------------------
+
+
+Pare-feu
+--------
+
+Récupérer mes scripts d'installation :
+
+  # git clone https://github.com/kikinovak/microlinux
+
+Le répertoire 'template/firewall' contient un pare-feu prêt à l'emploi :
+
+  # cd template/firewall
+  # cp rc.firewall.public /etc/rc.d/rc.firewall
+
+Adapter la configuration du script, puis :
+
+  # chmod +x /etc/rc.d/rc.firewall
+  # /etc/rc.d/rc.firewall start
+
+
+------------------------------------------------------------------------------
+# vim: syntax=txt

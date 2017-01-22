@@ -1,0 +1,121 @@
+FreeIPA + NFS
+-------------
+
+NFS serveur :
+
+# yum install nfs-utils
+
+J'ouvre le port 2049 en TCP.
+
+/etc/idmapd.conf :
+
+[General]
+#Verbosity = 0
+# The following should be set to the local NFSv4 domain name
+# The default is the host's DNS domain name.
+Domain = microlinux.lan
+  
+/etc/exports :
+
+/home 192.168.2.0/24(rw,no_root_squash)
+
+# systemctl restart rpcbind
+# systemctl start nfs-server
+# systemctl start nfs-lock
+# systemctl start nfs-idmap
+
+# systemctl enable rpcbind
+# systemctl enable nfs-server
+# systemctl enable nfs-lock
+# systemctl enable nfs-idmap
+
+
+NFS client :
+
+# yum install nfs-utils
+
+/etc/idmapd.conf :
+
+[General]
+#Verbosity = 0
+# The following should be set to the local NFSv4 domain name
+# The default is the host's DNS domain name.
+Domain = microlinux.lan
+
+# systemctl restart rpcbind
+# systemctl start nfs-lock
+# systemctl start nfs-idmap
+# systemctl start nfs-mountd
+
+# systemctl enable rpcbind
+# systemctl enable nfs-lock
+# systemctl enable nfs-idmap
+# systemctl enable nfs-mountd
+
+Point de montage /home vide ?
+
+# mount -t nfs amandine.microlinux.lan:/home /home
+
+Si c'est bon, ajouter une entrée à /etc/fstab.
+
+
+FreeIPA serveur :
+
+# yum install ipa-server
+
+# ipa-server-install --mkhomedir
+
+Setup complete
+
+Next steps:
+  1. You must make sure these network ports are open:
+    TCP Ports:
+      * 80, 443: HTTP/HTTPS
+      * 389, 636: LDAP/LDAPS
+      * 88, 464: kerberos
+    UDP Ports:
+      * 88, 464: kerberos
+      * 123: ntp
+
+  2. You can now obtain a kerberos ticket using the command: 'kinit admin'
+     This ticket will allow you to use the IPA tools (e.g., ipa user-add)
+     and the web user interface.
+
+Be sure to back up the CA certificate stored in /root/cacert.p12
+This file is required to create replicas. The password for this
+file is the Directory Manager password
+
+# kinit admin
+Password for admin@MICROLINUX.LAN: 
+
+# klist
+Ticket cache: KEYRING:persistent:0:0
+Default principal: admin@MICROLINUX.LAN
+
+Valid starting       Expires              Service principal
+20/03/2015 16:07:42  21/03/2015 16:07:37  krbtgt/MICROLINUX.LAN@MICROLINUX.LAN
+
+# ipa config-mod --defaultshell=/bin/bash
+  Longueur maximale de nom d'utilisateur: 32
+  Base de répertoire utilisateur: /home
+  Shell par défaut: /bin/bash
+  Groupe utilisateur par défaut: ipausers
+  Domaine par défaut pour les adresses courriel: microlinux.lan
+  Durée de recherche limite: 2
+  Taille limite de recherche: 100
+  Champs de recherche utilisateur: uid,givenname,sn,telephonenumber,ou,title
+  Group search fields: cn,description
+  Activer le mode migration: FALSE
+  Base du sujet de certificat: O=MICROLINUX.LAN
+  Notification avant expiration de mot de passe (jours): 4
+  Fonctionnalités du greffon de gestion des mots de passe: AllowNThash
+  Ordre des utilisateurs SELinux pour les cartes: guest_u:s0$xguest_u:s0$user_u:s0$staff_u:s0-s0:c0.c1023$unconfined_u:s0-s0:c0.c1023
+  Utilisateur SELinux par défaut: unconfined_u:s0-s0:c0.c1023
+  Types de PAC par défaut: MS-PAC, nfs:NONE
+
+
+
+Q1: quelles options pour /etc/exports?
+Q2: quels ports ouvrir dans le pare-feu ?
+
+
